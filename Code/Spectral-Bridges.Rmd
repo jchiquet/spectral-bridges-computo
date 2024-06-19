@@ -1,0 +1,98 @@
+---
+title: "Untitled"
+author: "Christophe Ambroise"
+date: "2024-06-13"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+```{r}
+library(keras)
+library(ggplot2)  
+library(kneedle)   # for kneedle which finds the elbow
+library(ClusterR)  # for kmeans++
+library(factoextra)# for visu
+
+
+spectral_bridges <-  function(X,
+                              n_classes = NULL,
+                              n_nodes = 30,
+                              M = 1e3) {
+  # 1. Vector quantization
+  n <- nrow(X)
+
+  kmeans_result  = KMeans_rcpp(X, clusters = n_nodes, 
+                               num_init = 1, max_iters = 100, 
+                               initializer = 'kmeans++')
+  
+  kmeans_centers <- kmeans_result$centroids
+  kmeans_labels <-  kmeans_result$clusters
+  kmeans_size <-  kmeans_result$obs_per_cluster
+
+  
+  # 2. Affinity computation
+  affinity <- matrix(0, n_nodes, n_nodes)
+  X.centered <-
+    do.call(rbind, lapply(1:n, function(i) {
+      X[i, ] - kmeans_centers[kmeans_labels[i], ]
+    }))
+  
+  affinity <- outer(1:n_nodes, 1:n_nodes,
+                    Vectorize(function(k, l) {
+                      ifelse(k == l,
+                             0,
+                             (sum(pmax(
+                               0, (kmeans_centers[l,] - kmeans_centers[k, ]) %*% t(X.centered[(kmeans_labels ==
+                                                                                                 k), ])
+                             )) +
+                               sum(pmax(
+                                 0, (kmeans_centers[k,] - kmeans_centers[l, ]) %*% t(X.centered[(kmeans_labels ==
+                                                                                                   l), ])
+                               ))) /
+                               (sum((kmeans_centers[k,] - kmeans_centers[l, ]) ^
+                                      2
+                               ) * (kmeans_size[k] + kmeans_size[l])))
+                    }))
+ 
+  #gamma<- log(1e3)/diff(quantile(affinity,c(0.1,0.9)))
+  #affinity<- exp(gamma*(affinity - 0.5*max(affinity)))
+
+  # 3. Spectral Clustering of the coding vectors
+  # Normalized Laplacian matrix
+  D_inv_sqrt <- 1 / sqrt(rowSums(affinity))
+  L <- diag(n_nodes) - t(affinity * D_inv_sqrt) * D_inv_sqrt
+  eigen.res<-eigen(-L, symmetric = TRUE)
+  ifelse(is.null(n_classes), 
+         n_classes <- kneedle(x=1:length(eigen.res$values),y=eigen.res$values)[1]-1,
+         n_classes <-n_classes)
+  plot(eigen.res$values)
+  eigvecs <- eigen.res$vectors[,1:n_classes]
+  eigvecs <- eigvecs / sqrt(rowSums(eigvecs ^ 2))
+  labels <-
+    kmeans(eigvecs, nstart = 20, centers = n_classes)$cluster
+  
+  # 4. Contaminate
+  clusters <- labels[kmeans_labels]
+  
+  return(list(clustering = clusters,data =X,class="partition"))
+}
+
+
+# K<-3
+# n<-100*2*K
+# delta=3
+# y<-rep(1:K,each=100)
+# X<-rbind(matrix(rnorm(n/K),n/K/2,2),matrix(rnorm(n/K),n/K/2,2)+delta,matrix(rnorm(n/K),n/K/2,2)+2*delta) 
+
+X<-iris[,1:4]
+y<-iris$Species
+
+n_nodes=20
+n_classes=3
+res<-spectral_bridges(X,n_nodes=n_nodes,n_classes=n_classes)
+fviz_cluster(res)             
+knitr::kable(table(res$cluster,y))
+```
+
