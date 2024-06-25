@@ -1,5 +1,5 @@
 ---
-title: "Untitled"
+title: "Spectral bridges testing"
 author: "Christophe Ambroise"
 date: "2024-06-13"
 output: html_document
@@ -7,65 +7,88 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(Rcpp)
+sourceCpp("bridge-affinity.cpp")  # Replace with the actual path to your C++ file
 ```
-```{r}
-library(keras)
+```{r spectral-bridges}
 library(ggplot2)  
 library(kneedle)   # for kneedle which finds the elbow
 library(ClusterR)  # for kmeans++
 library(factoextra)# for visu
 
+# Calculate entropy from probabilities
+compute_entropy <- function(probabilities) {
+  # Ensure probabilities are valid
+  probabilities <- probabilities[probabilities > 0]
+  # Calculate entropy
+  entropy <- -sum(probabilities * log2(probabilities))
+  return(entropy)
+}
+
+
 
 spectral_bridges <-  function(X,
                               n_classes = NULL,
                               n_nodes = 30,
-                              M = 1e3) {
+                              M = 1e3,transform="none") {
   # 1. Vector quantization
+  ###################################
+
   n <- nrow(X)
 
   kmeans_result  = KMeans_rcpp(X, clusters = n_nodes, 
-                               num_init = 1, max_iters = 100, 
+                               num_init = 3, max_iters = 30, 
                                initializer = 'kmeans++')
   
-  kmeans_centers <- kmeans_result$centroids
-  kmeans_labels <-  kmeans_result$clusters
-  kmeans_size <-  kmeans_result$obs_per_cluster
+  kmeans_centers <- as.matrix(kmeans_result$centroids)
+  kmeans_labels <-  as.matrix(kmeans_result$clusters)
+  kmeans_size <-    kmeans_result$obs_per_cluster
+  kmeans_Iw<-kmeans_result$WCSS_per_cluster
 
   
   # 2. Affinity computation
+  ###################################
+
   affinity <- matrix(0, n_nodes, n_nodes)
   X.centered <-
-    do.call(rbind, lapply(1:n, function(i) {
+    as.matrix(do.call(rbind, lapply(1:n, function(i) {
       X[i, ] - kmeans_centers[kmeans_labels[i], ]
-    }))
+    })))
   
-  affinity <- outer(1:n_nodes, 1:n_nodes,
+     affinity <- matrix(0, n_nodes, n_nodes)
+  X.centered <-
+    as.matrix(do.call(rbind, lapply(1:n, function(i) {
+      X[i, ] - kmeans_centers[kmeans_labels[i], ]
+    })))
+  
+ affinity <- outer(1:n_nodes, 1:n_nodes,
                     Vectorize(function(k, l) {
-                      ifelse(k == l,
-                             0,
-                             (sum(pmax(
-                               0, (kmeans_centers[l,] - kmeans_centers[k, ]) %*% t(X.centered[(kmeans_labels ==
-                                                                                                 k), ])
-                             )) +
-                               sum(pmax(
-                                 0, (kmeans_centers[k,] - kmeans_centers[l, ]) %*% t(X.centered[(kmeans_labels ==
-                                                                                                   l), ])
-                               ))) /
-                               (sum((kmeans_centers[k,] - kmeans_centers[l, ]) ^
-                                      2
-                               ) * (kmeans_size[k] + kmeans_size[l])))
-                    }))
- 
-  #gamma<- log(1e3)/diff(quantile(affinity,c(0.1,0.9)))
-  #affinity<- exp(gamma*(affinity - 0.5*max(affinity)))
+                      if (k==l) 0 else {
+              distkl2<-sum(((kmeans_centers[l,] - kmeans_centers[k, ]))^2);        
+              ti<-c(pmax(0, (kmeans_centers[l,] - kmeans_centers[k, ]) %*% 
+                                         t(X.centered[(kmeans_labels ==k), ]))/distkl2,
+                    (pmax(0, (kmeans_centers[k,] - kmeans_centers[l, ]) %*% 
+                                         t(X.centered[(kmeans_labels ==l), ]))/distkl2));
+              sum(ti)/(kmeans_size[k]+kmeans_size[l])
+              #compute_entropy(ti)
+              }
+              }))
+ print(affinity)
+   #affinity <- compute_affinity(kmeans_centers, kmeans_labels, X.centered, kmeans_size,n_nodes)
+
+   if (transform=="exp"){
+    gamma<- log(M)/diff(quantile(affinity,c(0.1,0.9)))
+    affinity<- exp(gamma*(affinity - 0.5*max(affinity)))}
 
   # 3. Spectral Clustering of the coding vectors
+  ###################################
   # Normalized Laplacian matrix
   D_inv_sqrt <- 1 / sqrt(rowSums(affinity))
   L <- diag(n_nodes) - t(affinity * D_inv_sqrt) * D_inv_sqrt
   eigen.res<-eigen(-L, symmetric = TRUE)
+  #eigen.res<-eigs_sym(-L, n_classes)
   ifelse(is.null(n_classes), 
-         n_classes <- kneedle(x=1:length(eigen.res$values),y=eigen.res$values)[1]-1,
+        n_classes <- kneedle(x=1:length(eigen.res$values),y=eigen.res$values)[1]-1,
          n_classes <-n_classes)
   plot(eigen.res$values)
   eigvecs <- eigen.res$vectors[,1:n_classes]
@@ -74,10 +97,17 @@ spectral_bridges <-  function(X,
     kmeans(eigvecs, nstart = 20, centers = n_classes)$cluster
   
   # 4. Contaminate
+  ###################################
   clusters <- labels[kmeans_labels]
   
   return(list(clustering = clusters,data =X,class="partition"))
 }
+````
+
+
+## Iris Data set
+
+```{r data-iris}
 
 
 # K<-3
@@ -89,10 +119,105 @@ spectral_bridges <-  function(X,
 X<-iris[,1:4]
 y<-iris$Species
 
-n_nodes=20
+n_nodes=12
 n_classes=3
-res<-spectral_bridges(X,n_nodes=n_nodes,n_classes=n_classes)
+res<-spectral_bridges(X,n_nodes=n_nodes,n_classes=n_classes,transform = "exp")
 fviz_cluster(res)             
 knitr::kable(table(res$cluster,y))
+```
+
+
+
+
+## MNIST data set 
+```{r}
+
+# Function to read the IDX file format
+read_idx_labels <- function(file) {
+  # Open the file in binary read mode
+  file_conn <- file(file, 'rb')
+  
+  # Read the magic number (first 4 bytes)
+  magic_number <- readBin(file_conn, integer(), n = 1, size = 4, endian = "big")
+  
+  # Read the number of labels (next 4 bytes)
+  num_labels <- readBin(file_conn, integer(), n = 1, size = 4, endian = "big")
+  
+  # Read the label data
+  labels <- readBin(file_conn, integer(), n = num_labels, size = 1, signed = FALSE)
+  
+  # Close the file connection
+  close(file_conn)
+  
+  # Return the labels
+  return(labels)
+}
+
+read_idx <- function(file) {
+  # Open the file in binary read mode
+  file_conn <- file(file, 'rb')
+  
+  # Read the magic number (first 4 bytes)
+  magic_number <- readBin(file_conn, integer(), n = 1, endian = "big")
+  
+  # Read the number of images (next 4 bytes)
+  num_images <- readBin(file_conn, integer(), n = 1, endian = "big")
+  
+  # Read the number of rows (next 4 bytes)
+  num_rows <- readBin(file_conn, integer(), n = 1, endian = "big")
+  
+  # Read the number of columns (next 4 bytes)
+  num_cols <- readBin(file_conn, integer(), n = 1, endian = "big")
+  
+  # Calculate the total number of pixels
+  num_pixels <- num_rows * num_cols
+  
+  # Read the image data
+  image_data <- readBin(file_conn, raw(), n = num_images * num_pixels, size = 1, endian = "big")
+  
+  # Close the file connection
+  close(file_conn)
+  
+  # Reshape the data into a 3D array (num_images x num_rows x num_cols)
+  image_matrix <- array(as.integer(image_data), dim = c(num_rows, num_cols, num_images))
+  
+  # Return the image matrix
+  return(image_matrix)
+}
+
+
+# Read the MNIST test images
+mnist_test_images <- read_idx("MNIST/t10k-images.idx3-ubyte")
+mnist_test_labels <- read_idx_labels("MNIST/t10k-labels-idx1-ubyte")
+mnist_train_images <- read_idx("MNIST/train-images-idx3-ubyte")
+mnist_train_labels <- read_idx_labels("MNIST/train-labels-idx1-ubyte")
+
+
+
+flip.image<-function(X){t(as.matrix(X[nrow(X):1,]))}
+  
+# Example: display the first image
+image(flip.image(matrix(mnist_test_images[,,100], nrow = 28, byrow = TRUE)), col = gray((0:255)/255))
+
+
+save(mnist_test_images,mnist_test_labels,mnist_train_images,mnist_train_labels,file="MNIST/mnist.rda")
+```
+
+```{r}
+load("MNIST/mnist.rda")
+library(RSpectra)
+array_data<- aperm(mnist_test_images, c(3, 2, 1))
+X<-t(apply(array_data, 1, c))
+svd<-svds(X,32)
+U<-svd$u
+D<-svd$d
+X<-t(t(U)*D)
+y<- mnist_test_labels
+
+res<-spectral_bridges(X,n_nodes=200,n_classes=10,transform = "exp")
+#fviz_cluster(res)             
+knitr::kable(table(res$cluster,y))
+library(mclust)
+adjustedRandIndex(res$cluster,y)
 ```
 

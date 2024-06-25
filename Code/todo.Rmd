@@ -1,0 +1,98 @@
+---
+title: "Untitled"
+author: "Christophe Ambroise"
+date: "2024-06-21"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+```{r}
+library(ClusterR)
+library(tictoc)
+library(Rcpp)
+sourceCpp("bridge-affinity.cpp")  # Replace with the actual path to your C++ file
+X<-iris[,1:4]
+spectral_bridges <-  function(X,
+                              n_classes = 3,
+                              n_nodes = 6,
+                              M = 1e3,transform="none") {
+  # 1. Vector quantization
+  n <- nrow(X)
+
+  kmeans_result  = KMeans_rcpp(X, clusters = n_nodes, 
+                               num_init = 1, max_iters = 1, 
+                               initializer = 'kmeans++')
+  
+  kmeans_centers <- as.matrix(kmeans_result$centroids)
+  kmeans_labels <-  as.matrix(kmeans_result$clusters)
+  kmeans_size <-  kmeans_result$obs_per_cluster
+
+  # 2. Affinity computation
+  affinity <- matrix(0, n_nodes, n_nodes)
+  X.centered <-
+    as.matrix(do.call(rbind, lapply(1:n, function(i) {
+      X[i, ] - kmeans_centers[kmeans_labels[i], ]
+    })))
+  
+tic()  
+
+  
+affinity <- outer(1:n_nodes, 1:n_nodes,
+                    Vectorize(function(k, l) {
+                      ifelse(k == l,
+                             0,
+                             ((sum(pmax(
+                               0, (kmeans_centers[l,] - kmeans_centers[k, ]) %*% t(X.centered[(kmeans_labels ==
+                                                                                                 k), ])
+                             )^1) +
+                               sum(pmax(
+                                 0, (kmeans_centers[k,] - kmeans_centers[l, ]) %*% t(X.centered[(kmeans_labels ==
+                                                                                                   l), ])
+                               )^1)) /
+                               (sum((kmeans_centers[k,] - kmeans_centers[l, ])^2)^1 * (kmeans_size[k] + kmeans_size[l]))))
+          }))
+
+toc()
+
+
+mem<-affinity
+
+tic() 
+#kmeans_centers.centered<-scale(kmeans_centers,center = TRUE,scale=FALSE)
+#kmeans_centers_norm_matrix <- matrix(apply(kmeans_centers.centered,1,function(x) #sum(x^2)),n_nodes, n_nodes)
+
+
+norm_diff<-matrix(0,n_nodes, n_nodes)
+affinity <- matrix(0, n_nodes, n_nodes)
+# Compute the affinity matrix
+for (k in 1:n_nodes) {
+  for (l in k:n_nodes) {
+    if (k != l) {
+      diff_kl<-kmeans_centers[k,] - kmeans_centers[l, ]
+      norm_diff[k, l]<-sum(diff_kl^2)
+      term1 <- sum(pmax(0, diff_kl %*% t(X.centered[kmeans_labels == k, ])))
+      term2 <- sum(pmax(0, -diff_kl %*% t(X.centered[kmeans_labels == l, ])))
+      affinity[k, l] <- (term1 + term2) / (norm_diff[k, l] * (kmeans_size[k] + kmeans_size[l]))
+      affinity[l, k]<-affinity[k, l]
+    }
+  }
+}
+toc()
+print(sum(affinity-mem))
+
+tic()
+affinity_matrix <- compute_affinity(kmeans_centers, kmeans_labels, X.centered, kmeans_size,n_nodes)$affinity
+toc()
+
+
+print(affinity)
+print(affinity_matrix)
+}
+
+spectral_bridges(X,3,6)
+
+
+```
+

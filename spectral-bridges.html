@@ -1,0 +1,1229 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.45">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Félix Laplante">
+<meta name="author" content="Christophe Ambroise">
+<meta name="dcterms.date" content="2025-07-06">
+<meta name="keywords" content="spectral clustering, vector quantization, scalable, non-parametric">
+<meta name="description" content="This document provides a template based on the quarto system for contributions to Computo. The github repository in itself provides a specific quarto extension useful for authors (and editors!).">
+
+<title>Spectral Bridges</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="spectral-bridges_files/libs/clipboard/clipboard.min.js"></script>
+<script src="spectral-bridges_files/libs/quarto-html/quarto.js"></script>
+<script src="spectral-bridges_files/libs/quarto-html/popper.min.js"></script>
+<script src="spectral-bridges_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="spectral-bridges_files/libs/quarto-html/anchor.min.js"></script>
+<link href="spectral-bridges_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="spectral-bridges_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="spectral-bridges_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="spectral-bridges_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="spectral-bridges_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script src="spectral-bridges_files/libs/quarto-contrib/pseudocode-2.4/pseudocode.min.js"></script>
+<link href="spectral-bridges_files/libs/quarto-contrib/pseudocode-2.4/pseudocode.min.css" rel="stylesheet">
+<style>
+
+      .quarto-title-block .quarto-title-banner h1,
+      .quarto-title-block .quarto-title-banner h2,
+      .quarto-title-block .quarto-title-banner h3,
+      .quarto-title-block .quarto-title-banner h4,
+      .quarto-title-block .quarto-title-banner h5,
+      .quarto-title-block .quarto-title-banner h6
+      {
+        color: #FFFFFF;
+      }
+
+      .quarto-title-block .quarto-title-banner {
+        color: #FFFFFF;
+background: #034E79;
+      }
+</style>
+<meta name="quarto:status" content="draft">
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+  </script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css">
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<meta name="citation_title" content="Spectral Bridges">
+<meta name="citation_keywords" content="spectral clustering,vector quantization,scalable,non-parametric">
+<meta name="citation_author" content="Félix Laplante">
+<meta name="citation_author" content="Christophe Ambroise">
+<meta name="citation_publication_date" content="2025-07-06">
+<meta name="citation_cover_date" content="2025-07-06">
+<meta name="citation_year" content="2025">
+<meta name="citation_online_date" content="2025-07-06">
+<meta name="citation_fulltext_html_url" content="https://github.com/computorg/computo-quarto-extension">
+<meta name="citation_doi" content="10.xxxx/xxx-xxx">
+<meta name="citation_issn" content="2824-7795">
+<meta name="citation_language" content="en">
+<meta name="citation_journal_title" content="Computo">
+<meta name="citation_reference" content="citation_title=Computo: Reproducible computational/algorithmic contributions in statistics and machine learning;,citation_author=Computo Team;,citation_publication_date=2021;,citation_cover_date=2021;,citation_year=2021;,citation_journal_title=computo;">
+<meta name="citation_reference" content="citation_title=R: A language and environment for statistical computing;,citation_author=R Core Team;,citation_publication_date=2020;,citation_cover_date=2020;,citation_year=2020;,citation_fulltext_html_url=https://www.R-project.org/;">
+<meta name="citation_reference" content="citation_title=Reticulate: Interface to python;,citation_author=Kevin Ushey;,citation_author=JJ Allaire;,citation_author=Yuan Tang;,citation_publication_date=2020;,citation_cover_date=2020;,citation_year=2020;,citation_fulltext_html_url=https://github.com/rstudio/reticulate;">
+<meta name="citation_reference" content="citation_title=Python: An ecosystem for scientific computing;,citation_author=Fernando Perez;,citation_author=Brian E Granger;,citation_author=John D Hunter;,citation_publication_date=2011;,citation_cover_date=2011;,citation_year=2011;,citation_issue=2;,citation_volume=13;,citation_journal_title=Computing in Science
+&amp;amp;amp; Engineering;,citation_publisher=AIP Publishing;">
+<meta name="citation_reference" content="citation_title=Some methods for classification and analysis of multivariate observations;,citation_author=James MacQueen;,citation_author=others;,citation_publication_date=1967;,citation_cover_date=1967;,citation_year=1967;,citation_volume=1;,citation_conference_title=Proceedings of the fifth berkeley symposium on mathematical statistics and probability;,citation_conference=Oakland, CA, USA;">
+<meta name="citation_reference" content="citation_title=On a class of repulsive mixture models;,citation_abstract=Finite or infinite mixture models are routinely used in Bayesian statistical practice for tasks such as clustering or density estimation. Such models are very attractive due to their flexibility and tractability. However, a common problem in fitting these or other discrete models to data is that they tend to produce a large number of overlapping clusters. Some attention has been given in the statistical literature to models that include a repulsive feature, i.e., that encourage separation of mixture components. We study here a method that has been shown to achieve this goal without sacrificing flexibility or model fit. The model is a special case of Gibbs measures, with a parameter that controls the level of repulsion that allows construction of d-dimensional probability densities whose coordinates tend to repel each other. This approach was successfully used for density regression in Quinlan et al. (J Stat Comput Simul 88(15):2931–2947, 2018). We detail some of the global properties of the repulsive family of distributions and offer some further insight by means of a small simulation study.;,citation_author=José J. Quinlan;,citation_author=Fernando A. Quintana;,citation_author=Garritt L. Page;,citation_publication_date=2021-06-01;,citation_cover_date=2021-06-01;,citation_year=2021;,citation_fulltext_html_url=https://doi.org/10.1007/s11749-020-00726-y;,citation_issue=2;,citation_doi=10.1007/s11749-020-00726-y;,citation_issn=1863-8260;,citation_volume=30;,citation_journal_title=TEST;">
+<meta name="citation_reference" content="citation_title=A stochastic PCA and SVD algorithm with an exponential convergence rate;,citation_abstract=We describe and analyze a simple algorithm for principal component analysis and singular value decomposition, VR-PCA, which uses computationally cheap stochastic iterations, yet converges exponentially fast to the optimal solution. In contrast, existing algorithms suffer either from slow convergence, or computationally intensive iterations whose runtime scales with the data size. The algorithm builds on a recent variance-reduced stochastic gradient technique, which was previously analyzed for strongly convex optimization, whereas here we apply it to an inherently non-convex problem, using a very different analysis.;,citation_author=Ohad Shamir;,citation_editor=Francis Bach;,citation_editor=David Blei;,citation_publication_date=2015;,citation_cover_date=2015;,citation_year=2015;,citation_fulltext_html_url=https://proceedings.mlr.press/v37/shamir15.html;,citation_volume=37;,citation_conference_title=Proceedings of the 32nd international conference on machine learning;,citation_conference=PMLR;,citation_series_title=Proceedings of machine learning research;">
+<meta name="citation_reference" content="citation_title=Approche probabiliste en classification automatique et contraintes de voisinage;,citation_author=Christophe Ambroise;,citation_publication_date=1996;,citation_cover_date=1996;,citation_year=1996;,citation_dissertation_institution=Compiègne;">
+<meta name="citation_reference" content="citation_title=The self-organizing map;,citation_author=Teuvo Kohonen;,citation_publication_date=1990;,citation_cover_date=1990;,citation_year=1990;,citation_issue=9;,citation_volume=78;,citation_journal_title=Proceedings of the IEEE;,citation_publisher=IEEE;">
+<meta name="citation_reference" content="citation_title=A tutorial on spectral clustering;,citation_author=Ulrike Von Luxburg;,citation_publication_date=2007;,citation_cover_date=2007;,citation_year=2007;,citation_volume=17;,citation_journal_title=Statistics and computing;,citation_publisher=Springer;">
+<meta name="citation_reference" content="citation_title=A density-based algorithm for discovering clusters in large spatial databases with noise;,citation_author=Martin Ester;,citation_author=Hans-Peter Kriegel;,citation_author=Jörg Sander;,citation_author=Xiaowei Xu;,citation_author=others;,citation_publication_date=1996;,citation_cover_date=1996;,citation_year=1996;,citation_volume=96;,citation_conference_title=Kdd;">
+</head>
+
+<body><div id="quarto-draft-alert" class="alert alert-warning"><i class="bi bi-pencil-square"></i>Draft</div>
+
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <div class="quarto-title-block"><div><h1 class="title"><a href="https://computo.sfds.asso.fr">
+        <img src="https://computo.sfds.asso.fr/assets/img/logo_notext_white.png" height="60px">
+      </a> &nbsp; Spectral Bridges</h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> source</button></div></div>
+            <p class="subtitle lead">Scalable Spectral Clustering free from hyperparameters</p>
+            <p><a href="http://creativecommons.org/licenses/by/4.0/"><img src="https://i.creativecommons.org/l/by/4.0/80x15.png" alt="Creative Commons BY License"></a>
+ISSN 2824-7795</p>
+            <div>
+        <div class="description">
+          <p>This document provides a template based on the quarto system for contributions to Computo. The github repository in itself provides a specific quarto extension useful for authors (and editors!).</p>
+        </div>
+      </div>
+                </div>
+  </div>
+    
+    <div class="quarto-title-meta-author">
+      <div class="quarto-title-meta-heading">Authors</div>
+      <div class="quarto-title-meta-heading">Affiliations</div>
+          
+          <div class="quarto-title-meta-contents">
+        Félix Laplante 
+      </div>
+          
+          <div class="quarto-title-meta-contents">
+              <p class="affiliation">
+                  Université de Paris Saclay
+                </p>
+            </div>
+            <div class="quarto-title-meta-contents">
+        <a href="https://computo.sfds.asso.fr">Christophe Ambroise</a> <a href="https://orcid.org/0000-0002-8148-0346" class="quarto-title-author-orcid"> <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAA2ZpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDo1N0NEMjA4MDI1MjA2ODExOTk0QzkzNTEzRjZEQTg1NyIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDozM0NDOEJGNEZGNTcxMUUxODdBOEVCODg2RjdCQ0QwOSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDozM0NDOEJGM0ZGNTcxMUUxODdBOEVCODg2RjdCQ0QwOSIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ1M1IE1hY2ludG9zaCI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOkZDN0YxMTc0MDcyMDY4MTE5NUZFRDc5MUM2MUUwNEREIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOjU3Q0QyMDgwMjUyMDY4MTE5OTRDOTM1MTNGNkRBODU3Ii8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+84NovQAAAR1JREFUeNpiZEADy85ZJgCpeCB2QJM6AMQLo4yOL0AWZETSqACk1gOxAQN+cAGIA4EGPQBxmJA0nwdpjjQ8xqArmczw5tMHXAaALDgP1QMxAGqzAAPxQACqh4ER6uf5MBlkm0X4EGayMfMw/Pr7Bd2gRBZogMFBrv01hisv5jLsv9nLAPIOMnjy8RDDyYctyAbFM2EJbRQw+aAWw/LzVgx7b+cwCHKqMhjJFCBLOzAR6+lXX84xnHjYyqAo5IUizkRCwIENQQckGSDGY4TVgAPEaraQr2a4/24bSuoExcJCfAEJihXkWDj3ZAKy9EJGaEo8T0QSxkjSwORsCAuDQCD+QILmD1A9kECEZgxDaEZhICIzGcIyEyOl2RkgwAAhkmC+eAm0TAAAAABJRU5ErkJggg=="></a>
+      </div>
+          
+          <div class="quarto-title-meta-contents">
+              <p class="affiliation">
+                  Université Paris-Saclay, CNRS, Univ Evry,
+                </p>
+            </div>
+        </div>
+                    
+  <div class="quarto-title-meta">
+                                
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">July 6, 2025</p>
+      </div>
+    </div>
+                                    
+      <div>
+      <div class="quarto-title-meta-heading">Modified</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date-modified">June 25, 2024</p>
+      </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Doi</div>
+      <div class="quarto-title-meta-contents">
+        <p class="doi">
+          <a href="https://doi.org/10.xxxx/xxx-xxx">10.xxxx/xxx-xxx</a>
+        </p>
+      </div>
+    </div>
+                  
+      <div>
+      <div class="quarto-title-meta-heading">Keywords</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">spectral clustering, vector quantization, scalable, non-parametric</p>
+      </div>
+    </div>
+    
+    <div>
+      <div class="quarto-title-meta-heading">Status</div>
+      <div class="quarto-title-meta-contents">
+              <p class="date">draft</p>
+                  </div>
+    </div>
+
+  </div>
+                                                
+  <div>
+    <div class="abstract">
+    <div class="abstract-title">Abstract</div>
+      <p>In this paper, Spectral-Bridges, a novel clustering algorithm, is presented. This algorithm builds upon the traditional k-means and spectral clustering frameworks by subdividing data into small Voronoi regions, which are subsequently assessed for their connectivity. Drawing inspiration from Support vector machine, a non-parametric clustering approach is proposed. This approach is characterized by minimal hyperparameters and intuitive usability, thereby augmenting adaptability and enabling the delineation of intricate, non-convex cluster structures.</p>
+      <p>Both global and local data arrangements are aimed to be discerned by Spectral-Bridges in a scale-invariant manner. K-means centroids are leveraged for subgroup initialization, and a strategy is proposed to link these regions, with the “affinity” gauged in terms of minimal margin between pairs of classes.</p>
+      <p>The empirical results underscore Spectral-Bridges as a fast, robust, and versatile tool for sophisticated clustering tasks spanning diverse domains. Its efficacy is observed to extend seamlessly to large-scale scenarios encompassing both real-world and synthetic datasets.</p>
+    </div>
+  </div>
+
+  </header><div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Contents</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction"><span class="header-section-number">1</span> Introduction</a></li>
+  <li><a href="#background" id="toc-background" class="nav-link" data-scroll-target="#background"><span class="header-section-number">2</span> Background</a></li>
+  <li><a href="#spectral-bridges" id="toc-spectral-bridges" class="nav-link" data-scroll-target="#spectral-bridges"><span class="header-section-number">3</span> Spectral bridges</a>
+  <ul class="collapse">
+  <li><a href="#bridge-gain-version-1" id="toc-bridge-gain-version-1" class="nav-link" data-scroll-target="#bridge-gain-version-1"><span class="header-section-number">3.1</span> Bridge gain version 1</a></li>
+  <li><a href="#bridge-version-2" id="toc-bridge-version-2" class="nav-link" data-scroll-target="#bridge-version-2"><span class="header-section-number">3.2</span> Bridge version 2</a></li>
+  <li><a href="#algorithm" id="toc-algorithm" class="nav-link" data-scroll-target="#algorithm"><span class="header-section-number">3.3</span> Algorithm</a></li>
+  </ul></li>
+  <li><a href="#numerical-experiments" id="toc-numerical-experiments" class="nav-link" data-scroll-target="#numerical-experiments"><span class="header-section-number">4</span> Numerical experiments</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
+  
+  </ul>
+<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="spectral-bridges.pdf"><i class="bi bi-file-pdf"></i>PDF (computo)</a></li></ul></div></nav>
+</div>
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+<section id="introduction" class="level1" data-number="1">
+<h1 data-number="1"><span class="header-section-number">1</span> Introduction</h1>
+<!--Interest of clustering-->
+<p>Clustering is a fundamental technique for exploratory data analysis. It partition a set of objects into a certain number of homogeneous groups, each referred to as a cluster. It is extensively utilized across diverse fields such biology, social sciences, and psychology. Clustering is frequently employed in conjunction with supervised learning as a pre-processing step, where it helps to structure and simplify data, thereby enhancing the performance and interpretability of subsequent predictive models.</p>
+<!-- Importance of defining "similar" -->
+<!-- Clustering approaches -->
+<p>There are numerous approaches to clustering, each defined by how similarity between objects is measured, either through a similarity measure or more strictly through a distance metric.</p>
+<p>Density-based methods identify regions within the data that have a high concentration of points, corresponding to the modes of the joint density. A notable non-parametric example of this approach is DBSCAN <span class="citation" data-cites="ester1996density">(<a href="#ref-ester1996density" role="doc-biblioref">Ester et al. 1996</a>)</span>. In contrast, model-based clustering, such as Gaussian mixture models, represents a parametric approach to density-based methods.</p>
+<p>Geometric approaches, such as kmeans <span class="citation" data-cites="macqueen1967some">(<a href="#ref-macqueen1967some" role="doc-biblioref">MacQueen et al. 1967</a>)</span> are distance-based and aim to partition the data in a way that optimizes a criterion reflecting group homogeneity.</p>
+<p>Graph-based methods treat data as a graph, with vertices representing data points and edges weighted to reflect the affinity between these points.</p>
+<!--
+
+Clustering is a fundamental problem in the field of data mining and machine learning [1], whose purpose is to partition a set of objects into a certain number of homogeneous groups, each referred to as a cluster. 
+Out of the large number of clustering algorithms that have been developed, spectral clustering in recent years has been gaining increasing attention due to its promising ability in dealing with non- linearly separable datasets [2], [3], [4], [5]. However, a critical limitation to conventional spectral clustering lies in its huge time and space complexity, which significantly restricts its application to large-scale problems.
+Conventional spectral clustering typically consists of two time- and memory-consuming phases, namely,
+-->
+</section>
+<section id="background" class="level1" data-number="2">
+<h1 data-number="2"><span class="header-section-number">2</span> Background</h1>
+<p>Spectral clustering is a graph-based approach that computes the eigenvectors of the graph’s Laplacian matrix. This technique transforms the data into a lower-dimensional space, making the clusters more discernible. A standard algorithm like k-means is then applied to these transformed features to identify the clusters<span class="citation" data-cites="von2007tutorial">(<a href="#ref-von2007tutorial" role="doc-biblioref">Von Luxburg 2007</a>)</span>.</p>
+<p>It enables to capture complex data structures and discern clusters based on the connectivity of data points in a transformed space. Notice that spectral clustering can be seen as a relaxed graph cut problem.</p>
+</section>
+<section id="spectral-bridges" class="level1" data-number="3">
+<h1 data-number="3"><span class="header-section-number">3</span> Spectral bridges</h1>
+<section id="bridge-gain-version-1" class="level2" data-number="3.1">
+<h2 data-number="3.1" class="anchored" data-anchor-id="bridge-gain-version-1"><span class="header-section-number">3.1</span> Bridge gain version 1</h2>
+<p>The basic idea involves calculating the reduction in inertia achieved by projecting onto a segment connecting two centroids, rather than using the two centroids separately.</p>
+The inertia of two balls <span class="math inline">k</span> and <span class="math inline">l</span> is <span class="math display">
+I_{kl} = \sum_{i\in k} \|\boldsymbol x_i - \boldsymbol \mu_k\|^2  + \sum_{i\in l} \|\boldsymbol x_i - \boldsymbol \mu_l\|^2.
+</span> The inertia of a bridge between <span class="math inline">k</span> and <span class="math inline">l</span> is defined as <span class="math display">
+B_{kl} = \sum_{i\in kl} \|\boldsymbol x_i - \boldsymbol p_{kl}(\boldsymbol x_i)\|^2,
+</span> where <span class="math display">
+\boldsymbol p_{kl}(\boldsymbol x_i) = \boldsymbol \mu_{k} + t_i(\boldsymbol \mu_{l} - \boldsymbol \mu_{k}),
+</span> with <span class="math display">
+t_i  = \min\left(1, \max\left(0, \frac{\langle \boldsymbol x_i - \boldsymbol \mu_k | \boldsymbol \mu_l - \boldsymbol \mu_k\rangle}{\|  \boldsymbol \mu_l - \boldsymbol \mu_k \|^2}\right)\right).
+</span> Notice that <span class="math inline">B_{kl}</span> can be expressed as the sum of three terms:
+<span class="math display">\begin{aligned}
+B_{kl} &amp;=&amp; \sum_{i \mid t_i=0} \|\boldsymbol x_i - \boldsymbol \mu_k\|^2  + \sum_{i \mid t_i=1} \|\boldsymbol x_i - \boldsymbol \mu_l\|^2 + \sum_{i \mid t_i\in ]0,1[} \|\boldsymbol x_i - \boldsymbol p_{kl}(\boldsymbol x_i)\|^2.
+\end{aligned}</span>
+The last term may be decomposed in two parts
+<span class="math display">\begin{aligned}
+\sum_{i \mid t_i\in ]0,1[} \|\boldsymbol x_i - \boldsymbol p_{kl}(\boldsymbol x_i)\|^2 &amp;= &amp;\sum_{i \mid t_i\in ]0,\frac{1}{2}[} \|\boldsymbol x_i - \boldsymbol p_{kl}(\boldsymbol x_i)\|^2 + \sum_{i \mid t_i\in [\frac{1}{2},1[} \|\boldsymbol x_i - \boldsymbol p_{kl}(\boldsymbol x_i)\|^2\\
+\end{aligned}</span>
+and each part further decomposed using Pythagore
+<span class="math display">\begin{aligned}
+\sum_{i \mid t_i\in ]0,\frac{1}{2}[} \|\boldsymbol x_i - \boldsymbol p_{kl}(\boldsymbol x_i)\|^2 &amp;=&amp; \sum_{i \mid t_i\in ]0,\frac{1}{2}[} \|\boldsymbol x_i - \boldsymbol \mu_k\|^2 - \sum_{i \mid t_i\in ]0,\frac{1}{2}[} \|\boldsymbol \mu_k - \boldsymbol p_{kl}(\boldsymbol x_i)\|^2\\
+&amp;=&amp; \sum_{i \mid t_i\in ]0,\frac{1}{2}[} \|\boldsymbol x_i - \boldsymbol \mu_k\|^2 - \sum_{i \mid t_i\in ]0,\frac{1}{2}[} \|t_i (\boldsymbol \mu_k - \boldsymbol \mu_{l})\|^2,
+\end{aligned}</span>
+<span class="math display">\begin{aligned}
+\sum_{i \mid t_i\in ]\frac{1}{2},1[} \|\boldsymbol x_i - \boldsymbol p_{kl}(\boldsymbol x_i)\|^2 &amp;=&amp; \sum_{i \mid t_i\in ]0,\frac{1}{2}[} \|\boldsymbol x_i - \boldsymbol \mu_l\|^2 - \sum_{i \mid t_i\in ]0,\frac{1}{2}[} \|\boldsymbol \mu_l - \boldsymbol p_{kl}(\boldsymbol x_i)\|^2\\
+&amp;=&amp; \sum_{i \mid t_i\in ]\frac{1}{2},1[} \|\boldsymbol x_i - \boldsymbol \mu_k\|^2 - \sum_{i \mid t_i\in ]0,\frac{1}{2}[} \|(1-t_i) (\boldsymbol \mu_k - \boldsymbol \mu_{l})\|^2
+\end{aligned}</span>
+Thus
+<span class="math display">\begin{aligned}
+I_{kl}- B_{kl} &amp;=&amp;  \sum_{i \mid t_i\in ]0,\frac{1}{2}[} t_i^2 \|\boldsymbol \mu_k - \boldsymbol \mu_l\|^2 + \sum_{i \mid t_i\in ]\frac{1}{2},1[} (1-t_i)^2 \|\boldsymbol \mu_k - \boldsymbol \mu_l\|^2,\\
+\frac{I_{kl}- B_{kl}}{\|\boldsymbol \mu_k - \boldsymbol \mu_l\|^2} &amp;=&amp; \sum_{i \mid t_i\in ]0,\frac{1}{2}[} t_i^2  + \sum_{i \mid t_i\in ]\frac{1}{2},1[} (1-t_i)^2 \\
+\frac{I_{kl}- B_{kl}}{(n_k+n_l)\|\boldsymbol \mu_k - \boldsymbol \mu_l\|^2} &amp;=&amp; \frac{\sum_{\boldsymbol{i} \in k} \langle \boldsymbol{x_i} - \boldsymbol{\mu}_k \vert \boldsymbol{\mu}_l - \boldsymbol{\mu}_k \rangle_+^2  \sum_{\boldsymbol{i} \in l} \langle \boldsymbol{x_i} - \boldsymbol{\mu}_l \vert \boldsymbol{\mu}_k - \boldsymbol{\mu}_l\rangle_+^2}{(n_k+n_l)\|\boldsymbol \mu_k - \boldsymbol \mu_l\|^4}
+\end{aligned}</span>
+</section>
+<section id="bridge-version-2" class="level2" data-number="3.2">
+<h2 data-number="3.2" class="anchored" data-anchor-id="bridge-version-2"><span class="header-section-number">3.2</span> Bridge version 2</h2>
+<p>K-means clustering assigns a class to each point based on its proximity to a central point, called a centroid. As a result, the boundary that separates two classes is a hyperplane. This hyperplane is orthogonal to the line segment connecting the centroids of the two classes and intersects this segment at its midpoint.</p>
+<p>We introduce the concept of Bridge affinity between two classes, <span class="math inline">k</span> and <span class="math inline">l</span>, which is determined by the mean distance of points to the hyperplane that separates these classes. Visualizing the segment as a bridge, we define for each point <span class="math inline">\boldsymbol x \in kl</span> the distance required to reach the center of the bridge, denoted as <span class="math inline">\boldsymbol \mu_{kl} = \frac{1}{2}(\boldsymbol \mu_k+\boldsymbol \mu_l)</span>. This formulation draws a parallel to the concept of the support vector margin, emphasizing the geometric characterization of cluster separation.</p>
+<p>Let us denote <span class="math inline">\boldsymbol p_{kl}(\boldsymbol x)</span> the projection of <span class="math inline">\boldsymbol x \in k</span> onto the segment <span class="math inline">[\boldsymbol \mu_k,\boldsymbol \mu_l]</span>: <span class="math display">
+\boldsymbol p_{kl}(\boldsymbol x) = \boldsymbol \mu_{k} + t(\boldsymbol \mu_{l} - \boldsymbol \mu_{k}),
+</span> with <span class="math display">
+t  = \min\left(1, \max\left(0, \frac{\langle \boldsymbol x - \boldsymbol \mu_k | \boldsymbol \mu_l - \boldsymbol \mu_k\rangle}{\|  \boldsymbol \mu_l - \boldsymbol \mu_k \|^2}\right)\right).
+</span> The ‘bridge distance’ for a point <span class="math inline">\boldsymbol x \in k</span> is <span class="math display">
+\|\boldsymbol p_{kl}(\boldsymbol x) - \boldsymbol \mu_{kl}\| = (1/2-t) \| \boldsymbol \mu_k-\boldsymbol \mu_l \|.
+</span> The ratio <span class="math inline">\frac{\|\boldsymbol p_{kl}(\boldsymbol x) - \boldsymbol \mu_{kl}\|}{\| \boldsymbol \mu_k-\boldsymbol \mu_k \|}</span> acts as a dissmilarity. If the average ratio is large it suggests a low density between the classes. Conversely, if this average ratio is small, it indicates that the two classes may reside within the same densely populated region.</p>
+<p>We then define the bridge affinity as a fonction of this ratio between the bridge distance and the length of the bridge <span class="math display">
+t_{kl}(\boldsymbol x) =  1/2- \frac{\|\boldsymbol p_{kl}(\boldsymbol x) - \boldsymbol \mu_{kl}\|}{\| \boldsymbol \mu_k-\boldsymbol \mu_l \|}.
+</span></p>
+<p>The bridge affinity between two classes <span class="math inline">k</span> and <span class="math inline">l</span> is defined as the mean bridge affinity of all points of classes <span class="math inline">k</span>, <span class="math inline">l</span>:</p>
+<p><span class="math display">
+a_{kl} =\sum_{\boldsymbol x \in kl} t_{kl}(\boldsymbol x)= \frac{\sum_{\boldsymbol{x} \in k} \langle \boldsymbol{x} - \boldsymbol{\mu}_k \vert \boldsymbol{\mu}_l - \boldsymbol{\mu}_k \rangle_+ + \sum_{\boldsymbol{x} \in l} \langle \boldsymbol{x} - \boldsymbol{\mu}_l \vert \boldsymbol{\mu}_k - \boldsymbol{\mu}_l\rangle_+}{(\#P_k + \#P_l) \lVert \boldsymbol{\mu}_k - \boldsymbol{\mu}_l \rVert^2}.
+</span></p>
+</section>
+<section id="algorithm" class="level2" data-number="3.3">
+<h2 data-number="3.3" class="anchored" data-anchor-id="algorithm"><span class="header-section-number">3.3</span> Algorithm</h2>
+<div id="alg-spectral-bridges" class="pseudocode-container" data-line-number="true" data-no-end="false" data-indent-size="1.2em" data-comment-delimiter="//" data-alg-title="Algorithm" data-pseudocode-index="1" data-line-number-punc=":">
+<div class="pseudocode">
+\begin{algorithm} \caption{Spectral Bridges} \begin{algorithmic} \Procedure{SpectralBridges}{$data, k, p$} \Comment{data: input dataset, k: number of clusters, p: number of Voronoi regions} \State $centroids \gets$ \Call{KMeans}{$data, p$} \Comment{Initial centroids using k-means} \State $voronoiRegions \gets$ \Call{Subdivide}{$data, centroids$} \Comment{Subdivide data into Voronoi regions} \State $graph \gets$ \Call{CreateGraph}{$voronoiRegions$} \Comment{Assess connectivity between regions} \State $clusters \gets$ \Call{WardLinkage}{$graph, k$} \Comment{Cluster using Ward linkage-inspired approach} \State \Return $clusters$ \EndProcedure \Procedure{KMeans}{$data, p$} \State Initialize $p$ centroids randomly \Repeat \State Assign each point to the nearest centroid \State Update centroids based on assignments \Until{centroids do not change} \State \Return centroids \EndProcedure \Procedure{Subdivide}{$data, centroids$} \State $voronoiRegions \gets \{\}$ \For{each point $x$ in $data$} \State Find the nearest centroid for $x$ \State Assign $x$ to the corresponding Voronoi region \EndFor \State \Return $voronoiRegions$ \EndProcedure \Procedure{CreateGraph}{$voronoiRegions$} \State $graph \gets$ empty graph \For{each pair of regions $(R_i, R_j)$ in $voronoiRegions$} \State Calculate connectivity measure between $R_i$ and $R_j$ \State Add edge between $R_i$ and $R_j$ in $graph$ with weight based on connectivity \EndFor \State \Return $graph$ \EndProcedure \Procedure{WardLinkage}{$graph, k$} \State $clusters \gets$ Initialize each region as a separate cluster \Repeat \State Find the pair of clusters with the smallest merging cost \State Merge the selected pair of clusters \Until{number of clusters equals $k$} \State \Return $clusters$ \EndProcedure \end{algorithmic} \end{algorithm}
+</div>
+</div>
+</section>
+</section>
+<section id="numerical-experiments" class="level1" data-number="4">
+<h1 data-number="4"><span class="header-section-number">4</span> Numerical experiments</h1>
+</section>
+<section id="references" class="level1 unnumbered">
+<h1 class="unnumbered">References</h1>
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="ref-ester1996density" class="csl-entry" role="listitem">
+Ester, Martin, Hans-Peter Kriegel, Jörg Sander, Xiaowei Xu, et al. 1996. <span>“A Density-Based Algorithm for Discovering Clusters in Large Spatial Databases with Noise.”</span> In <em>Kdd</em>, 96:226–31.
+</div>
+<div id="ref-macqueen1967some" class="csl-entry" role="listitem">
+MacQueen, James et al. 1967. <span>“Some Methods for Classification and Analysis of Multivariate Observations.”</span> In <em>Proceedings of the Fifth Berkeley Symposium on Mathematical Statistics and Probability</em>, 1:281–97. Oakland, CA, USA.
+</div>
+<div id="ref-von2007tutorial" class="csl-entry" role="listitem">
+Von Luxburg, Ulrike. 2007. <span>“A Tutorial on Spectral Clustering.”</span> <em>Statistics and Computing</em> 17: 395–416.
+</div>
+</div>
+</section>
+
+
+<div id="quarto-appendix" class="default"><section id="session-information" class="level1 appendix unnumbered"><h2 class="anchored quarto-appendix-heading">Session information</h2><div class="quarto-appendix-contents">
+
+<div class="cell">
+<details class="code-fold">
+<summary>Hide/Show the code</summary>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sessionInfo</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>R version 4.3.2 (2023-10-31)
+Platform: x86_64-apple-darwin20 (64-bit)
+Running under: macOS Sonoma 14.3.1
+
+Matrix products: default
+BLAS:   /Library/Frameworks/R.framework/Versions/4.3-x86_64/Resources/lib/libRblas.0.dylib 
+LAPACK: /Library/Frameworks/R.framework/Versions/4.3-x86_64/Resources/lib/libRlapack.dylib;  LAPACK version 3.11.0
+
+locale:
+[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+
+time zone: Europe/Paris
+tzcode source: internal
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+loaded via a namespace (and not attached):
+ [1] htmlwidgets_1.6.4 compiler_4.3.2    fastmap_1.1.1     cli_3.6.2        
+ [5] tools_4.3.2       htmltools_0.5.7   rstudioapi_0.15.0 yaml_2.3.8       
+ [9] rmarkdown_2.26    knitr_1.45        jsonlite_1.8.8    xfun_0.42        
+[13] digest_0.6.34     rlang_1.1.3       evaluate_0.23    </code></pre>
+</div>
+</div>
+<!-- -->
+
+</div></section><section class="quarto-appendix-contents" id="quarto-reuse"><h2 class="anchored quarto-appendix-heading">Reuse</h2><div class="quarto-appendix-contents"><div><a rel="license" href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a></div></div></section><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@article{laplante2025,
+  author = {Laplante, Félix and Ambroise, Christophe},
+  title = {Spectral {Bridges}},
+  journal = {Computo},
+  date = {2025-07-06},
+  url = {https://github.com/computorg/computo-quarto-extension},
+  doi = {10.xxxx/xxx-xxx},
+  issn = {2824-7795},
+  langid = {en}
+}
+</code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-laplante2025" class="csl-entry quarto-appendix-citeas" role="listitem">
+Laplante, Félix, and Christophe Ambroise. 2025. <span>“Spectral
+Bridges.”</span> <em>Computo</em>, July. <a href="https://doi.org/10.xxxx/xxx-xxx">https://doi.org/10.xxxx/xxx-xxx</a>.
+</div></div></section></div></main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+  const viewSource = window.document.getElementById('quarto-view-source') ||
+                     window.document.getElementById('quarto-code-tools-source');
+  if (viewSource) {
+    const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+    viewSource.addEventListener("click", function(e) {
+      if (sourceUrl) {
+        // rstudio viewer pane
+        if (/\bcapabilities=\b/.test(window.location)) {
+          window.open(sourceUrl);
+        } else {
+          window.location.href = sourceUrl;
+        }
+      } else {
+        const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+        modal.show();
+      }
+      return false;
+    });
+  }
+  function toggleCodeHandler(show) {
+    return function(e) {
+      const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+      for (let i=0; i<detailsSrc.length; i++) {
+        const details = detailsSrc[i].parentElement;
+        if (show) {
+          details.open = true;
+        } else {
+          details.removeAttribute("open");
+        }
+      }
+      const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+      const fromCls = show ? "hidden" : "unhidden";
+      const toCls = show ? "unhidden" : "hidden";
+      for (let i=0; i<cellCodeDivs.length; i++) {
+        const codeDiv = cellCodeDivs[i];
+        if (codeDiv.classList.contains(fromCls)) {
+          codeDiv.classList.remove(fromCls);
+          codeDiv.classList.add(toCls);
+        } 
+      }
+      return false;
+    }
+  }
+  const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+  if (hideAllCode) {
+    hideAllCode.addEventListener("click", toggleCodeHandler(false));
+  }
+  const showAllCode = window.document.getElementById("quarto-show-all-code");
+  if (showAllCode) {
+    showAllCode.addEventListener("click", toggleCodeHandler(true));
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+          // target, if specified
+          link.setAttribute("target", "_blank");
+          if (link.getAttribute("rel") === null) {
+            link.setAttribute("rel", "noopener");
+          }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="sourceCode" id="cb3" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "Spectral Bridges"</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="an">subtitle:</span><span class="co"> "Scalable Spectral Clustering free from hyperparameters"</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="an">date:</span><span class="co"> 19/06/2024</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="an">date-modified:</span><span class="co"> last-modified</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="an">author:</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="co">  - name: Félix Laplante</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="co">    email: flheight0@gmail.com</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="co">    affiliations:</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="co">      - Université de Paris Saclay</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="co">  - name: Christophe Ambroise</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="co">    corresponding: true</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="co">    email: christophe.ambroise@univ-evry.fr</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="co">    url: https://computo.sfds.asso.fr</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="co">    orcid: 0000-0002-8148-0346</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="co">    affiliations:</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="co">      - name: Université Paris-Saclay, CNRS, Univ Evry, </span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a><span class="co">        department: Laboratoire de Mathématiques et Modélisation d'Evry</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a><span class="co">        address: 23 boulevard de France</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a><span class="co">        city: Evry-Courcouronnes</span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a><span class="co">        country: France</span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a><span class="an">description:</span><span class="co"> |</span></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a><span class="co">  This document provides a template based on the quarto system for contributions to Computo. The github repository in itself provides a specific quarto extension useful for authors (and editors!).</span></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a><span class="an">keywords:</span><span class="co"> [spectral clustering, vector quantization, scalable, non-parametric]</span></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a><span class="an">doi:</span><span class="co"> 10.xxxx/xxx-xxx</span></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a><span class="an">citation:</span></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a><span class="co">  type: article-journal</span></span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a><span class="co">  container-title: "Computo"</span></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a><span class="co">  doi: "10.xxxx/xxx-xxx"</span></span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a><span class="co">  url: "https://github.com/computorg/computo-quarto-extension"</span></span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a><span class="co">  issn: "2824-7795"</span></span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a><span class="an">bibliography:</span><span class="co"> references.bib</span></span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a><span class="an">google-scholar:</span><span class="co"> true</span></span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a><span class="an">github-user:</span><span class="co"> cambroise</span></span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a><span class="an">repo:</span><span class="co"> "spectral-bridges"</span></span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a><span class="an">draft:</span><span class="co"> true # set to false once the build is running</span></span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a><span class="an">published:</span><span class="co"> false # will be set to true once accepted</span></span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a><span class="an">format:</span></span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a><span class="co">  computo-html: default </span></span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a><span class="co">  computo-pdf:  default</span></span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a><span class="fu"># Abstract</span></span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a>In this paper, Spectral-Bridges, a novel clustering algorithm, is presented. This algorithm builds upon the traditional k-means and spectral clustering frameworks by subdividing data into small Voronoi regions, which are subsequently assessed for their connectivity. Drawing inspiration from Support vector machine, a non-parametric clustering approach is proposed. This approach is characterized by minimal hyperparameters and intuitive usability, thereby augmenting adaptability and enabling the delineation of intricate, non-convex cluster structures.</span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a>Both global and local data arrangements are aimed to be discerned by Spectral-Bridges in a scale-invariant manner. K-means centroids are leveraged for subgroup initialization, and a strategy is proposed to link these regions, with the "affinity" gauged in terms of minimal margin between pairs of classes. </span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a>The empirical results underscore Spectral-Bridges as a fast, robust, and versatile tool for sophisticated clustering tasks spanning diverse domains. Its efficacy is observed to extend seamlessly to large-scale scenarios encompassing both real-world and synthetic datasets.</span>
+<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a><span class="fu"># Introduction</span></span>
+<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a><span class="co">&lt;!--Interest of clustering--&gt;</span></span>
+<span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a>Clustering is a fundamental technique for exploratory data analysis. It partition a set of objects into a certain number of homogeneous groups, each referred to as a cluster.  It is extensively utilized across diverse fields such  biology, social sciences, and psychology. Clustering is frequently employed in conjunction with supervised learning as a pre-processing step, where it helps to structure and simplify data, thereby enhancing the performance and interpretability of subsequent predictive models.</span>
+<span id="cb3-56"><a href="#cb3-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-57"><a href="#cb3-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-58"><a href="#cb3-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-59"><a href="#cb3-59" aria-hidden="true" tabindex="-1"></a><span class="co">&lt;!-- Importance of defining "similar" --&gt;</span></span>
+<span id="cb3-60"><a href="#cb3-60" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-61"><a href="#cb3-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-62"><a href="#cb3-62" aria-hidden="true" tabindex="-1"></a><span class="co">&lt;!-- Clustering approaches --&gt;</span></span>
+<span id="cb3-63"><a href="#cb3-63" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-64"><a href="#cb3-64" aria-hidden="true" tabindex="-1"></a>There are numerous approaches to clustering, each defined by how similarity between objects is measured, either through a similarity measure or more strictly through a distance metric.</span>
+<span id="cb3-65"><a href="#cb3-65" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-66"><a href="#cb3-66" aria-hidden="true" tabindex="-1"></a>Density-based methods identify regions within the data that have a high concentration of points, corresponding to the modes of the joint density. A notable non-parametric example of this approach is DBSCAN <span class="co">[</span><span class="ot">@ester1996density</span><span class="co">]</span>. In contrast, model-based clustering, such as Gaussian mixture models, represents a parametric approach to density-based methods.</span>
+<span id="cb3-67"><a href="#cb3-67" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-68"><a href="#cb3-68" aria-hidden="true" tabindex="-1"></a>Geometric approaches, such as kmeans <span class="co">[</span><span class="ot">@macqueen1967some</span><span class="co">]</span>  are distance-based and aim to partition the data in a way that optimizes a criterion reflecting group homogeneity.</span>
+<span id="cb3-69"><a href="#cb3-69" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-70"><a href="#cb3-70" aria-hidden="true" tabindex="-1"></a>Graph-based methods treat data as a graph, with vertices representing data points and edges weighted to reflect the affinity between these points.</span>
+<span id="cb3-71"><a href="#cb3-71" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-72"><a href="#cb3-72" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-73"><a href="#cb3-73" aria-hidden="true" tabindex="-1"></a><span class="co">&lt;!--</span></span>
+<span id="cb3-74"><a href="#cb3-74" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-75"><a href="#cb3-75" aria-hidden="true" tabindex="-1"></a><span class="co">Clustering is a fundamental problem in the field of data mining and machine learning [1], whose purpose is to partition a set of objects into a certain number of homogeneous groups, each referred to as a cluster. </span></span>
+<span id="cb3-76"><a href="#cb3-76" aria-hidden="true" tabindex="-1"></a><span class="co">Out of the large number of clustering algorithms that have been developed, spectral clustering in recent years has been gaining increasing attention due to its promising ability in dealing with non- linearly separable datasets [2], [3], [4], [5]. However, a critical limitation to conventional spectral clustering lies in its huge time and space complexity, which significantly restricts its application to large-scale problems.</span></span>
+<span id="cb3-77"><a href="#cb3-77" aria-hidden="true" tabindex="-1"></a><span class="co">Conventional spectral clustering typically consists of two time- and memory-consuming phases, namely,</span></span>
+<span id="cb3-78"><a href="#cb3-78" aria-hidden="true" tabindex="-1"></a><span class="co">--&gt;</span></span>
+<span id="cb3-79"><a href="#cb3-79" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-80"><a href="#cb3-80" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-81"><a href="#cb3-81" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-82"><a href="#cb3-82" aria-hidden="true" tabindex="-1"></a><span class="fu"># Background</span></span>
+<span id="cb3-83"><a href="#cb3-83" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-84"><a href="#cb3-84" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-85"><a href="#cb3-85" aria-hidden="true" tabindex="-1"></a>Spectral clustering is a graph-based approach that computes the eigenvectors of the graph's Laplacian matrix. This technique transforms the data into a lower-dimensional space, making the clusters more discernible. A standard algorithm like k-means is then applied to these transformed features to identify the clusters<span class="co">[</span><span class="ot">@von2007tutorial</span><span class="co">]</span>.</span>
+<span id="cb3-86"><a href="#cb3-86" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-87"><a href="#cb3-87" aria-hidden="true" tabindex="-1"></a>It enables to capture complex data structures and discern clusters based on the connectivity of data points in a transformed space.</span>
+<span id="cb3-88"><a href="#cb3-88" aria-hidden="true" tabindex="-1"></a>Notice that spectral clustering can be seen as a relaxed graph cut problem. </span>
+<span id="cb3-89"><a href="#cb3-89" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-90"><a href="#cb3-90" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-91"><a href="#cb3-91" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-92"><a href="#cb3-92" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-93"><a href="#cb3-93" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-94"><a href="#cb3-94" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-95"><a href="#cb3-95" aria-hidden="true" tabindex="-1"></a><span class="fu"># Spectral bridges</span></span>
+<span id="cb3-96"><a href="#cb3-96" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-97"><a href="#cb3-97" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-98"><a href="#cb3-98" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-99"><a href="#cb3-99" aria-hidden="true" tabindex="-1"></a><span class="fu">## Bridge gain version 1</span></span>
+<span id="cb3-100"><a href="#cb3-100" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-101"><a href="#cb3-101" aria-hidden="true" tabindex="-1"></a>The basic idea involves calculating the reduction in inertia achieved by projecting onto a segment connecting two centroids, rather than using the two centroids separately.</span>
+<span id="cb3-102"><a href="#cb3-102" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-103"><a href="#cb3-103" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-104"><a href="#cb3-104" aria-hidden="true" tabindex="-1"></a>The inertia of two balls $k$ and $l$ is </span>
+<span id="cb3-105"><a href="#cb3-105" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb3-106"><a href="#cb3-106" aria-hidden="true" tabindex="-1"></a>I_{kl} = \sum_{i\in k} \|\boldsymbol x_i - \boldsymbol \mu_k\|^2  + \sum_{i\in l} \|\boldsymbol x_i - \boldsymbol \mu_l\|^2.</span>
+<span id="cb3-107"><a href="#cb3-107" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb3-108"><a href="#cb3-108" aria-hidden="true" tabindex="-1"></a>The inertia of a bridge between $k$ and $l$ is defined as</span>
+<span id="cb3-109"><a href="#cb3-109" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb3-110"><a href="#cb3-110" aria-hidden="true" tabindex="-1"></a>B_{kl} = \sum_{i\in kl} \|\boldsymbol x_i - \boldsymbol p_{kl}(\boldsymbol x_i)\|^2,</span>
+<span id="cb3-111"><a href="#cb3-111" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb3-112"><a href="#cb3-112" aria-hidden="true" tabindex="-1"></a>where </span>
+<span id="cb3-113"><a href="#cb3-113" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb3-114"><a href="#cb3-114" aria-hidden="true" tabindex="-1"></a>\boldsymbol p_{kl}(\boldsymbol x_i) = \boldsymbol \mu_{k} + t_i(\boldsymbol \mu_{l} - \boldsymbol \mu_{k}),</span>
+<span id="cb3-115"><a href="#cb3-115" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb3-116"><a href="#cb3-116" aria-hidden="true" tabindex="-1"></a>with </span>
+<span id="cb3-117"><a href="#cb3-117" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb3-118"><a href="#cb3-118" aria-hidden="true" tabindex="-1"></a>t_i  = \min\left(1, \max\left(0, \frac{\langle \boldsymbol x_i - \boldsymbol \mu_k | \boldsymbol \mu_l - \boldsymbol \mu_k\rangle}{\|  \boldsymbol \mu_l - \boldsymbol \mu_k \|^2}\right)\right). </span>
+<span id="cb3-119"><a href="#cb3-119" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb3-120"><a href="#cb3-120" aria-hidden="true" tabindex="-1"></a>Notice that $B_{kl}$ can be expressed as the sum of three terms:</span>
+<span id="cb3-121"><a href="#cb3-121" aria-hidden="true" tabindex="-1"></a>\begin{aligned}</span>
+<span id="cb3-122"><a href="#cb3-122" aria-hidden="true" tabindex="-1"></a>B_{kl} &amp;=&amp; \sum_{i \mid t_i=0} \|\boldsymbol x_i - \boldsymbol \mu_k\|^2  + \sum_{i \mid t_i=1} \|\boldsymbol x_i - \boldsymbol \mu_l\|^2 + \sum_{i \mid t_i\in ]0,1[} \|\boldsymbol x_i - \boldsymbol p_{kl}(\boldsymbol x_i)\|^2.</span>
+<span id="cb3-123"><a href="#cb3-123" aria-hidden="true" tabindex="-1"></a>\end{aligned}</span>
+<span id="cb3-124"><a href="#cb3-124" aria-hidden="true" tabindex="-1"></a>The last term may be decomposed in two parts </span>
+<span id="cb3-125"><a href="#cb3-125" aria-hidden="true" tabindex="-1"></a>\begin{aligned}</span>
+<span id="cb3-126"><a href="#cb3-126" aria-hidden="true" tabindex="-1"></a>\sum_{i \mid t_i\in ]0,1<span class="co">[</span><span class="ot">} \|\boldsymbol x_i - \boldsymbol p_{kl}(\boldsymbol x_i)\|^2 &amp;= &amp;\sum_{i \mid t_i\in </span><span class="co">]</span>0,\frac{1}{2}[} \|\boldsymbol x_i - \boldsymbol p_{kl}(\boldsymbol x_i)\|^2 + \sum_{i \mid t_i\in [\frac{1}{2},1[} \|\boldsymbol x_i - \boldsymbol p_{kl}(\boldsymbol x_i)\|^2<span class="sc">\\</span></span>
+<span id="cb3-127"><a href="#cb3-127" aria-hidden="true" tabindex="-1"></a>\end{aligned}</span>
+<span id="cb3-128"><a href="#cb3-128" aria-hidden="true" tabindex="-1"></a>and each part further decomposed using Pythagore</span>
+<span id="cb3-129"><a href="#cb3-129" aria-hidden="true" tabindex="-1"></a>\begin{aligned}</span>
+<span id="cb3-130"><a href="#cb3-130" aria-hidden="true" tabindex="-1"></a>\sum_{i \mid t_i\in ]0,\frac{1}{2}<span class="co">[</span><span class="ot">} \|\boldsymbol x_i - \boldsymbol p_{kl}(\boldsymbol x_i)\|^2 &amp;=&amp; \sum_{i \mid t_i\in </span><span class="co">]</span>0,\frac{1}{2}<span class="co">[</span><span class="ot">} \|\boldsymbol x_i - \boldsymbol \mu_k\|^2 - \sum_{i \mid t_i\in </span><span class="co">]</span>0,\frac{1}{2}[} \|\boldsymbol \mu_k - \boldsymbol p_{kl}(\boldsymbol x_i)\|^2<span class="sc">\\</span></span>
+<span id="cb3-131"><a href="#cb3-131" aria-hidden="true" tabindex="-1"></a>&amp;=&amp; \sum_{i \mid t_i\in ]0,\frac{1}{2}<span class="co">[</span><span class="ot">} \|\boldsymbol x_i - \boldsymbol \mu_k\|^2 - \sum_{i \mid t_i\in </span><span class="co">]</span>0,\frac{1}{2}[} \|t_i (\boldsymbol \mu_k - \boldsymbol \mu_{l})\|^2,</span>
+<span id="cb3-132"><a href="#cb3-132" aria-hidden="true" tabindex="-1"></a>\end{aligned}</span>
+<span id="cb3-133"><a href="#cb3-133" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-134"><a href="#cb3-134" aria-hidden="true" tabindex="-1"></a>\begin{aligned}</span>
+<span id="cb3-135"><a href="#cb3-135" aria-hidden="true" tabindex="-1"></a>\sum_{i \mid t_i\in ]\frac{1}{2},1<span class="co">[</span><span class="ot">} \|\boldsymbol x_i - \boldsymbol p_{kl}(\boldsymbol x_i)\|^2 &amp;=&amp; \sum_{i \mid t_i\in </span><span class="co">]</span>0,\frac{1}{2}<span class="co">[</span><span class="ot">} \|\boldsymbol x_i - \boldsymbol \mu_l\|^2 - \sum_{i \mid t_i\in </span><span class="co">]</span>0,\frac{1}{2}[} \|\boldsymbol \mu_l - \boldsymbol p_{kl}(\boldsymbol x_i)\|^2<span class="sc">\\</span></span>
+<span id="cb3-136"><a href="#cb3-136" aria-hidden="true" tabindex="-1"></a>&amp;=&amp; \sum_{i \mid t_i\in ]\frac{1}{2},1<span class="co">[</span><span class="ot">} \|\boldsymbol x_i - \boldsymbol \mu_k\|^2 - \sum_{i \mid t_i\in </span><span class="co">]</span>0,\frac{1}{2}[} \|(1-t_i) (\boldsymbol \mu_k - \boldsymbol \mu_{l})\|^2</span>
+<span id="cb3-137"><a href="#cb3-137" aria-hidden="true" tabindex="-1"></a>\end{aligned}</span>
+<span id="cb3-138"><a href="#cb3-138" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-139"><a href="#cb3-139" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-140"><a href="#cb3-140" aria-hidden="true" tabindex="-1"></a>Thus </span>
+<span id="cb3-141"><a href="#cb3-141" aria-hidden="true" tabindex="-1"></a>\begin{aligned}</span>
+<span id="cb3-142"><a href="#cb3-142" aria-hidden="true" tabindex="-1"></a>I_{kl}- B_{kl} &amp;=&amp;  \sum_{i \mid t_i\in ]0,\frac{1}{2}<span class="co">[</span><span class="ot">} t_i^2 \|\boldsymbol \mu_k - \boldsymbol \mu_l\|^2 + \sum_{i \mid t_i\in </span><span class="co">]</span>\frac{1}{2},1[} (1-t_i)^2 \|\boldsymbol \mu_k - \boldsymbol \mu_l\|^2,<span class="sc">\\</span></span>
+<span id="cb3-143"><a href="#cb3-143" aria-hidden="true" tabindex="-1"></a>\frac{I_{kl}- B_{kl}}{\|\boldsymbol \mu_k - \boldsymbol \mu_l\|^2} &amp;=&amp; \sum_{i \mid t_i\in ]0,\frac{1}{2}<span class="co">[</span><span class="ot">} t_i^2  + \sum_{i \mid t_i\in </span><span class="co">]</span>\frac{1}{2},1[} (1-t_i)^2 <span class="sc">\\</span></span>
+<span id="cb3-144"><a href="#cb3-144" aria-hidden="true" tabindex="-1"></a>\frac{I_{kl}- B_{kl}}{(n_k+n_l)\|\boldsymbol \mu_k - \boldsymbol \mu_l\|^2} &amp;=&amp; \frac{\sum_{\boldsymbol{i} \in k} \langle \boldsymbol{x_i} - \boldsymbol{\mu}_k \vert \boldsymbol{\mu}_l - \boldsymbol{\mu}_k \rangle_+^2  \sum_{\boldsymbol{i} \in l} \langle \boldsymbol{x_i} - \boldsymbol{\mu}_l \vert \boldsymbol{\mu}_k - \boldsymbol{\mu}_l\rangle_+^2}{(n_k+n_l)\|\boldsymbol \mu_k - \boldsymbol \mu_l\|^4}</span>
+<span id="cb3-145"><a href="#cb3-145" aria-hidden="true" tabindex="-1"></a>\end{aligned}</span>
+<span id="cb3-146"><a href="#cb3-146" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-147"><a href="#cb3-147" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-148"><a href="#cb3-148" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-149"><a href="#cb3-149" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-150"><a href="#cb3-150" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-151"><a href="#cb3-151" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-152"><a href="#cb3-152" aria-hidden="true" tabindex="-1"></a><span class="fu">## Bridge version 2 </span></span>
+<span id="cb3-153"><a href="#cb3-153" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-154"><a href="#cb3-154" aria-hidden="true" tabindex="-1"></a>K-means clustering assigns a class to each point based on its proximity to a central point, called a centroid. As a result, the boundary that separates two classes is a hyperplane. This hyperplane is orthogonal to the line segment connecting the centroids of the two classes and intersects this segment at its midpoint.</span>
+<span id="cb3-155"><a href="#cb3-155" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-156"><a href="#cb3-156" aria-hidden="true" tabindex="-1"></a>We introduce the concept of Bridge affinity between two classes, $k$</span>
+<span id="cb3-157"><a href="#cb3-157" aria-hidden="true" tabindex="-1"></a> and $l$, which is determined by the mean distance of points to the hyperplane that separates these classes. Visualizing the segment as a bridge, we define for each point $\boldsymbol x \in kl$ the distance required to reach the center of the bridge, denoted as  $\boldsymbol \mu_{kl} = \frac{1}{2}(\boldsymbol \mu_k+\boldsymbol \mu_l)$. This formulation draws a parallel to the concept of the support vector margin, emphasizing the geometric characterization of cluster separation. </span>
+<span id="cb3-158"><a href="#cb3-158" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-159"><a href="#cb3-159" aria-hidden="true" tabindex="-1"></a>Let us denote $\boldsymbol p_{kl}(\boldsymbol x)$ the projection of $\boldsymbol x \in k$ onto the segment $<span class="co">[</span><span class="ot">\boldsymbol \mu_k,\boldsymbol \mu_l</span><span class="co">]</span>$: </span>
+<span id="cb3-160"><a href="#cb3-160" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb3-161"><a href="#cb3-161" aria-hidden="true" tabindex="-1"></a>\boldsymbol p_{kl}(\boldsymbol x) = \boldsymbol \mu_{k} + t(\boldsymbol \mu_{l} - \boldsymbol \mu_{k}),</span>
+<span id="cb3-162"><a href="#cb3-162" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb3-163"><a href="#cb3-163" aria-hidden="true" tabindex="-1"></a>with </span>
+<span id="cb3-164"><a href="#cb3-164" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb3-165"><a href="#cb3-165" aria-hidden="true" tabindex="-1"></a>t  = \min\left(1, \max\left(0, \frac{\langle \boldsymbol x - \boldsymbol \mu_k | \boldsymbol \mu_l - \boldsymbol \mu_k\rangle}{\|  \boldsymbol \mu_l - \boldsymbol \mu_k \|^2}\right)\right). </span>
+<span id="cb3-166"><a href="#cb3-166" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb3-167"><a href="#cb3-167" aria-hidden="true" tabindex="-1"></a>The 'bridge distance'  for a point $\boldsymbol x \in k$ is </span>
+<span id="cb3-168"><a href="#cb3-168" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb3-169"><a href="#cb3-169" aria-hidden="true" tabindex="-1"></a>\|\boldsymbol p_{kl}(\boldsymbol x) - \boldsymbol \mu_{kl}\| = (1/2-t) \| \boldsymbol \mu_k-\boldsymbol \mu_l \|.</span>
+<span id="cb3-170"><a href="#cb3-170" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb3-171"><a href="#cb3-171" aria-hidden="true" tabindex="-1"></a>The ratio $\frac{\|\boldsymbol p_{kl}(\boldsymbol x) - \boldsymbol \mu_{kl}\|}{\| \boldsymbol \mu_k-\boldsymbol \mu_k \|}$ acts as a dissmilarity. If the average ratio is large it suggests a low density between the classes. Conversely, if this average  ratio is small, it indicates that the two classes may reside within the same densely populated region.  </span>
+<span id="cb3-172"><a href="#cb3-172" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-173"><a href="#cb3-173" aria-hidden="true" tabindex="-1"></a>We then define the bridge affinity as a fonction of this ratio between the bridge distance and the length of the bridge</span>
+<span id="cb3-174"><a href="#cb3-174" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb3-175"><a href="#cb3-175" aria-hidden="true" tabindex="-1"></a> t_{kl}(\boldsymbol x) =  1/2- \frac{\|\boldsymbol p_{kl}(\boldsymbol x) - \boldsymbol \mu_{kl}\|}{\| \boldsymbol \mu_k-\boldsymbol \mu_l \|}.</span>
+<span id="cb3-176"><a href="#cb3-176" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb3-177"><a href="#cb3-177" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-178"><a href="#cb3-178" aria-hidden="true" tabindex="-1"></a>The bridge affinity between two classes  $k$ and $l$ is defined as the mean bridge affinity of all points of classes  $k$, $l$:</span>
+<span id="cb3-179"><a href="#cb3-179" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-180"><a href="#cb3-180" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb3-181"><a href="#cb3-181" aria-hidden="true" tabindex="-1"></a>a_{kl} =\sum_{\boldsymbol x \in kl} t_{kl}(\boldsymbol x)= \frac{\sum_{\boldsymbol{x} \in k} \langle \boldsymbol{x} - \boldsymbol{\mu}_k \vert \boldsymbol{\mu}_l - \boldsymbol{\mu}_k \rangle_+ + \sum_{\boldsymbol{x} \in l} \langle \boldsymbol{x} - \boldsymbol{\mu}_l \vert \boldsymbol{\mu}_k - \boldsymbol{\mu}_l\rangle_+}{(<span class="sc">\#</span>P_k + <span class="sc">\#</span>P_l) \lVert \boldsymbol{\mu}_k - \boldsymbol{\mu}_l \rVert^2}.</span>
+<span id="cb3-182"><a href="#cb3-182" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb3-183"><a href="#cb3-183" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-184"><a href="#cb3-184" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-185"><a href="#cb3-185" aria-hidden="true" tabindex="-1"></a><span class="fu">## Algorithm</span></span>
+<span id="cb3-186"><a href="#cb3-186" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-187"><a href="#cb3-187" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-188"><a href="#cb3-188" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-189"><a href="#cb3-189" aria-hidden="true" tabindex="-1"></a><span class="in">```pseudocode</span></span>
+<span id="cb3-190"><a href="#cb3-190" aria-hidden="true" tabindex="-1"></a><span class="in">#| label: alg-spectral-bridges</span></span>
+<span id="cb3-191"><a href="#cb3-191" aria-hidden="true" tabindex="-1"></a><span class="in">#| html-indent-size: "1.2em"</span></span>
+<span id="cb3-192"><a href="#cb3-192" aria-hidden="true" tabindex="-1"></a><span class="in">#| html-comment-delimiter: "//"</span></span>
+<span id="cb3-193"><a href="#cb3-193" aria-hidden="true" tabindex="-1"></a><span class="in">#| html-line-number: true</span></span>
+<span id="cb3-194"><a href="#cb3-194" aria-hidden="true" tabindex="-1"></a><span class="in">#| html-line-number-punc: ":"</span></span>
+<span id="cb3-195"><a href="#cb3-195" aria-hidden="true" tabindex="-1"></a><span class="in">#| html-no-end: false</span></span>
+<span id="cb3-196"><a href="#cb3-196" aria-hidden="true" tabindex="-1"></a><span class="in">#| pdf-placement: "htb!"</span></span>
+<span id="cb3-197"><a href="#cb3-197" aria-hidden="true" tabindex="-1"></a><span class="in">#| pdf-line-number: true</span></span>
+<span id="cb3-198"><a href="#cb3-198" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-199"><a href="#cb3-199" aria-hidden="true" tabindex="-1"></a><span class="in">\begin{algorithm}</span></span>
+<span id="cb3-200"><a href="#cb3-200" aria-hidden="true" tabindex="-1"></a><span class="in">\caption{Spectral Bridges}</span></span>
+<span id="cb3-201"><a href="#cb3-201" aria-hidden="true" tabindex="-1"></a><span class="in">\begin{algorithmic}</span></span>
+<span id="cb3-202"><a href="#cb3-202" aria-hidden="true" tabindex="-1"></a><span class="in">\Procedure{SpectralBridges}{$data, k, p$} \Comment{data: input dataset, k: number of clusters, p: number of Voronoi regions}</span></span>
+<span id="cb3-203"><a href="#cb3-203" aria-hidden="true" tabindex="-1"></a><span class="in">  \State $centroids \gets$ \Call{KMeans}{$data, p$} \Comment{Initial centroids using k-means}</span></span>
+<span id="cb3-204"><a href="#cb3-204" aria-hidden="true" tabindex="-1"></a><span class="in">  \State $voronoiRegions \gets$ \Call{Subdivide}{$data, centroids$} \Comment{Subdivide data into Voronoi regions}</span></span>
+<span id="cb3-205"><a href="#cb3-205" aria-hidden="true" tabindex="-1"></a><span class="in">  \State $graph \gets$ \Call{CreateGraph}{$voronoiRegions$} \Comment{Assess connectivity between regions}</span></span>
+<span id="cb3-206"><a href="#cb3-206" aria-hidden="true" tabindex="-1"></a><span class="in">  \State $clusters \gets$ \Call{WardLinkage}{$graph, k$} \Comment{Cluster using Ward linkage-inspired approach}</span></span>
+<span id="cb3-207"><a href="#cb3-207" aria-hidden="true" tabindex="-1"></a><span class="in">  \State \Return $clusters$</span></span>
+<span id="cb3-208"><a href="#cb3-208" aria-hidden="true" tabindex="-1"></a><span class="in">\EndProcedure</span></span>
+<span id="cb3-209"><a href="#cb3-209" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-210"><a href="#cb3-210" aria-hidden="true" tabindex="-1"></a><span class="in">\Procedure{KMeans}{$data, p$}</span></span>
+<span id="cb3-211"><a href="#cb3-211" aria-hidden="true" tabindex="-1"></a><span class="in">  \State Initialize $p$ centroids randomly</span></span>
+<span id="cb3-212"><a href="#cb3-212" aria-hidden="true" tabindex="-1"></a><span class="in">  \Repeat</span></span>
+<span id="cb3-213"><a href="#cb3-213" aria-hidden="true" tabindex="-1"></a><span class="in">    \State Assign each point to the nearest centroid</span></span>
+<span id="cb3-214"><a href="#cb3-214" aria-hidden="true" tabindex="-1"></a><span class="in">    \State Update centroids based on assignments</span></span>
+<span id="cb3-215"><a href="#cb3-215" aria-hidden="true" tabindex="-1"></a><span class="in">  \Until{centroids do not change}</span></span>
+<span id="cb3-216"><a href="#cb3-216" aria-hidden="true" tabindex="-1"></a><span class="in">  \State \Return centroids</span></span>
+<span id="cb3-217"><a href="#cb3-217" aria-hidden="true" tabindex="-1"></a><span class="in">\EndProcedure</span></span>
+<span id="cb3-218"><a href="#cb3-218" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-219"><a href="#cb3-219" aria-hidden="true" tabindex="-1"></a><span class="in">\Procedure{Subdivide}{$data, centroids$}</span></span>
+<span id="cb3-220"><a href="#cb3-220" aria-hidden="true" tabindex="-1"></a><span class="in">  \State $voronoiRegions \gets \{\}$</span></span>
+<span id="cb3-221"><a href="#cb3-221" aria-hidden="true" tabindex="-1"></a><span class="in">  \For{each point $x$ in $data$}</span></span>
+<span id="cb3-222"><a href="#cb3-222" aria-hidden="true" tabindex="-1"></a><span class="in">    \State Find the nearest centroid for $x$</span></span>
+<span id="cb3-223"><a href="#cb3-223" aria-hidden="true" tabindex="-1"></a><span class="in">    \State Assign $x$ to the corresponding Voronoi region</span></span>
+<span id="cb3-224"><a href="#cb3-224" aria-hidden="true" tabindex="-1"></a><span class="in">  \EndFor</span></span>
+<span id="cb3-225"><a href="#cb3-225" aria-hidden="true" tabindex="-1"></a><span class="in">  \State \Return $voronoiRegions$</span></span>
+<span id="cb3-226"><a href="#cb3-226" aria-hidden="true" tabindex="-1"></a><span class="in">\EndProcedure</span></span>
+<span id="cb3-227"><a href="#cb3-227" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-228"><a href="#cb3-228" aria-hidden="true" tabindex="-1"></a><span class="in">\Procedure{CreateGraph}{$voronoiRegions$}</span></span>
+<span id="cb3-229"><a href="#cb3-229" aria-hidden="true" tabindex="-1"></a><span class="in">  \State $graph \gets$ empty graph</span></span>
+<span id="cb3-230"><a href="#cb3-230" aria-hidden="true" tabindex="-1"></a><span class="in">  \For{each pair of regions $(R_i, R_j)$ in $voronoiRegions$}</span></span>
+<span id="cb3-231"><a href="#cb3-231" aria-hidden="true" tabindex="-1"></a><span class="in">    \State Calculate connectivity measure between $R_i$ and $R_j$</span></span>
+<span id="cb3-232"><a href="#cb3-232" aria-hidden="true" tabindex="-1"></a><span class="in">    \State Add edge between $R_i$ and $R_j$ in $graph$ with weight based on connectivity</span></span>
+<span id="cb3-233"><a href="#cb3-233" aria-hidden="true" tabindex="-1"></a><span class="in">  \EndFor</span></span>
+<span id="cb3-234"><a href="#cb3-234" aria-hidden="true" tabindex="-1"></a><span class="in">  \State \Return $graph$</span></span>
+<span id="cb3-235"><a href="#cb3-235" aria-hidden="true" tabindex="-1"></a><span class="in">\EndProcedure</span></span>
+<span id="cb3-236"><a href="#cb3-236" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-237"><a href="#cb3-237" aria-hidden="true" tabindex="-1"></a><span class="in">\Procedure{WardLinkage}{$graph, k$}</span></span>
+<span id="cb3-238"><a href="#cb3-238" aria-hidden="true" tabindex="-1"></a><span class="in">  \State $clusters \gets$ Initialize each region as a separate cluster</span></span>
+<span id="cb3-239"><a href="#cb3-239" aria-hidden="true" tabindex="-1"></a><span class="in">  \Repeat</span></span>
+<span id="cb3-240"><a href="#cb3-240" aria-hidden="true" tabindex="-1"></a><span class="in">    \State Find the pair of clusters with the smallest merging cost</span></span>
+<span id="cb3-241"><a href="#cb3-241" aria-hidden="true" tabindex="-1"></a><span class="in">    \State Merge the selected pair of clusters</span></span>
+<span id="cb3-242"><a href="#cb3-242" aria-hidden="true" tabindex="-1"></a><span class="in">  \Until{number of clusters equals $k$}</span></span>
+<span id="cb3-243"><a href="#cb3-243" aria-hidden="true" tabindex="-1"></a><span class="in">  \State \Return $clusters$</span></span>
+<span id="cb3-244"><a href="#cb3-244" aria-hidden="true" tabindex="-1"></a><span class="in">\EndProcedure</span></span>
+<span id="cb3-245"><a href="#cb3-245" aria-hidden="true" tabindex="-1"></a><span class="in">\end{algorithmic}</span></span>
+<span id="cb3-246"><a href="#cb3-246" aria-hidden="true" tabindex="-1"></a><span class="in">\end{algorithm}</span></span>
+<span id="cb3-247"><a href="#cb3-247" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb3-248"><a href="#cb3-248" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-249"><a href="#cb3-249" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-250"><a href="#cb3-250" aria-hidden="true" tabindex="-1"></a><span class="fu"># Numerical experiments</span></span>
+<span id="cb3-251"><a href="#cb3-251" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-252"><a href="#cb3-252" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-253"><a href="#cb3-253" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-254"><a href="#cb3-254" aria-hidden="true" tabindex="-1"></a><span class="fu"># References {.unnumbered}</span></span>
+<span id="cb3-255"><a href="#cb3-255" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-256"><a href="#cb3-256" aria-hidden="true" tabindex="-1"></a>::: {#refs}</span>
+<span id="cb3-257"><a href="#cb3-257" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb3-258"><a href="#cb3-258" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-259"><a href="#cb3-259" aria-hidden="true" tabindex="-1"></a><span class="fu"># Session information {.appendix .unnumbered}</span></span>
+<span id="cb3-260"><a href="#cb3-260" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-261"><a href="#cb3-261" aria-hidden="true" tabindex="-1"></a><span class="in">```{r session-info}</span></span>
+<span id="cb3-262"><a href="#cb3-262" aria-hidden="true" tabindex="-1"></a><span class="in">sessionInfo()</span></span>
+<span id="cb3-263"><a href="#cb3-263" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></pre></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+<script>
+(function(d) {
+  d.querySelectorAll(".pseudocode-container").forEach(function(el) {
+    let pseudocodeOptions = {
+      indentSize: el.dataset.indentSize || "1.2em",
+      commentDelimiter: el.dataset.commentDelimiter || "//",
+      lineNumber: el.dataset.lineNumber === "true" ? true : false,
+      lineNumberPunc: el.dataset.lineNumberPunc || ":",
+      noEnd: el.dataset.noEnd === "true" ? true : false,
+      titlePrefix: el.dataset.algTitle || "Algorithm"
+    };
+    pseudocode.renderElement(el.querySelector(".pseudocode"), pseudocodeOptions);
+  });
+})(document);
+(function(d) {
+  d.querySelectorAll(".pseudocode-container").forEach(function(el) {
+    titleSpan = el.querySelector(".ps-root > .ps-algorithm > .ps-line > .ps-keyword")
+    titlePrefix = el.dataset.algTitle;
+    titleIndex = el.dataset.chapterLevel ? el.dataset.chapterLevel + "." + el.dataset.pseudocodeIndex : el.dataset.pseudocodeIndex;
+    titleSpan.innerHTML = titlePrefix + " " + titleIndex + " ";
+  });
+})(document);
+</script>
+
+
+
+
+</body></html>

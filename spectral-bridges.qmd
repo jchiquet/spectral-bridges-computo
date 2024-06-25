@@ -42,9 +42,9 @@ format:
 
 # Abstract
 
-In this paper, Spectral-Bridges, a novel clustering algorithm, is presented. This algorithm builds upon the traditional k-means and spectral clustering frameworks by subdividing data into small Voronoi regions, which are subsequently assessed for their connectivity. Drawing inspiration from Ward linkage, a non-parametric clustering approach is embraced by the Spectral-Bridges algorithm. This approach is characterized by minimal hyperparameters and intuitive usability, thereby augmenting adaptability and enabling the delineation of intricate, non-convex cluster structures.
+In this paper, Spectral-Bridges, a novel clustering algorithm, is presented. This algorithm builds upon the traditional k-means and spectral clustering frameworks by subdividing data into small Voronoi regions, which are subsequently assessed for their connectivity. Drawing inspiration from Support vector machine, a non-parametric clustering approach is proposed. This approach is characterized by minimal hyperparameters and intuitive usability, thereby augmenting adaptability and enabling the delineation of intricate, non-convex cluster structures.
 
-Both global and local data arrangements are aimed to be discerned by Spectral-Bridges in a scale-invariant manner. K-means centroids are leveraged for subgroup initialization, and a strategy is proposed to link these regions, with the "reward" gauged in terms of newly captured variance achievable by connecting them through a projected data segment, referred to as a bridge.
+Both global and local data arrangements are aimed to be discerned by Spectral-Bridges in a scale-invariant manner. K-means centroids are leveraged for subgroup initialization, and a strategy is proposed to link these regions, with the "affinity" gauged in terms of minimal margin between pairs of classes. 
 
 The empirical results underscore Spectral-Bridges as a fast, robust, and versatile tool for sophisticated clustering tasks spanning diverse domains. Its efficacy is observed to extend seamlessly to large-scale scenarios encompassing both real-world and synthetic datasets.
 
@@ -94,40 +94,92 @@ Notice that spectral clustering can be seen as a relaxed graph cut problem.
 
 # Spectral bridges
 
-## Bridge gain
 
 
-The affinity matrix
-Let $A = (a_{kl})_{1 \leq k,l \leq n}$ be the  affinity matrix:
+## Bridge gain version 1
+
+The basic idea involves calculating the reduction in inertia achieved by projecting onto a segment connecting two centroids, rather than using the two centroids separately.
+
+
+The inertia of two balls $k$ and $l$ is 
+$$
+I_{kl} = \sum_{i\in k} \|\boldsymbol x_i - \boldsymbol \mu_k\|^2  + \sum_{i\in l} \|\boldsymbol x_i - \boldsymbol \mu_l\|^2.
+$$
+The inertia of a bridge between $k$ and $l$ is defined as
+$$
+B_{kl} = \sum_{i\in kl} \|\boldsymbol x_i - \boldsymbol p_{kl}(\boldsymbol x_i)\|^2,
+$$
+where 
+$$
+\boldsymbol p_{kl}(\boldsymbol x_i) = \boldsymbol \mu_{k} + t_i(\boldsymbol \mu_{l} - \boldsymbol \mu_{k}),
+$$
+with 
+$$
+t_i  = \min\left(1, \max\left(0, \frac{\langle \boldsymbol x_i - \boldsymbol \mu_k | \boldsymbol \mu_l - \boldsymbol \mu_k\rangle}{\|  \boldsymbol \mu_l - \boldsymbol \mu_k \|^2}\right)\right). 
+$$
+Notice that $B_{kl}$ can be expressed as the sum of three terms:
+\begin{aligned}
+B_{kl} &=& \sum_{i \mid t_i=0} \|\boldsymbol x_i - \boldsymbol \mu_k\|^2  + \sum_{i \mid t_i=1} \|\boldsymbol x_i - \boldsymbol \mu_l\|^2 + \sum_{i \mid t_i\in ]0,1[} \|\boldsymbol x_i - \boldsymbol p_{kl}(\boldsymbol x_i)\|^2.
+\end{aligned}
+The last term may be decomposed in two parts 
+\begin{aligned}
+\sum_{i \mid t_i\in ]0,1[} \|\boldsymbol x_i - \boldsymbol p_{kl}(\boldsymbol x_i)\|^2 &= &\sum_{i \mid t_i\in ]0,\frac{1}{2}[} \|\boldsymbol x_i - \boldsymbol p_{kl}(\boldsymbol x_i)\|^2 + \sum_{i \mid t_i\in [\frac{1}{2},1[} \|\boldsymbol x_i - \boldsymbol p_{kl}(\boldsymbol x_i)\|^2\\
+\end{aligned}
+and each part further decomposed using Pythagore
+\begin{aligned}
+\sum_{i \mid t_i\in ]0,\frac{1}{2}[} \|\boldsymbol x_i - \boldsymbol p_{kl}(\boldsymbol x_i)\|^2 &=& \sum_{i \mid t_i\in ]0,\frac{1}{2}[} \|\boldsymbol x_i - \boldsymbol \mu_k\|^2 - \sum_{i \mid t_i\in ]0,\frac{1}{2}[} \|\boldsymbol \mu_k - \boldsymbol p_{kl}(\boldsymbol x_i)\|^2\\
+&=& \sum_{i \mid t_i\in ]0,\frac{1}{2}[} \|\boldsymbol x_i - \boldsymbol \mu_k\|^2 - \sum_{i \mid t_i\in ]0,\frac{1}{2}[} \|t_i (\boldsymbol \mu_k - \boldsymbol \mu_{l})\|^2,
+\end{aligned}
+
+\begin{aligned}
+\sum_{i \mid t_i\in ]\frac{1}{2},1[} \|\boldsymbol x_i - \boldsymbol p_{kl}(\boldsymbol x_i)\|^2 &=& \sum_{i \mid t_i\in ]0,\frac{1}{2}[} \|\boldsymbol x_i - \boldsymbol \mu_l\|^2 - \sum_{i \mid t_i\in ]0,\frac{1}{2}[} \|\boldsymbol \mu_l - \boldsymbol p_{kl}(\boldsymbol x_i)\|^2\\
+&=& \sum_{i \mid t_i\in ]\frac{1}{2},1[} \|\boldsymbol x_i - \boldsymbol \mu_k\|^2 - \sum_{i \mid t_i\in ]0,\frac{1}{2}[} \|(1-t_i) (\boldsymbol \mu_k - \boldsymbol \mu_{l})\|^2
+\end{aligned}
+
+
+Thus 
+\begin{aligned}
+I_{kl}- B_{kl} &=&  \sum_{i \mid t_i\in ]0,\frac{1}{2}[} t_i^2 \|\boldsymbol \mu_k - \boldsymbol \mu_l\|^2 + \sum_{i \mid t_i\in ]\frac{1}{2},1[} (1-t_i)^2 \|\boldsymbol \mu_k - \boldsymbol \mu_l\|^2,\\
+\frac{I_{kl}- B_{kl}}{\|\boldsymbol \mu_k - \boldsymbol \mu_l\|^2} &=& \sum_{i \mid t_i\in ]0,\frac{1}{2}[} t_i^2  + \sum_{i \mid t_i\in ]\frac{1}{2},1[} (1-t_i)^2 \\
+\frac{I_{kl}- B_{kl}}{(n_k+n_l)\|\boldsymbol \mu_k - \boldsymbol \mu_l\|^2} &=& \frac{\sum_{\boldsymbol{i} \in k} \langle \boldsymbol{x_i} - \boldsymbol{\mu}_k \vert \boldsymbol{\mu}_l - \boldsymbol{\mu}_k \rangle_+^2  \sum_{\boldsymbol{i} \in l} \langle \boldsymbol{x_i} - \boldsymbol{\mu}_l \vert \boldsymbol{\mu}_k - \boldsymbol{\mu}_l\rangle_+^2}{(n_k+n_l)\|\boldsymbol \mu_k - \boldsymbol \mu_l\|^4}
+\end{aligned}
+
+
+
+
+
+
+## Bridge version 2 
+
+K-means clustering assigns a class to each point based on its proximity to a central point, called a centroid. As a result, the boundary that separates two classes is a hyperplane. This hyperplane is orthogonal to the line segment connecting the centroids of the two classes and intersects this segment at its midpoint.
+
+We introduce the concept of Bridge affinity between two classes, $k$
+ and $l$, which is determined by the mean distance of points to the hyperplane that separates these classes. Visualizing the segment as a bridge, we define for each point $\boldsymbol x \in kl$ the distance required to reach the center of the bridge, denoted as  $\boldsymbol \mu_{kl} = \frac{1}{2}(\boldsymbol \mu_k+\boldsymbol \mu_l)$. This formulation draws a parallel to the concept of the support vector margin, emphasizing the geometric characterization of cluster separation. 
+
+Let us denote $\boldsymbol p_{kl}(\boldsymbol x)$ the projection of $\boldsymbol x \in k$ onto the segment $[\boldsymbol \mu_k,\boldsymbol \mu_l]$: 
+$$
+\boldsymbol p_{kl}(\boldsymbol x) = \boldsymbol \mu_{k} + t(\boldsymbol \mu_{l} - \boldsymbol \mu_{k}),
+$$
+with 
+$$
+t  = \min\left(1, \max\left(0, \frac{\langle \boldsymbol x - \boldsymbol \mu_k | \boldsymbol \mu_l - \boldsymbol \mu_k\rangle}{\|  \boldsymbol \mu_l - \boldsymbol \mu_k \|^2}\right)\right). 
+$$
+The 'bridge distance'  for a point $\boldsymbol x \in k$ is 
+$$
+\|\boldsymbol p_{kl}(\boldsymbol x) - \boldsymbol \mu_{kl}\| = (1/2-t) \| \boldsymbol \mu_k-\boldsymbol \mu_l \|.
+$$
+The ratio $\frac{\|\boldsymbol p_{kl}(\boldsymbol x) - \boldsymbol \mu_{kl}\|}{\| \boldsymbol \mu_k-\boldsymbol \mu_k \|}$ acts as a dissmilarity. If the average ratio is large it suggests a low density between the classes. Conversely, if this average  ratio is small, it indicates that the two classes may reside within the same densely populated region.  
+
+We then define the bridge affinity as a fonction of this ratio between the bridge distance and the length of the bridge
+$$
+ t_{kl}(\boldsymbol x) =  1/2- \frac{\|\boldsymbol p_{kl}(\boldsymbol x) - \boldsymbol \mu_{kl}\|}{\| \boldsymbol \mu_k-\boldsymbol \mu_l \|}.
+$$
+
+The bridge affinity between two classes  $k$ and $l$ is defined as the mean bridge affinity of all points of classes  $k$, $l$:
 
 $$
-a_{kl} = \Big[ \frac{\sum_{\boldsymbol{x} \in P_k} \operatorname{d}^2(\boldsymbol{x}, \boldsymbol{\mu}_k) + \sum_{\boldsymbol{x} \in P_l} \operatorname{d}^2(\boldsymbol{x}, \boldsymbol{\mu}_l) - \sum_{\boldsymbol{x} \in P_k \cup P_l} \operatorname{d}^2(\boldsymbol{x}, [\boldsymbol{\mu}_k, \boldsymbol{\mu}_l])}{(\#P_k + \#P_l) \lVert \boldsymbol{\mu}_k - \boldsymbol{\mu}_l \rVert^2} \Big]^{1/2}
+a_{kl} =\sum_{\boldsymbol x \in kl} t_{kl}(\boldsymbol x)= \frac{\sum_{\boldsymbol{x} \in k} \langle \boldsymbol{x} - \boldsymbol{\mu}_k \vert \boldsymbol{\mu}_l - \boldsymbol{\mu}_k \rangle_+ + \sum_{\boldsymbol{x} \in l} \langle \boldsymbol{x} - \boldsymbol{\mu}_l \vert \boldsymbol{\mu}_k - \boldsymbol{\mu}_l\rangle_+}{(\#P_k + \#P_l) \lVert \boldsymbol{\mu}_k - \boldsymbol{\mu}_l \rVert^2}.
 $$
-
-One can rewrite this : 
-
-$$
-a_{kl} =\Big[ \frac{\sum_{\boldsymbol{x} \in P_k} \langle \boldsymbol{x} - \boldsymbol{\mu}_k \vert \boldsymbol{\mu}_l - \boldsymbol{\mu}_k \rangle_+ + \sum_{\boldsymbol{x} \in P_l} \langle \boldsymbol{x} - \boldsymbol{\mu}_l \vert \boldsymbol{\mu}_k - \boldsymbol{\mu}_l\rangle_+}{(\#P_k + \#P_l) \lVert \boldsymbol{\mu}_k - \boldsymbol{\mu}_l \rVert^2} \Big]^{1/2}
-$$
-
-
-
-Because for each $\boldsymbol{x} \in P_k$, let us denote $\boldsymbol{x}_\bot$ the orthogonal projection on the right line : $(\boldsymbol{\mu}_k, \boldsymbol{\mu}_l)$. 
-
-- If $\boldsymbol{x}_\bot \notin [\boldsymbol{\mu}_k, \boldsymbol{\mu}_l]$, \textit{i.e.} $\langle \boldsymbol{x} - \boldsymbol{\mu}_k \vert \boldsymbol{\mu}_l - \boldsymbol{\mu}_k\rangle < 0$, then the point $\boldsymbol{x}$ is closest to $\boldsymbol{\mu}_k$. In that case, the difference between $\operatorname{d}^2(\boldsymbol{x}, \boldsymbol{\mu}_k) - \operatorname{d}^2(\boldsymbol{x}, [\boldsymbol{\mu}_k, \boldsymbol{\mu}_l]) = 0$.
-- If $\boldsymbol{x}_\bot \in [\boldsymbol{\mu}_k, \boldsymbol{\mu}_l]$, \textit{i.e.} $\langle\boldsymbol{x} - \boldsymbol{\mu}_k \vert \boldsymbol{\mu}_l - \boldsymbol{\mu}_k\rangle \geq 0$. And, by the Pythagorean theorem, we have : $\lVert \boldsymbol{x} - \boldsymbol{\mu}_k \rVert^2 = \lVert \boldsymbol{x} - \boldsymbol{x}_\bot \rVert^2 + \lVert \boldsymbol{x}_\bot - \boldsymbol{\mu}_k \rVert^2$, so \\ 
-    $\lVert \boldsymbol{x} - \boldsymbol{\mu}_k \rVert^2 - \lVert \boldsymbol{x} - \boldsymbol{x}_\bot \rVert^2 = \lVert \boldsymbol{x}_\bot - \boldsymbol{\mu}_k \rVert^2$ and 
-    $\operatorname{d}^2(\boldsymbol{x}, \boldsymbol{\mu}_k) - \operatorname{d}^2(\boldsymbol{x}, [\boldsymbol{\mu}_k, \boldsymbol{\mu}_l]) = \lVert \boldsymbol{x}_\bot - \boldsymbol{\mu}_k \rVert^2 = \langle \boldsymbol{x} - \boldsymbol{\mu}_k, \boldsymbol{\mu}_l - \boldsymbol{\mu}_k \rangle$
-
-
-
-
-Thus, more concisely, $\forall \boldsymbol{x} \in P_k$, one can write :
-
-$$
-\operatorname{d}^2(\boldsymbol{x}, \boldsymbol{\mu}_k) - \operatorname{d}^2(\boldsymbol{x}, [\boldsymbol{\mu}_k, \boldsymbol{\mu}_l]) = \langle\boldsymbol{x} - \boldsymbol{\mu}_k \vert \boldsymbol{\mu}_l - \boldsymbol{\mu}_k\rangle_+
-$$
-
 
 
 ## Algorithm
