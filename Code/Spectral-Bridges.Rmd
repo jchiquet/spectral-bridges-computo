@@ -37,7 +37,7 @@ spectral_bridges <-  function(X,
   n <- nrow(X)
 
   kmeans_result  = KMeans_rcpp(X, clusters = n_nodes, 
-                               num_init = 3, max_iters = 30, 
+                               num_init = 3, max_iters =30, 
                                initializer = 'kmeans++')
   
   kmeans_centers <- as.matrix(kmeans_result$centroids)
@@ -46,7 +46,7 @@ spectral_bridges <-  function(X,
   kmeans_Iw<-kmeans_result$WCSS_per_cluster
 
   
-  # 2. Affinity computation
+  # 2. Affinity computation 
   ###################################
 
   affinity <- matrix(0, n_nodes, n_nodes)
@@ -65,11 +65,11 @@ spectral_bridges <-  function(X,
                     Vectorize(function(k, l) {
                       if (k==l) 0 else {
               distkl2<-sum(((kmeans_centers[l,] - kmeans_centers[k, ]))^2);        
-              ti<-c(pmax(0, (kmeans_centers[l,] - kmeans_centers[k, ]) %*% 
+              alphai<-c(pmax(0, (kmeans_centers[l,] - kmeans_centers[k, ]) %*% 
                                          t(X.centered[(kmeans_labels ==k), ]))/distkl2,
                     (pmax(0, (kmeans_centers[k,] - kmeans_centers[l, ]) %*% 
                                          t(X.centered[(kmeans_labels ==l), ]))/distkl2));
-              sum(ti)/(kmeans_size[k]+kmeans_size[l])
+              sqrt(sum(alphai^2)/(kmeans_size[k]+kmeans_size[l]))
               #compute_entropy(ti)
               }
               }))
@@ -102,7 +102,7 @@ spectral_bridges <-  function(X,
   
   return(list(clustering = clusters,data =X,class="partition"))
 }
-````
+```
 
 
 ## Iris Data set

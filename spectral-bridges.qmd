@@ -38,151 +38,211 @@ published: false # will be set to true once accepted
 format:
   computo-html: default 
   computo-pdf:  default
+editor: 
+  markdown: 
+    wrap: 72
 ---
 
 # Abstract
 
-In this paper, Spectral-Bridges, a novel clustering algorithm, is presented. This algorithm builds upon the traditional k-means and spectral clustering frameworks by subdividing data into small Voronoi regions, which are subsequently assessed for their connectivity. Drawing inspiration from Support vector machine, a non-parametric clustering approach is proposed. This approach is characterized by minimal hyperparameters and intuitive usability, thereby augmenting adaptability and enabling the delineation of intricate, non-convex cluster structures.
+In this paper, Spectral-Bridges, a novel clustering algorithm, is
+presented. This algorithm builds upon the traditional k-means and
+spectral clustering frameworks by subdividing data into small Voronoi
+regions, which are subsequently assessed for their connectivity. Drawing
+inspiration from Support vector machine, a non-parametric clustering
+approach is proposed. This approach is characterized by minimal
+hyperparameters and intuitive usability, thereby augmenting adaptability
+and enabling the delineation of intricate, non-convex cluster
+structures.
 
-Both global and local data arrangements are aimed to be discerned by Spectral-Bridges in a scale-invariant manner. K-means centroids are leveraged for subgroup initialization, and a strategy is proposed to link these regions, with the "affinity" gauged in terms of minimal margin between pairs of classes. 
+Both global and local data arrangements are aimed to be discerned by
+Spectral-Bridges in a scale-invariant manner. 
 
-The empirical results underscore Spectral-Bridges as a fast, robust, and versatile tool for sophisticated clustering tasks spanning diverse domains. Its efficacy is observed to extend seamlessly to large-scale scenarios encompassing both real-world and synthetic datasets.
-
+The empirical results underscore Spectral-Bridges as a fast, robust, and
+versatile tool for sophisticated clustering tasks spanning diverse
+domains. Its efficacy is observed to extend seamlessly to large-scale
+scenarios encompassing both real-world and synthetic datasets.
 
 # Introduction
 
 <!--Interest of clustering-->
-Clustering is a fundamental technique for exploratory data analysis. It partition a set of objects into a certain number of homogeneous groups, each referred to as a cluster.  It is extensively utilized across diverse fields such  biology, social sciences, and psychology. Clustering is frequently employed in conjunction with supervised learning as a pre-processing step, where it helps to structure and simplify data, thereby enhancing the performance and interpretability of subsequent predictive models.
 
-
+Clustering is a fundamental technique for exploratory data analysis. It
+partition a set of objects into a certain number of homogeneous groups,
+each referred to as a cluster. It is extensively utilized across diverse
+fields such biology, social sciences, and psychology. Clustering is
+frequently employed in conjunction with supervised learning as a
+pre-processing step, where it helps to structure and simplify data,
+thereby enhancing the performance and interpretability of subsequent
+predictive models.
 
 <!-- Importance of defining "similar" -->
 
-
 <!-- Clustering approaches -->
 
-There are numerous approaches to clustering, each defined by how similarity between objects is measured, either through a similarity measure or more strictly through a distance metric.
+There are numerous approaches to clustering, each defined by how
+similarity between objects is measured, either through a similarity
+measure or more strictly through a distance metric.
 
-Density-based methods identify regions within the data that have a high concentration of points, corresponding to the modes of the joint density. A notable non-parametric example of this approach is DBSCAN [@ester1996density]. In contrast, model-based clustering, such as Gaussian mixture models, represents a parametric approach to density-based methods.
+Density-based methods identify regions within the data that have a high
+concentration of points, corresponding to the modes of the joint
+density. A notable non-parametric example of this approach is DBSCAN
+[@ester1996density]. In contrast, model-based clustering, such as
+Gaussian mixture models, represents a parametric approach to
+density-based methods.
 
-Geometric approaches, such as kmeans [@macqueen1967some]  are distance-based and aim to partition the data in a way that optimizes a criterion reflecting group homogeneity.
+Geometric approaches, such as kmeans [@macqueen1967some] are
+distance-based and aim to partition the data in a way that optimizes a
+criterion reflecting group homogeneity.
 
-Graph-based methods treat data as a graph, with vertices representing data points and edges weighted to reflect the affinity between these points.
+Graph-based methods treat data as a graph, with vertices representing
+data points and edges weighted to reflect the affinity between these
+points.
 
-
+```{=html}
 <!--
 
 Clustering is a fundamental problem in the field of data mining and machine learning [1], whose purpose is to partition a set of objects into a certain number of homogeneous groups, each referred to as a cluster. 
 Out of the large number of clustering algorithms that have been developed, spectral clustering in recent years has been gaining increasing attention due to its promising ability in dealing with non- linearly separable datasets [2], [3], [4], [5]. However, a critical limitation to conventional spectral clustering lies in its huge time and space complexity, which significantly restricts its application to large-scale problems.
 Conventional spectral clustering typically consists of two time- and memory-consuming phases, namely,
 -->
+```
+
+
+The algorithm proposed in this paper draws from numerous clustering techniques. The initial intuition is to detect high-density areas. To this end, a vector quantization is used to divide the space into a Voronoi tessellation. An original geometric criterion is then employed to detect pairs of Voronoi regions that are either distant from each other or separated by a low-density boundary. Finally, this affinity measure is considered as the weight of an edge in a complete graph connecting the centroids of the tessellation, and a spectral clustering algorithm is used to find a partition of this graph.
+
+The paper begins with a section dedicated to presenting the context and related algorithms, followed by a detailed description of the proposed algorithm. Experiments and comparisons with reference algorithms are then conducted on both real and synthetic data.
 
 
 
 # Background
 
+Spectral clustering is a graph-based approach that computes the
+eigenvectors of the graph's Laplacian matrix. This technique transforms
+the data into a lower-dimensional space, making the clusters more
+discernible. A standard algorithm like k-means is then applied to these
+transformed features to identify the clusters[@von2007tutorial].
 
-Spectral clustering is a graph-based approach that computes the eigenvectors of the graph's Laplacian matrix. This technique transforms the data into a lower-dimensional space, making the clusters more discernible. A standard algorithm like k-means is then applied to these transformed features to identify the clusters[@von2007tutorial].
-
-It enables to capture complex data structures and discern clusters based on the connectivity of data points in a transformed space.
-Notice that spectral clustering can be seen as a relaxed graph cut problem. 
-
-
-
-
-
+It enables to capture complex data structures and discern clusters based
+on the connectivity of data points in a transformed space. Notice that
+spectral clustering can be seen as a relaxed graph cut problem.
 
 # Spectral bridges
 
+The proposed algorithm uses K-means centroids for vector quantization defining Voronoi region, and a strategy is proposed to link these regions, with the "affinity" gauged in terms of minimal margin between pairs of classes. These affinities are considered as weight of edges defining a completely connected graph whose vertices are the regions. Spectral clustering on the region provide a partition of the input space. The sole parameters of the algorithm are the number of Voronoi region and the number of final cluster. 
 
 
-## Bridge gain version 1
+## Bridge gain affinity
 
-The basic idea involves calculating the reduction in inertia achieved by projecting onto a segment connecting two centroids, rather than using the two centroids separately.
+The basic idea involves calculating the difference in inertia achieved
+by projecting onto a segment connecting two centroids, rather than using
+the two centroids separately. If the difference is small, it suggests a
+low density between the classes. Conversely, if this diffrence is large,
+it indicates that the two classes may reside within the same densely
+populated region.
+
+<!-- ::: {#fig-balls-vs-bridge} -->
+<!-- ::::{.columns} -->
+<!-- ::: {.column with="50%"} -->
+<!-- ![](figures/balls.pdf){width=150,height=150} -->
+<!-- ::: -->
+<!-- ::: {.column with="50%"} -->
+<!-- ![](figures/bridge.pdf){width=150,height=150} -->
+<!-- ::: -->
+<!-- :::: -->
+<!-- Balls (left) versus Bridge (right). The inertia of each structure is the sum of the squared distances represented by grey lines.   -->
+<!-- ::: -->
+
+
+::: {#fig-balls-bridge layout-ncol=2}
+![](figures/balls.pdf){width=50%}
+
+![](figures/bridge.pdf){width=50%}
+
+Balls (left) versus Bridge (right). The inertia of each structure is the sum of the squared distances represented by grey lines.
+:::
 
 
 The inertia of two balls $k$ and $l$ is 
 $$
 I_{kl} = \sum_{i\in k} \|\boldsymbol x_i - \boldsymbol \mu_k\|^2  + \sum_{i\in l} \|\boldsymbol x_i - \boldsymbol \mu_l\|^2.
-$$
-The inertia of a bridge between $k$ and $l$ is defined as
-$$
+$$ 
+The inertia of a bridge between $k$ and $l$ is defined as $$
 B_{kl} = \sum_{i\in kl} \|\boldsymbol x_i - \boldsymbol p_{kl}(\boldsymbol x_i)\|^2,
-$$
-where 
-$$
+$$ where $$
 \boldsymbol p_{kl}(\boldsymbol x_i) = \boldsymbol \mu_{k} + t_i(\boldsymbol \mu_{l} - \boldsymbol \mu_{k}),
-$$
-with 
-$$
+$$ with $$
 t_i  = \min\left(1, \max\left(0, \frac{\langle \boldsymbol x_i - \boldsymbol \mu_k | \boldsymbol \mu_l - \boldsymbol \mu_k\rangle}{\|  \boldsymbol \mu_l - \boldsymbol \mu_k \|^2}\right)\right). 
+$$ 
+
+The normalized average of the difference betwenn Bridge and balls inertia is (See [Appendix](#gain)) 
 $$
-Notice that $B_{kl}$ can be expressed as the sum of three terms:
-\begin{aligned}
-B_{kl} &=& \sum_{i \mid t_i=0} \|\boldsymbol x_i - \boldsymbol \mu_k\|^2  + \sum_{i \mid t_i=1} \|\boldsymbol x_i - \boldsymbol \mu_l\|^2 + \sum_{i \mid t_i\in ]0,1[} \|\boldsymbol x_i - \boldsymbol p_{kl}(\boldsymbol x_i)\|^2.
-\end{aligned}
-The last term may be decomposed in two parts 
-\begin{aligned}
-\sum_{i \mid t_i\in ]0,1[} \|\boldsymbol x_i - \boldsymbol p_{kl}(\boldsymbol x_i)\|^2 &= &\sum_{i \mid t_i\in ]0,\frac{1}{2}[} \|\boldsymbol x_i - \boldsymbol p_{kl}(\boldsymbol x_i)\|^2 + \sum_{i \mid t_i\in [\frac{1}{2},1[} \|\boldsymbol x_i - \boldsymbol p_{kl}(\boldsymbol x_i)\|^2\\
-\end{aligned}
-and each part further decomposed using Pythagore
-\begin{aligned}
-\sum_{i \mid t_i\in ]0,\frac{1}{2}[} \|\boldsymbol x_i - \boldsymbol p_{kl}(\boldsymbol x_i)\|^2 &=& \sum_{i \mid t_i\in ]0,\frac{1}{2}[} \|\boldsymbol x_i - \boldsymbol \mu_k\|^2 - \sum_{i \mid t_i\in ]0,\frac{1}{2}[} \|\boldsymbol \mu_k - \boldsymbol p_{kl}(\boldsymbol x_i)\|^2\\
-&=& \sum_{i \mid t_i\in ]0,\frac{1}{2}[} \|\boldsymbol x_i - \boldsymbol \mu_k\|^2 - \sum_{i \mid t_i\in ]0,\frac{1}{2}[} \|t_i (\boldsymbol \mu_k - \boldsymbol \mu_{l})\|^2,
-\end{aligned}
-
-\begin{aligned}
-\sum_{i \mid t_i\in ]\frac{1}{2},1[} \|\boldsymbol x_i - \boldsymbol p_{kl}(\boldsymbol x_i)\|^2 &=& \sum_{i \mid t_i\in ]0,\frac{1}{2}[} \|\boldsymbol x_i - \boldsymbol \mu_l\|^2 - \sum_{i \mid t_i\in ]0,\frac{1}{2}[} \|\boldsymbol \mu_l - \boldsymbol p_{kl}(\boldsymbol x_i)\|^2\\
-&=& \sum_{i \mid t_i\in ]\frac{1}{2},1[} \|\boldsymbol x_i - \boldsymbol \mu_k\|^2 - \sum_{i \mid t_i\in ]0,\frac{1}{2}[} \|(1-t_i) (\boldsymbol \mu_k - \boldsymbol \mu_{l})\|^2
-\end{aligned}
-
-
-Thus 
-\begin{aligned}
-I_{kl}- B_{kl} &=&  \sum_{i \mid t_i\in ]0,\frac{1}{2}[} t_i^2 \|\boldsymbol \mu_k - \boldsymbol \mu_l\|^2 + \sum_{i \mid t_i\in ]\frac{1}{2},1[} (1-t_i)^2 \|\boldsymbol \mu_k - \boldsymbol \mu_l\|^2,\\
-\frac{I_{kl}- B_{kl}}{\|\boldsymbol \mu_k - \boldsymbol \mu_l\|^2} &=& \sum_{i \mid t_i\in ]0,\frac{1}{2}[} t_i^2  + \sum_{i \mid t_i\in ]\frac{1}{2},1[} (1-t_i)^2 \\
-\frac{I_{kl}- B_{kl}}{(n_k+n_l)\|\boldsymbol \mu_k - \boldsymbol \mu_l\|^2} &=& \frac{\sum_{\boldsymbol{i} \in k} \langle \boldsymbol{x_i} - \boldsymbol{\mu}_k \vert \boldsymbol{\mu}_l - \boldsymbol{\mu}_k \rangle_+^2  \sum_{\boldsymbol{i} \in l} \langle \boldsymbol{x_i} - \boldsymbol{\mu}_l \vert \boldsymbol{\mu}_k - \boldsymbol{\mu}_l\rangle_+^2}{(n_k+n_l)\|\boldsymbol \mu_k - \boldsymbol \mu_l\|^4}
-\end{aligned}
-
-
-
-
-
-
-## Bridge version 2 
-
-K-means clustering assigns a class to each point based on its proximity to a central point, called a centroid. As a result, the boundary that separates two classes is a hyperplane. This hyperplane is orthogonal to the line segment connecting the centroids of the two classes and intersects this segment at its midpoint.
-
-We introduce the concept of Bridge affinity between two classes, $k$
- and $l$, which is determined by the mean distance of points to the hyperplane that separates these classes. Visualizing the segment as a bridge, we define for each point $\boldsymbol x \in kl$ the distance required to reach the center of the bridge, denoted as  $\boldsymbol \mu_{kl} = \frac{1}{2}(\boldsymbol \mu_k+\boldsymbol \mu_l)$. This formulation draws a parallel to the concept of the support vector margin, emphasizing the geometric characterization of cluster separation. 
-
-Let us denote $\boldsymbol p_{kl}(\boldsymbol x)$ the projection of $\boldsymbol x \in k$ onto the segment $[\boldsymbol \mu_k,\boldsymbol \mu_l]$: 
-$$
-\boldsymbol p_{kl}(\boldsymbol x) = \boldsymbol \mu_{k} + t(\boldsymbol \mu_{l} - \boldsymbol \mu_{k}),
-$$
-with 
-$$
-t  = \min\left(1, \max\left(0, \frac{\langle \boldsymbol x - \boldsymbol \mu_k | \boldsymbol \mu_l - \boldsymbol \mu_k\rangle}{\|  \boldsymbol \mu_l - \boldsymbol \mu_k \|^2}\right)\right). 
-$$
-The 'bridge distance'  for a point $\boldsymbol x \in k$ is 
-$$
-\|\boldsymbol p_{kl}(\boldsymbol x) - \boldsymbol \mu_{kl}\| = (1/2-t) \| \boldsymbol \mu_k-\boldsymbol \mu_l \|.
-$$
-The ratio $\frac{\|\boldsymbol p_{kl}(\boldsymbol x) - \boldsymbol \mu_{kl}\|}{\| \boldsymbol \mu_k-\boldsymbol \mu_k \|}$ acts as a dissmilarity. If the average ratio is large it suggests a low density between the classes. Conversely, if this average  ratio is small, it indicates that the two classes may reside within the same densely populated region.  
-
-We then define the bridge affinity as a fonction of this ratio between the bridge distance and the length of the bridge
-$$
- t_{kl}(\boldsymbol x) =  1/2- \frac{\|\boldsymbol p_{kl}(\boldsymbol x) - \boldsymbol \mu_{kl}\|}{\| \boldsymbol \mu_k-\boldsymbol \mu_l \|}.
+\frac{B_{kl}- I_{kl}}{(n_k+n_l)\|\boldsymbol \mu_k - \boldsymbol \mu_l\|^2} = \frac{\sum_{\boldsymbol{i} \in k} \langle \boldsymbol{x_i} - \boldsymbol{\mu}_k \vert \boldsymbol{\mu}_l - \boldsymbol{\mu}_k \rangle_+^2  \sum_{\boldsymbol{i} \in l} \langle \boldsymbol{x_i} - \boldsymbol{\mu}_l \vert \boldsymbol{\mu}_k - \boldsymbol{\mu}_l\rangle_+^2}{(n_k+n_l)\|\boldsymbol \mu_k - \boldsymbol \mu_l\|^4}.
 $$
 
-The bridge affinity between two classes  $k$ and $l$ is defined as the mean bridge affinity of all points of classes  $k$, $l$:
 
+From this reduction, we define the bridge affinity between centroids $k$
+and $l$ as: 
 $$
-a_{kl} =\sum_{\boldsymbol x \in kl} t_{kl}(\boldsymbol x)= \frac{\sum_{\boldsymbol{x} \in k} \langle \boldsymbol{x} - \boldsymbol{\mu}_k \vert \boldsymbol{\mu}_l - \boldsymbol{\mu}_k \rangle_+ + \sum_{\boldsymbol{x} \in l} \langle \boldsymbol{x} - \boldsymbol{\mu}_l \vert \boldsymbol{\mu}_k - \boldsymbol{\mu}_l\rangle_+}{(\#P_k + \#P_l) \lVert \boldsymbol{\mu}_k - \boldsymbol{\mu}_l \rVert^2}.
-$$
+a_{kl}=
+\begin{cases}
+0, & \text{ if } k=l,\\
+\sqrt{\frac{B_{kl}- I_{kl}}{(n_k+n_l)\|\boldsymbol \mu_k - \boldsymbol \mu_l\|^2}}, & \text{otherwise}.
+\end{cases}
+$$ 
 
+
+The basic intuition behind this affinity is that $t_i$ represents the
+relative position of the projection of $\boldsymbol x_i$ on the segment
+$[\boldsymbol \mu_k,\boldsymbol \mu_l]$. For each $\boldsymbol x_i$ an
+affinity value $\alpha_i$ is defined as $$
+\alpha_i =
+\begin{cases}
+t_i, &  \text{ if } t_i\in[0,1/2]\\
+1-t_i, & \text{ if } t_i\in]1/2,1],
+\end{cases}
+$$ This value represents the relative position on the segment, with the
+centroid of the class to which $\boldsymbol x_i$ belongs as the starting
+point.
+
+The boundary that separates the two clusters defined by centroids
+$\boldsymbol \mu_k$ and $\boldsymbol \mu_l$ is a hyperplane. This
+hyperplane is orthogonal to the line segment connecting the centroids
+and intersects this segment at its midpoint.
+
+If we consider all points $\boldsymbol x_i \in kl$ which are not
+projected on centroids but somewhere on the segments, The distance from
+a point to the hyperplane is large, 
+$$
+\|\boldsymbol p_{kl}(\boldsymbol x_i) - \boldsymbol \mu_{kl}\| = (1/2-\alpha_i) \| \boldsymbol \mu_k-\boldsymbol \mu_l \|.
+$$
+This distance is similar to the concept of margin in Support Vector Machine [@Cortes1995].
+
+
+When the $\alpha_i$ values are small (close to zero since $\alpha_i\in [0,1/2]$), the margins to the hyperplane
+are large, indicating a low density between the classes. Conversely, if
+the margins are small, it suggests that the two classes may reside
+within the same densely populated region. Consequently, the sum of the
+$\alpha_i$ or $\alpha_i^2$ increases with the density of the region
+between the classes. 
+
+Note that the criterion is local and indicates the relative difference in densities between the balls and the bridge, rather than evaluating a global score for the densities of the structures.
 
 ## Algorithm
+
+
+
+::: {#fig-steps layout-ncol=3}
+![Vector quantization](figures/spectral-briges-1.pdf)
+
+![Affinity computation](figures/spectral-briges-2.pdf)
+
+![Spectral clustering](figures/spectral-briges-3-4.pdf)
+
+Illustration of the Spectral bridges algorithm with the Iris dataset (first principal plane). Vector quantization (left), Affinity computation (center), Spectral clustering and spreading (right).
+:::
+
+
 
 
 
@@ -199,56 +259,142 @@ $$
 \begin{algorithm}
 \caption{Spectral Bridges}
 \begin{algorithmic}
-\Procedure{SpectralBridges}{$data, k, p$} \Comment{data: input dataset, k: number of clusters, p: number of Voronoi regions}
-  \State $centroids \gets$ \Call{KMeans}{$data, p$} \Comment{Initial centroids using k-means}
-  \State $voronoiRegions \gets$ \Call{Subdivide}{$data, centroids$} \Comment{Subdivide data into Voronoi regions}
-  \State $graph \gets$ \Call{CreateGraph}{$voronoiRegions$} \Comment{Assess connectivity between regions}
-  \State $clusters \gets$ \Call{WardLinkage}{$graph, k$} \Comment{Cluster using Ward linkage-inspired approach}
-  \State \Return $clusters$
-\EndProcedure
-
-\Procedure{KMeans}{$data, p$}
-  \State Initialize $p$ centroids randomly
-  \Repeat
-    \State Assign each point to the nearest centroid
-    \State Update centroids based on assignments
-  \Until{centroids do not change}
-  \State \Return centroids
-\EndProcedure
-
-\Procedure{Subdivide}{$data, centroids$}
-  \State $voronoiRegions \gets \{\}$
-  \For{each point $x$ in $data$}
-    \State Find the nearest centroid for $x$
-    \State Assign $x$ to the corresponding Voronoi region
-  \EndFor
-  \State \Return $voronoiRegions$
-\EndProcedure
-
-\Procedure{CreateGraph}{$voronoiRegions$}
-  \State $graph \gets$ empty graph
-  \For{each pair of regions $(R_i, R_j)$ in $voronoiRegions$}
-    \State Calculate connectivity measure between $R_i$ and $R_j$
-    \State Add edge between $R_i$ and $R_j$ in $graph$ with weight based on connectivity
-  \EndFor
-  \State \Return $graph$
-\EndProcedure
-
-\Procedure{WardLinkage}{$graph, k$}
-  \State $clusters \gets$ Initialize each region as a separate cluster
-  \Repeat
-    \State Find the pair of clusters with the smallest merging cost
-    \State Merge the selected pair of clusters
-  \Until{number of clusters equals $k$}
-  \State \Return $clusters$
+\Procedure{SpectralBridges}{$X, k, m$} \Comment{$X$: input dataset, $k$: number of clusters, $m$: number of Voronoi regions}
+    \State \textbf{Step 1: Vector Quantization}
+    \State $centroids \gets$ \Call{KMeans}{$X, m$} \Comment{Initial centroids using k-means++}
+    \State $voronoiRegions \gets$ \Call{Subdivide}{$X, centroids$} \Comment{Subdivide data into Voronoi regions}
+       \State \textbf{Step 2: Affinity Matrix Computation} $A = \{a_{kl}\}$
+        \State \textbf{Step 3: Spectral Clustering} \Comment{Affect each region to a cluster}
+        \State $labels \gets$ \Call{SpectralClustering}{$X, k$}
+      \State \textbf{Step 4: Propagate} \Comment{Each data point is affected to the cluster of its region}
+      \State $clusters \gets$ \Call{Propagate}{$X, labels, centroids$}
+     \State \Return $clusters$ \Comment{Cluster labels for data points in $X$}
 \EndProcedure
 \end{algorithmic}
 \end{algorithm}
 ```
 
-
 # Numerical experiments
 
+
+In this section, we present the results obtained from testing our algorithm on various datasets, both small and large scale, including real-world and well-known synthetic datasets. These experiments assess the accuracy, time and space complexity, ease of use, robustness, and adaptability of our algorithm. We compare **Spectral-Bridges** (**SB**) against several state-of-the-art methods, including **k-means++** (**KM**) [@macqueen1967some; @arthur2007k], **Expectation-Maximization** (**EM**) [@dempster1977maximum], **Ward Clustering** (**WC**) [@ward1963hierarchical], and **DBSCAN** (**DB**) [@ester1996density]. This comparison establishes baselines across centroid-based clustering algorithms, hierarchical methods, and density-based methods. We evaluate the algorithms on both raw and PCA-processed data with varying dimensionality. For synthetic datasets, we introduce Gaussian and/or uniform noise to evaluate the robustness of our algorithm.
+
+## Real-world Data
+
+- **MNIST**: A large dataset containing 60,000 handwritten digit images in ten balanced classes, commonly used for image processing benchmarks. Each image consists of $28 \times 28 = 784$ pixels.
+- **UCI ML Breast Cancer Wisconsin**: A dataset featuring computed attributes from digitized images of fine needle aspirates (FNA) of breast masses, used to predict whether a tumor is malignant or benign.
+
+## Synthetic Data
+
+- **Impossible**: A synthetic dataset designed to challenge clustering algorithms with complex patterns.
+- **Moons**: A two-dimensional dataset with two interleaving half circles.
+- **Circles**: A synthetic dataset of points arranged in two non-linearly separable circles.
+- **Smile**: A synthetic dataset with points arranged in the shape of a smiling face, used to test the separation of non-linearly separable data.
+
+### Datasets Summary & Class Balance
+
+| **Dataset**    | **#Dims** | **#Samples** | **#Classes** | **Class Proportions**                     |
+| -------------- | --------- | ------------ | ------------ | ----------------------------------------- |
+| MNIST          | 784       | 60000        | 10           | 9.9%, 11.2%, 9.9%, 10.3%, 9.7%, 9%, 9.9%, 10.4%, 9.7%, 9.9% |
+| Breast Cancer  | 30        | 569          | 2            | 37.3%, 62.7%                              |
+| Impossible     | 2         | 3594         | 7            | 24.8%, 18.8%, 11.3%, 7.5%, 12.5%, 12.5%, 12.5% |
+| Moons          | 2         | 1000         | 2            | 50%, 50%                                  |
+| Circles        | 2         | 1000         | 2            | 50%, 50%                                  |
+| Smile          | 2         | 1000         | 4            | 25%, 25%, 25%, 25%                        |
+
+Table: Datasets Summary & Class Balance
+
+
+Class proportions are presented in ascending order starting from label $0$.
+
+## Metrics
+
+To evaluate the performance of our clustering algorithm, we use the Adjusted Rand Index (**ARI**) [@halkidi2002cluster] and Normalized Mutual Information (**NMI**) [@cover1991information]. ARI measures the similarity between two clustering results, ranging from $-0.5$ to $1$, with $1$ indicating perfect agreement. NMI ranges from $0$ to $1$, with higher values indicating better clustering quality. In some tests, we also report the variability of scores across multiple runs due to the random initialization in k-means, though k-means++ generally provides stable and reproducible results.
+
+## Platform
+
+All experiments were conducted on an Archlinux machine with Linux 6.9.3 Kernel, 8GB of RAM, and an AMD Ryzen 3 7320U processor.
+
+## Accuracy
+
+We first evaluated our algorithm's accuracy on the MNIST dataset. Metrics were collected to compare our method with k-means++, EM, and Ward clustering. Metric were estimated by taking the empirical average over $100$ consecutive runs with the same random seed for each method.
+
+Let $h$ denote the embedding dimension of the dataset. We tested our method on the raw MNIST dataset without preprocessing ($h = 784$) and after reducing its dimension using PCA to $h \in \{8, 16, 32, 64\}$ (see fig.1).
+
+![Comparison of **k-means++** (blue), **EM** (green), **Ward Clustering** (red), and **Spectral-Bridges** (purple) on PCA embedding and full MNIST](figures/ari_comparison.pdf)
+
+For visualization purposes, we projected with UMAP the predicted clusters from our algorithm and other methods to compare them against the ground truth labels to better understand the cluster shapes (see table 2). Note that the projection was not used in our experiments as an embedding, and thus does not play any role in the clustering process itself. As a matter of fact, the embedding used was obtained with PCA, $h = 64$. Note that the label colors match the legend only in the case of the ground truth data. Indeed, the ordering of the labels have no impact on clustering quality.
+
+::: {#fig-MNIST layout-ncol=3}
+
+![Ground Truth](figures/GTumap.pdf)
+
+![Spectral-Bridges](figures/SBumap.pdf)
+
+![k-means++](figures/KMumap.pdf)
+
+UMAP projection of predicted clusters: **Ground Truth (left)**, **Spectral-Bridges (center)**, **k-means++ (right)**
+UMAP projection of predicted clusters : **Ground Truth (top)**, **Spectral-Bridges (middle)**, **k-means++ (bottom)**
+:::
+
+
+TODO CANCER
+
+![ARI and NMI scores of **k-means++** (blue), **EM** (green), **Ward Clustering** (red), and **Spectral-Bridges** (purple) on the UCI Breast Cancer dataset](figures/cancer_summary.pdf)
+
+.....
+
+![TODO](figures/synthetic_summary.pdf)
+
+
+# Conclusive remarks
+
+Possibility to kernelize
+
+
+# Appendix  {.appendix}
+
+## Derivation of the bridge gain {#gain}
+
+
+Notice that $B_{kl}$, the bridge inertia between centroids $k$ and$l$,  can be expressed as the sum of three terms:
+
+$$
+\begin{aligned}
+B_{kl} &=& \sum_{i \mid t_i=0} \|\boldsymbol x_i - \boldsymbol \mu_k\|^2  + \sum_{i \mid t_i=1} \|\boldsymbol x_i - \boldsymbol \mu_l\|^2 + \sum_{i \mid t_i\in ]0,1[} \|\boldsymbol x_i - \boldsymbol p_{kl}(\boldsymbol x_i)\|^2.
+\end{aligned}
+$$
+
+The last term may be decomposed in two parts
+
+$$
+\begin{aligned}
+\sum_{i \mid t_i\in ]0,1[} \|\boldsymbol x_i - \boldsymbol p_{kl}(\boldsymbol x_i)\|^2 &= &\sum_{i \mid t_i\in ]0,\frac{1}{2}[} \|\boldsymbol x_i - \boldsymbol p_{kl}(\boldsymbol x_i)\|^2 + \sum_{i \mid t_i\in [\frac{1}{2},1[} \|\boldsymbol x_i - \boldsymbol p_{kl}(\boldsymbol x_i)\|^2\\
+\end{aligned}
+$$
+
+and each part further decomposed using Pythagore 
+$$
+\begin{aligned}
+\sum_{i \mid t_i\in ]0,\frac{1}{2}[} \|\boldsymbol x_i - \boldsymbol p_{kl}(\boldsymbol x_i)\|^2 &=& \sum_{i \mid t_i\in ]0,\frac{1}{2}[} \|\boldsymbol x_i - \boldsymbol \mu_k\|^2 - \sum_{i \mid t_i\in ]0,\frac{1}{2}[} \|\boldsymbol \mu_k - \boldsymbol p_{kl}(\boldsymbol x_i)\|^2\\
+&=& \sum_{i \mid t_i\in ]0,\frac{1}{2}[} \|\boldsymbol x_i - \boldsymbol \mu_k\|^2 - \sum_{i \mid t_i\in ]0,\frac{1}{2}[} \|t_i (\boldsymbol \mu_k - \boldsymbol \mu_{l})\|^2,
+\end{aligned}
+$$
+
+$$
+\begin{aligned}
+\sum_{i \mid t_i\in ]\frac{1}{2},1[} \|\boldsymbol x_i - \boldsymbol p_{kl}(\boldsymbol x_i)\|^2 &=& \sum_{i \mid t_i\in ]0,\frac{1}{2}[} \|\boldsymbol x_i - \boldsymbol \mu_l\|^2 - \sum_{i \mid t_i\in ]0,\frac{1}{2}[} \|\boldsymbol \mu_l - \boldsymbol p_{kl}(\boldsymbol x_i)\|^2\\
+&=& \sum_{i \mid t_i\in ]\frac{1}{2},1[} \|\boldsymbol x_i - \boldsymbol \mu_k\|^2 - \sum_{i \mid t_i\in ]0,\frac{1}{2}[} \|(1-t_i) (\boldsymbol \mu_k - \boldsymbol \mu_{l})\|^2
+\end{aligned}
+$$
+
+Thus $$
+\begin{aligned}
+B_{kl}- I_{kl} &=&  \sum_{i \mid t_i\in ]0,\frac{1}{2}[} t_i^2 \|\boldsymbol \mu_k - \boldsymbol \mu_l\|^2 + \sum_{i \mid t_i\in ]\frac{1}{2},1[} (1-t_i)^2 \|\boldsymbol \mu_k - \boldsymbol \mu_l\|^2,\\
+\frac{B_{kl}- I_{kl}}{\|\boldsymbol \mu_k - \boldsymbol \mu_l\|^2} &=& \sum_{i \mid t_i\in ]0,\frac{1}{2}[} t_i^2  + \sum_{i \mid t_i\in ]\frac{1}{2},1[} (1-t_i)^2, \\
+\frac{B_{kl}- I_{kl}}{(n_k+n_l)\|\boldsymbol \mu_k - \boldsymbol \mu_l\|^2} &=& \frac{\sum_{\boldsymbol{i} \in k} \langle \boldsymbol{x_i} - \boldsymbol{\mu}_k \vert \boldsymbol{\mu}_l - \boldsymbol{\mu}_k \rangle_+^2  \sum_{\boldsymbol{i} \in l} \langle \boldsymbol{x_i} - \boldsymbol{\mu}_l \vert \boldsymbol{\mu}_k - \boldsymbol{\mu}_l\rangle_+^2}{(n_k+n_l)\|\boldsymbol \mu_k - \boldsymbol \mu_l\|^4}.
+\end{aligned}
+$$
 
 
 # References {.unnumbered}
