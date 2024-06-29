@@ -357,7 +357,7 @@ Possibility to kernelize
 ## Derivation of the bridge gain {#gain}
 
 
-Notice that $B_{kl}$, the bridge inertia between centroids $k$ and$l$,  can be expressed as the sum of three terms:
+Notice that $B_{kl}$, the bridge inertia between centroids $k$ and $l$,  can be expressed as the sum of three terms:
 
 $$
 \begin{aligned}
