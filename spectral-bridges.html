@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.5.45">
+<meta name="generator" content="quarto-1.5.52">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -244,7 +244,7 @@ ISSN 2824-7795</p>
       <div>
       <div class="quarto-title-meta-heading">Modified</div>
       <div class="quarto-title-meta-contents">
-        <p class="date-modified">June 28, 2024</p>
+        <p class="date-modified">June 29, 2024</p>
       </div>
     </div>
       
@@ -406,7 +406,8 @@ t_i, &amp;  \text{ if } t_i\in[0,1/2]\\
 <p>If we consider all points <span class="math inline">\boldsymbol x_i \in kl</span> which are not projected on centroids but somewhere on the segments, The distance from a point to the hyperplane is large, <span class="math display">
 \|\boldsymbol p_{kl}(\boldsymbol x_i) - \boldsymbol \mu_{kl}\| = (1/2-\alpha_i) \| \boldsymbol \mu_k-\boldsymbol \mu_l \|.
 </span> This distance is similar to the concept of margin in Support Vector Machine <span class="citation" data-cites="Cortes1995">(<a href="#ref-Cortes1995" role="doc-biblioref">Cortes and Vapnik 1995</a>)</span>.</p>
-<p>When the <span class="math inline">\alpha_i</span> values are small, the margins to the hyperplane are large, indicating a low density between the classes. Conversely, if the distances are small, it suggests that the two classes may reside within the same densely populated region. Consequently, the sum of the <span class="math inline">\alpha_i</span> or <span class="math inline">\alpha_i^2</span> increases with the density of the region between the classes.</p>
+<p>When the <span class="math inline">\alpha_i</span> values are small (close to zero since <span class="math inline">\alpha_i\in [0,1/2]</span>), the margins to the hyperplane are large, indicating a low density between the classes. Conversely, if the margins are small, it suggests that the two classes may reside within the same densely populated region. Consequently, the sum of the <span class="math inline">\alpha_i</span> or <span class="math inline">\alpha_i^2</span> increases with the density of the region between the classes.</p>
+<p>Note that the criterion is local and indicates the relative difference in densities between the balls and the bridge, rather than evaluating a global score for the densities of the structures.</p>
 </section>
 <section id="algorithm" class="level2" data-number="3.2">
 <h2 data-number="3.2" class="anchored" data-anchor-id="algorithm"><span class="header-section-number">3.2</span> Algorithm</h2>
@@ -445,14 +446,9 @@ Figure&nbsp;2: Illustration of the Spectral bridges algorithm with the Iris data
 </figcaption>
 </figure>
 </div>
-<div id="alg-quicksort" class="pseudocode-container" data-alg-title="Algorithm" data-indent-size="1.2em" data-no-end="false" data-line-number-punc=":" data-line-number="true" data-comment-delimiter="//" data-pseudocode-index="1">
+<div id="alg-spectral-bridges" class="pseudocode-container" data-alg-title="Algorithm" data-no-end="false" data-comment-delimiter="//" data-indent-size="1.2em" data-line-number="true" data-line-number-punc=":" data-pseudocode-index="1">
 <div class="pseudocode">
 \begin{algorithm} \caption{Spectral Bridges} \begin{algorithmic} \Procedure{SpectralBridges}{$X, k, m$} \Comment{$X$: input dataset, $k$: number of clusters, $m$: number of Voronoi regions} \State \textbf{Step 1: Vector Quantization} \State $centroids \gets$ \Call{KMeans}{$X, m$} \Comment{Initial centroids using k-means++} \State $voronoiRegions \gets$ \Call{Subdivide}{$X, centroids$} \Comment{Subdivide data into Voronoi regions} \State \textbf{Step 2: Affinity Matrix Computation} $A = \{a_{kl}\}$ \State \textbf{Step 3: Spectral Clustering} \Comment{Affect each region to a cluster} \State $labels \gets$ \Call{SpectralClustering}{$X, k$} \State \textbf{Step 4: Propagate} \Comment{Each data point is affected to the cluster of its region} \State $clusters \gets$ \Call{Propagate}{$X, labels, centroids$} \State \Return $clusters$ \Comment{Cluster labels for data points in $X$} \EndProcedure \end{algorithmic} \end{algorithm}
-</div>
-</div>
-<div id="alg-spectral-bridges" class="pseudocode-container" data-alg-title="Algorithm" data-indent-size="1.2em" data-no-end="false" data-line-number-punc=":" data-line-number="true" data-comment-delimiter="//" data-pseudocode-index="2">
-<div class="pseudocode">
-\begin{algorithm} \caption{Spectral Bridges Clustering} \begin{algorithmic} \Procedure{SpectralBridges}{$X, k, m$} \Comment{$X$: input dataset, $k$: number of clusters, $m$: number of Voronoi regions} \State \textbf{Step 1: Vector Quantization} \State $centroids \gets$ \Call{KMeans}{$X, m$} \Comment{Initial centroids using k-means++} \State $voronoiRegions \gets$ \Call{Subdivide}{$X, centroids$} \Comment{Subdivide data into Voronoi regions} \State \textbf{Step 2: Affinity Matrix Computation} $A = \{a_{kl}\}$ with \State \[ a_{kl} = \begin{cases} 0, &amp; \text{if } k = l,\\ \sqrt{\frac{B_{kl} - I_{kl}}{(n_k + n_l) \|\boldsymbol{\mu}_k - \boldsymbol{\mu}_l\|^2}}, &amp; \text{otherwise}. \end{cases} \] \State \textbf{Step 3: Spectral Clustering} \Comment{Affect each region to a cluster} \State $labels \gets$ \Call{SpectralClustering}{$X, k$} \State \textbf{Step 4: Propagate} \Comment{Each data point is affected to the cluster of its region} \State $clusters \gets$ \Call{Propagate}{$X, labels, centroids$} \State \Return $clusters$ \Comment{Cluster labels for data points in $X$} \EndProcedure \end{algorithmic} \end{algorithm}
 </div>
 </div>
 </section>
@@ -641,7 +637,7 @@ Von Luxburg, Ulrike. 2007. <span>“A Tutorial on Spectral Clustering.”</span>
 
 <section id="gain" class="level2" data-number="6.1">
 <h2 data-number="6.1" class="anchored" data-anchor-id="gain"><span class="header-section-number">6.1</span> Derivation of the bridge gain</h2>
-<p>Notice that <span class="math inline">B_{kl}</span>, the bridge inertia between centroids <span class="math inline">k</span> and<span class="math inline">l</span>, can be expressed as the sum of three terms:</p>
+<p>Notice that <span class="math inline">B_{kl}</span>, the bridge inertia between centroids <span class="math inline">k</span> and <span class="math inline">l</span>, can be expressed as the sum of three terms:</p>
 <p><span class="math display">
 \begin{aligned}
 B_{kl} &amp;=&amp; \sum_{i \mid t_i=0} \|\boldsymbol x_i - \boldsymbol \mu_k\|^2  + \sum_{i \mid t_i=1} \|\boldsymbol x_i - \boldsymbol \mu_l\|^2 + \sum_{i \mid t_i\in ]0,1[} \|\boldsymbol x_i - \boldsymbol p_{kl}(\boldsymbol x_i)\|^2.
@@ -681,16 +677,17 @@ B_{kl}- I_{kl} &amp;=&amp;  \sum_{i \mid t_i\in ]0,\frac{1}{2}[} t_i^2 \|\boldsy
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sessionInfo</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
-<pre><code>R version 4.3.2 (2023-10-31)
-Platform: x86_64-apple-darwin20 (64-bit)
-Running under: macOS Sonoma 14.3.1
+<pre><code>R version 4.4.1 (2024-06-14 ucrt)
+Platform: x86_64-w64-mingw32/x64
+Running under: Windows 11 x64 (build 22631)
 
 Matrix products: default
-BLAS:   /Library/Frameworks/R.framework/Versions/4.3-x86_64/Resources/lib/libRblas.0.dylib 
-LAPACK: /Library/Frameworks/R.framework/Versions/4.3-x86_64/Resources/lib/libRlapack.dylib;  LAPACK version 3.11.0
+
 
 locale:
-[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+[1] LC_COLLATE=French_France.utf8  LC_CTYPE=French_France.utf8   
+[3] LC_MONETARY=French_France.utf8 LC_NUMERIC=C                  
+[5] LC_TIME=French_France.utf8    
 
 time zone: Europe/Paris
 tzcode source: internal
@@ -699,10 +696,10 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 loaded via a namespace (and not attached):
- [1] htmlwidgets_1.6.4 compiler_4.3.2    fastmap_1.1.1     cli_3.6.2        
- [5] tools_4.3.2       htmltools_0.5.7   rstudioapi_0.15.0 yaml_2.3.8       
- [9] rmarkdown_2.26    knitr_1.45        jsonlite_1.8.8    xfun_0.42        
-[13] digest_0.6.34     rlang_1.1.3       evaluate_0.23    </code></pre>
+ [1] compiler_4.4.1    fastmap_1.2.0     cli_3.6.3         tools_4.4.1      
+ [5] htmltools_0.5.8.1 yaml_2.3.8        rmarkdown_2.27    knitr_1.47       
+ [9] jsonlite_1.8.8    xfun_0.45         digest_0.6.36     rlang_1.1.4      
+[13] evaluate_0.24.0  </code></pre>
 </div>
 </div>
 <!-- -->
@@ -1419,14 +1416,14 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb3-219"><a href="#cb3-219" aria-hidden="true" tabindex="-1"></a>This distance is similar to the concept of margin in Support Vector Machine <span class="co">[</span><span class="ot">@Cortes1995</span><span class="co">]</span>.</span>
 <span id="cb3-220"><a href="#cb3-220" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-221"><a href="#cb3-221" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-222"><a href="#cb3-222" aria-hidden="true" tabindex="-1"></a>When the $\alpha_i$ values are small, the margins to the hyperplane</span>
+<span id="cb3-222"><a href="#cb3-222" aria-hidden="true" tabindex="-1"></a>When the $\alpha_i$ values are small (close to zero since $\alpha_i\in <span class="co">[</span><span class="ot">0,1/2</span><span class="co">]</span>$), the margins to the hyperplane</span>
 <span id="cb3-223"><a href="#cb3-223" aria-hidden="true" tabindex="-1"></a>are large, indicating a low density between the classes. Conversely, if</span>
-<span id="cb3-224"><a href="#cb3-224" aria-hidden="true" tabindex="-1"></a>the distances are small, it suggests that the two classes may reside</span>
+<span id="cb3-224"><a href="#cb3-224" aria-hidden="true" tabindex="-1"></a>the margins are small, it suggests that the two classes may reside</span>
 <span id="cb3-225"><a href="#cb3-225" aria-hidden="true" tabindex="-1"></a>within the same densely populated region. Consequently, the sum of the</span>
 <span id="cb3-226"><a href="#cb3-226" aria-hidden="true" tabindex="-1"></a>$\alpha_i$ or $\alpha_i^2$ increases with the density of the region</span>
 <span id="cb3-227"><a href="#cb3-227" aria-hidden="true" tabindex="-1"></a>between the classes. </span>
 <span id="cb3-228"><a href="#cb3-228" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-229"><a href="#cb3-229" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-229"><a href="#cb3-229" aria-hidden="true" tabindex="-1"></a>Note that the criterion is local and indicates the relative difference in densities between the balls and the bridge, rather than evaluating a global score for the densities of the structures.</span>
 <span id="cb3-230"><a href="#cb3-230" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-231"><a href="#cb3-231" aria-hidden="true" tabindex="-1"></a><span class="fu">## Algorithm</span></span>
 <span id="cb3-232"><a href="#cb3-232" aria-hidden="true" tabindex="-1"></a></span>
@@ -1447,7 +1444,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb3-247"><a href="#cb3-247" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-248"><a href="#cb3-248" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-249"><a href="#cb3-249" aria-hidden="true" tabindex="-1"></a><span class="in">```pseudocode</span></span>
-<span id="cb3-250"><a href="#cb3-250" aria-hidden="true" tabindex="-1"></a><span class="in">#| label: alg-quicksort</span></span>
+<span id="cb3-250"><a href="#cb3-250" aria-hidden="true" tabindex="-1"></a><span class="in">#| label: alg-spectral-bridges</span></span>
 <span id="cb3-251"><a href="#cb3-251" aria-hidden="true" tabindex="-1"></a><span class="in">#| html-indent-size: "1.2em"</span></span>
 <span id="cb3-252"><a href="#cb3-252" aria-hidden="true" tabindex="-1"></a><span class="in">#| html-comment-delimiter: "//"</span></span>
 <span id="cb3-253"><a href="#cb3-253" aria-hidden="true" tabindex="-1"></a><span class="in">#| html-line-number: true</span></span>
@@ -1474,200 +1471,141 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb3-274"><a href="#cb3-274" aria-hidden="true" tabindex="-1"></a><span class="in">\end{algorithm}</span></span>
 <span id="cb3-275"><a href="#cb3-275" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb3-276"><a href="#cb3-276" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-277"><a href="#cb3-277" aria-hidden="true" tabindex="-1"></a><span class="in">```pseudocode</span></span>
-<span id="cb3-278"><a href="#cb3-278" aria-hidden="true" tabindex="-1"></a><span class="in">#| label: alg-spectral-bridges</span></span>
-<span id="cb3-279"><a href="#cb3-279" aria-hidden="true" tabindex="-1"></a><span class="in">#| html-indent-size: "1.2em"</span></span>
-<span id="cb3-280"><a href="#cb3-280" aria-hidden="true" tabindex="-1"></a><span class="in">#| html-comment-delimiter: "//"</span></span>
-<span id="cb3-281"><a href="#cb3-281" aria-hidden="true" tabindex="-1"></a><span class="in">#| html-line-number: true</span></span>
-<span id="cb3-282"><a href="#cb3-282" aria-hidden="true" tabindex="-1"></a><span class="in">#| html-line-number-punc: ":"</span></span>
-<span id="cb3-283"><a href="#cb3-283" aria-hidden="true" tabindex="-1"></a><span class="in">#| html-no-end: false</span></span>
-<span id="cb3-284"><a href="#cb3-284" aria-hidden="true" tabindex="-1"></a><span class="in">#| pdf-placement: "htb!"</span></span>
-<span id="cb3-285"><a href="#cb3-285" aria-hidden="true" tabindex="-1"></a><span class="in">#| pdf-line-number: true</span></span>
+<span id="cb3-277"><a href="#cb3-277" aria-hidden="true" tabindex="-1"></a><span class="fu"># Numerical experiments</span></span>
+<span id="cb3-278"><a href="#cb3-278" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-279"><a href="#cb3-279" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-280"><a href="#cb3-280" aria-hidden="true" tabindex="-1"></a>In this section, we present the results obtained from testing our algorithm on various datasets, both small and large scale, including real-world and well-known synthetic datasets. These experiments assess the accuracy, time and space complexity, ease of use, robustness, and adaptability of our algorithm. We compare **Spectral-Bridges** (**SB**) against several state-of-the-art methods, including **k-means++** (**KM**) [@macqueen1967some; @arthur2007k], **Expectation-Maximization** (**EM**) [@dempster1977maximum], **Ward Clustering** (**WC**) [@ward1963hierarchical], and **DBSCAN** (**DB**) <span class="co">[</span><span class="ot">@ester1996density</span><span class="co">]</span>. This comparison establishes baselines across centroid-based clustering algorithms, hierarchical methods, and density-based methods. We evaluate the algorithms on both raw and PCA-processed data with varying dimensionality. For synthetic datasets, we introduce Gaussian and/or uniform noise to evaluate the robustness of our algorithm.</span>
+<span id="cb3-281"><a href="#cb3-281" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-282"><a href="#cb3-282" aria-hidden="true" tabindex="-1"></a><span class="fu">## Real-world Data</span></span>
+<span id="cb3-283"><a href="#cb3-283" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-284"><a href="#cb3-284" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**MNIST**: A large dataset containing 60,000 handwritten digit images in ten balanced classes, commonly used for image processing benchmarks. Each image consists of $28 \times 28 = 784$ pixels.</span>
+<span id="cb3-285"><a href="#cb3-285" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**UCI ML Breast Cancer Wisconsin**: A dataset featuring computed attributes from digitized images of fine needle aspirates (FNA) of breast masses, used to predict whether a tumor is malignant or benign.</span>
 <span id="cb3-286"><a href="#cb3-286" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-287"><a href="#cb3-287" aria-hidden="true" tabindex="-1"></a><span class="in">\begin{algorithm}</span></span>
-<span id="cb3-288"><a href="#cb3-288" aria-hidden="true" tabindex="-1"></a><span class="in">\caption{Spectral Bridges Clustering}</span></span>
-<span id="cb3-289"><a href="#cb3-289" aria-hidden="true" tabindex="-1"></a><span class="in">\begin{algorithmic}</span></span>
-<span id="cb3-290"><a href="#cb3-290" aria-hidden="true" tabindex="-1"></a><span class="in">\Procedure{SpectralBridges}{$X, k, m$} \Comment{$X$: input dataset, $k$: number of clusters, $m$: number of Voronoi regions}</span></span>
-<span id="cb3-291"><a href="#cb3-291" aria-hidden="true" tabindex="-1"></a><span class="in">    \State \textbf{Step 1: Vector Quantization}</span></span>
-<span id="cb3-292"><a href="#cb3-292" aria-hidden="true" tabindex="-1"></a><span class="in">    \State $centroids \gets$ \Call{KMeans}{$X, m$} \Comment{Initial centroids using k-means++}</span></span>
-<span id="cb3-293"><a href="#cb3-293" aria-hidden="true" tabindex="-1"></a><span class="in">    \State $voronoiRegions \gets$ \Call{Subdivide}{$X, centroids$} \Comment{Subdivide data into Voronoi regions}</span></span>
-<span id="cb3-294"><a href="#cb3-294" aria-hidden="true" tabindex="-1"></a><span class="in">    </span></span>
-<span id="cb3-295"><a href="#cb3-295" aria-hidden="true" tabindex="-1"></a><span class="in">    \State \textbf{Step 2: Affinity Matrix Computation} $A = \{a_{kl}\}$ with</span></span>
-<span id="cb3-296"><a href="#cb3-296" aria-hidden="true" tabindex="-1"></a><span class="in">    \State \[ a_{kl} = \begin{cases}</span></span>
-<span id="cb3-297"><a href="#cb3-297" aria-hidden="true" tabindex="-1"></a><span class="in">    0, &amp; \text{if } k = l,\\</span></span>
-<span id="cb3-298"><a href="#cb3-298" aria-hidden="true" tabindex="-1"></a><span class="in">    \sqrt{\frac{B_{kl} - I_{kl}}{(n_k + n_l) \|\boldsymbol{\mu}_k - \boldsymbol{\mu}_l\|^2}}, &amp; \text{otherwise}.</span></span>
-<span id="cb3-299"><a href="#cb3-299" aria-hidden="true" tabindex="-1"></a><span class="in">    \end{cases} \]</span></span>
-<span id="cb3-300"><a href="#cb3-300" aria-hidden="true" tabindex="-1"></a><span class="in">    </span></span>
-<span id="cb3-301"><a href="#cb3-301" aria-hidden="true" tabindex="-1"></a><span class="in">    \State \textbf{Step 3: Spectral Clustering} \Comment{Affect each region to a cluster}</span></span>
-<span id="cb3-302"><a href="#cb3-302" aria-hidden="true" tabindex="-1"></a><span class="in">    \State $labels \gets$ \Call{SpectralClustering}{$X, k$}</span></span>
-<span id="cb3-303"><a href="#cb3-303" aria-hidden="true" tabindex="-1"></a><span class="in">    </span></span>
-<span id="cb3-304"><a href="#cb3-304" aria-hidden="true" tabindex="-1"></a><span class="in">    \State \textbf{Step 4: Propagate} \Comment{Each data point is affected to the cluster of its region}</span></span>
-<span id="cb3-305"><a href="#cb3-305" aria-hidden="true" tabindex="-1"></a><span class="in">    \State $clusters \gets$ \Call{Propagate}{$X, labels, centroids$}</span></span>
-<span id="cb3-306"><a href="#cb3-306" aria-hidden="true" tabindex="-1"></a><span class="in">    </span></span>
-<span id="cb3-307"><a href="#cb3-307" aria-hidden="true" tabindex="-1"></a><span class="in">    \State \Return $clusters$ \Comment{Cluster labels for data points in $X$}</span></span>
-<span id="cb3-308"><a href="#cb3-308" aria-hidden="true" tabindex="-1"></a><span class="in">\EndProcedure</span></span>
-<span id="cb3-309"><a href="#cb3-309" aria-hidden="true" tabindex="-1"></a><span class="in">\end{algorithmic}</span></span>
-<span id="cb3-310"><a href="#cb3-310" aria-hidden="true" tabindex="-1"></a><span class="in">\end{algorithm}</span></span>
-<span id="cb3-311"><a href="#cb3-311" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb3-312"><a href="#cb3-312" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-313"><a href="#cb3-313" aria-hidden="true" tabindex="-1"></a><span class="fu"># Numerical experiments</span></span>
-<span id="cb3-314"><a href="#cb3-314" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-287"><a href="#cb3-287" aria-hidden="true" tabindex="-1"></a><span class="fu">## Synthetic Data</span></span>
+<span id="cb3-288"><a href="#cb3-288" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-289"><a href="#cb3-289" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Impossible**: A synthetic dataset designed to challenge clustering algorithms with complex patterns.</span>
+<span id="cb3-290"><a href="#cb3-290" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Moons**: A two-dimensional dataset with two interleaving half circles.</span>
+<span id="cb3-291"><a href="#cb3-291" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Circles**: A synthetic dataset of points arranged in two non-linearly separable circles.</span>
+<span id="cb3-292"><a href="#cb3-292" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Smile**: A synthetic dataset with points arranged in the shape of a smiling face, used to test the separation of non-linearly separable data.</span>
+<span id="cb3-293"><a href="#cb3-293" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-294"><a href="#cb3-294" aria-hidden="true" tabindex="-1"></a><span class="fu">### Datasets Summary &amp; Class Balance</span></span>
+<span id="cb3-295"><a href="#cb3-295" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-296"><a href="#cb3-296" aria-hidden="true" tabindex="-1"></a>| **Dataset**    | **#Dims** | **#Samples** | **#Classes** | **Class Proportions**                     |</span>
+<span id="cb3-297"><a href="#cb3-297" aria-hidden="true" tabindex="-1"></a>| -------------- | --------- | ------------ | ------------ | ----------------------------------------- |</span>
+<span id="cb3-298"><a href="#cb3-298" aria-hidden="true" tabindex="-1"></a>| MNIST          | 784       | 60000        | 10           | 9.9%, 11.2%, 9.9%, 10.3%, 9.7%, 9%, 9.9%, 10.4%, 9.7%, 9.9% |</span>
+<span id="cb3-299"><a href="#cb3-299" aria-hidden="true" tabindex="-1"></a>| Breast Cancer  | 30        | 569          | 2            | 37.3%, 62.7%                              |</span>
+<span id="cb3-300"><a href="#cb3-300" aria-hidden="true" tabindex="-1"></a>| Impossible     | 2         | 3594         | 7            | 24.8%, 18.8%, 11.3%, 7.5%, 12.5%, 12.5%, 12.5% |</span>
+<span id="cb3-301"><a href="#cb3-301" aria-hidden="true" tabindex="-1"></a>| Moons          | 2         | 1000         | 2            | 50%, 50%                                  |</span>
+<span id="cb3-302"><a href="#cb3-302" aria-hidden="true" tabindex="-1"></a>| Circles        | 2         | 1000         | 2            | 50%, 50%                                  |</span>
+<span id="cb3-303"><a href="#cb3-303" aria-hidden="true" tabindex="-1"></a>| Smile          | 2         | 1000         | 4            | 25%, 25%, 25%, 25%                        |</span>
+<span id="cb3-304"><a href="#cb3-304" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-305"><a href="#cb3-305" aria-hidden="true" tabindex="-1"></a>Table: Datasets Summary &amp; Class Balance</span>
+<span id="cb3-306"><a href="#cb3-306" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-307"><a href="#cb3-307" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-308"><a href="#cb3-308" aria-hidden="true" tabindex="-1"></a>Class proportions are presented in ascending order starting from label $0$.</span>
+<span id="cb3-309"><a href="#cb3-309" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-310"><a href="#cb3-310" aria-hidden="true" tabindex="-1"></a><span class="fu">## Metrics</span></span>
+<span id="cb3-311"><a href="#cb3-311" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-312"><a href="#cb3-312" aria-hidden="true" tabindex="-1"></a>To evaluate the performance of our clustering algorithm, we use the Adjusted Rand Index (**ARI**) [@halkidi2002cluster] and Normalized Mutual Information (**NMI**) <span class="co">[</span><span class="ot">@cover1991information</span><span class="co">]</span>. ARI measures the similarity between two clustering results, ranging from $-0.5$ to $1$, with $1$ indicating perfect agreement. NMI ranges from $0$ to $1$, with higher values indicating better clustering quality. In some tests, we also report the variability of scores across multiple runs due to the random initialization in k-means, though k-means++ generally provides stable and reproducible results.</span>
+<span id="cb3-313"><a href="#cb3-313" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-314"><a href="#cb3-314" aria-hidden="true" tabindex="-1"></a><span class="fu">## Platform</span></span>
 <span id="cb3-315"><a href="#cb3-315" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-316"><a href="#cb3-316" aria-hidden="true" tabindex="-1"></a>In this section, we present the results obtained from testing our algorithm on various datasets, both small and large scale, including real-world and well-known synthetic datasets. These experiments assess the accuracy, time and space complexity, ease of use, robustness, and adaptability of our algorithm. We compare **Spectral-Bridges** (**SB**) against several state-of-the-art methods, including **k-means++** (**KM**) [@macqueen1967some; @arthur2007k], **Expectation-Maximization** (**EM**) [@dempster1977maximum], **Ward Clustering** (**WC**) [@ward1963hierarchical], and **DBSCAN** (**DB**) <span class="co">[</span><span class="ot">@ester1996density</span><span class="co">]</span>. This comparison establishes baselines across centroid-based clustering algorithms, hierarchical methods, and density-based methods. We evaluate the algorithms on both raw and PCA-processed data with varying dimensionality. For synthetic datasets, we introduce Gaussian and/or uniform noise to evaluate the robustness of our algorithm.</span>
+<span id="cb3-316"><a href="#cb3-316" aria-hidden="true" tabindex="-1"></a>All experiments were conducted on an Archlinux machine with Linux 6.9.3 Kernel, 8GB of RAM, and an AMD Ryzen 3 7320U processor.</span>
 <span id="cb3-317"><a href="#cb3-317" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-318"><a href="#cb3-318" aria-hidden="true" tabindex="-1"></a><span class="fu">## Real-world Data</span></span>
+<span id="cb3-318"><a href="#cb3-318" aria-hidden="true" tabindex="-1"></a><span class="fu">## Accuracy</span></span>
 <span id="cb3-319"><a href="#cb3-319" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-320"><a href="#cb3-320" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**MNIST**: A large dataset containing 60,000 handwritten digit images in ten balanced classes, commonly used for image processing benchmarks. Each image consists of $28 \times 28 = 784$ pixels.</span>
-<span id="cb3-321"><a href="#cb3-321" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**UCI ML Breast Cancer Wisconsin**: A dataset featuring computed attributes from digitized images of fine needle aspirates (FNA) of breast masses, used to predict whether a tumor is malignant or benign.</span>
-<span id="cb3-322"><a href="#cb3-322" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-323"><a href="#cb3-323" aria-hidden="true" tabindex="-1"></a><span class="fu">## Synthetic Data</span></span>
-<span id="cb3-324"><a href="#cb3-324" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-325"><a href="#cb3-325" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Impossible**: A synthetic dataset designed to challenge clustering algorithms with complex patterns.</span>
-<span id="cb3-326"><a href="#cb3-326" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Moons**: A two-dimensional dataset with two interleaving half circles.</span>
-<span id="cb3-327"><a href="#cb3-327" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Circles**: A synthetic dataset of points arranged in two non-linearly separable circles.</span>
-<span id="cb3-328"><a href="#cb3-328" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Smile**: A synthetic dataset with points arranged in the shape of a smiling face, used to test the separation of non-linearly separable data.</span>
+<span id="cb3-320"><a href="#cb3-320" aria-hidden="true" tabindex="-1"></a>We first evaluated our algorithm's accuracy on the MNIST dataset. Metrics were collected to compare our method with k-means++, EM, and Ward clustering. Metric were estimated by taking the empirical average over $100$ consecutive runs with the same random seed for each method.</span>
+<span id="cb3-321"><a href="#cb3-321" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-322"><a href="#cb3-322" aria-hidden="true" tabindex="-1"></a>Let $h$ denote the embedding dimension of the dataset. We tested our method on the raw MNIST dataset without preprocessing ($h = 784$) and after reducing its dimension using PCA to $h \in <span class="sc">\{</span>8, 16, 32, 64<span class="sc">\}</span>$ (see fig.1).</span>
+<span id="cb3-323"><a href="#cb3-323" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-324"><a href="#cb3-324" aria-hidden="true" tabindex="-1"></a><span class="al">![Comparison of **k-means++** (blue), **EM** (green), **Ward Clustering** (red), and **Spectral-Bridges** (purple) on PCA embedding and full MNIST](figures/ari_comparison.pdf)</span></span>
+<span id="cb3-325"><a href="#cb3-325" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-326"><a href="#cb3-326" aria-hidden="true" tabindex="-1"></a>For visualization purposes, we projected with UMAP the predicted clusters from our algorithm and other methods to compare them against the ground truth labels to better understand the cluster shapes (see table 2). Note that the projection was not used in our experiments as an embedding, and thus does not play any role in the clustering process itself. As a matter of fact, the embedding used was obtained with PCA, $h = 64$. Note that the label colors match the legend only in the case of the ground truth data. Indeed, the ordering of the labels have no impact on clustering quality.</span>
+<span id="cb3-327"><a href="#cb3-327" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-328"><a href="#cb3-328" aria-hidden="true" tabindex="-1"></a>::: {#fig-MNIST layout-ncol=3}</span>
 <span id="cb3-329"><a href="#cb3-329" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-330"><a href="#cb3-330" aria-hidden="true" tabindex="-1"></a><span class="fu">### Datasets Summary &amp; Class Balance</span></span>
+<span id="cb3-330"><a href="#cb3-330" aria-hidden="true" tabindex="-1"></a><span class="al">![Ground Truth](figures/GTumap.pdf)</span></span>
 <span id="cb3-331"><a href="#cb3-331" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-332"><a href="#cb3-332" aria-hidden="true" tabindex="-1"></a>| **Dataset**    | **#Dims** | **#Samples** | **#Classes** | **Class Proportions**                     |</span>
-<span id="cb3-333"><a href="#cb3-333" aria-hidden="true" tabindex="-1"></a>| -------------- | --------- | ------------ | ------------ | ----------------------------------------- |</span>
-<span id="cb3-334"><a href="#cb3-334" aria-hidden="true" tabindex="-1"></a>| MNIST          | 784       | 60000        | 10           | 9.9%, 11.2%, 9.9%, 10.3%, 9.7%, 9%, 9.9%, 10.4%, 9.7%, 9.9% |</span>
-<span id="cb3-335"><a href="#cb3-335" aria-hidden="true" tabindex="-1"></a>| Breast Cancer  | 30        | 569          | 2            | 37.3%, 62.7%                              |</span>
-<span id="cb3-336"><a href="#cb3-336" aria-hidden="true" tabindex="-1"></a>| Impossible     | 2         | 3594         | 7            | 24.8%, 18.8%, 11.3%, 7.5%, 12.5%, 12.5%, 12.5% |</span>
-<span id="cb3-337"><a href="#cb3-337" aria-hidden="true" tabindex="-1"></a>| Moons          | 2         | 1000         | 2            | 50%, 50%                                  |</span>
-<span id="cb3-338"><a href="#cb3-338" aria-hidden="true" tabindex="-1"></a>| Circles        | 2         | 1000         | 2            | 50%, 50%                                  |</span>
-<span id="cb3-339"><a href="#cb3-339" aria-hidden="true" tabindex="-1"></a>| Smile          | 2         | 1000         | 4            | 25%, 25%, 25%, 25%                        |</span>
+<span id="cb3-332"><a href="#cb3-332" aria-hidden="true" tabindex="-1"></a><span class="al">![Spectral-Bridges](figures/SBumap.pdf)</span></span>
+<span id="cb3-333"><a href="#cb3-333" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-334"><a href="#cb3-334" aria-hidden="true" tabindex="-1"></a><span class="al">![k-means++](figures/KMumap.pdf)</span></span>
+<span id="cb3-335"><a href="#cb3-335" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-336"><a href="#cb3-336" aria-hidden="true" tabindex="-1"></a>UMAP projection of predicted clusters: **Ground Truth (left)**, **Spectral-Bridges (center)**, **k-means++ (right)**</span>
+<span id="cb3-337"><a href="#cb3-337" aria-hidden="true" tabindex="-1"></a>UMAP projection of predicted clusters : **Ground Truth (top)**, **Spectral-Bridges (middle)**, **k-means++ (bottom)**</span>
+<span id="cb3-338"><a href="#cb3-338" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb3-339"><a href="#cb3-339" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-340"><a href="#cb3-340" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-341"><a href="#cb3-341" aria-hidden="true" tabindex="-1"></a>Table: Datasets Summary &amp; Class Balance</span>
+<span id="cb3-341"><a href="#cb3-341" aria-hidden="true" tabindex="-1"></a>TODO CANCER</span>
 <span id="cb3-342"><a href="#cb3-342" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-343"><a href="#cb3-343" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-344"><a href="#cb3-344" aria-hidden="true" tabindex="-1"></a>Class proportions are presented in ascending order starting from label $0$.</span>
-<span id="cb3-345"><a href="#cb3-345" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-346"><a href="#cb3-346" aria-hidden="true" tabindex="-1"></a><span class="fu">## Metrics</span></span>
-<span id="cb3-347"><a href="#cb3-347" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-348"><a href="#cb3-348" aria-hidden="true" tabindex="-1"></a>To evaluate the performance of our clustering algorithm, we use the Adjusted Rand Index (**ARI**) [@halkidi2002cluster] and Normalized Mutual Information (**NMI**) <span class="co">[</span><span class="ot">@cover1991information</span><span class="co">]</span>. ARI measures the similarity between two clustering results, ranging from $-0.5$ to $1$, with $1$ indicating perfect agreement. NMI ranges from $0$ to $1$, with higher values indicating better clustering quality. In some tests, we also report the variability of scores across multiple runs due to the random initialization in k-means, though k-means++ generally provides stable and reproducible results.</span>
+<span id="cb3-343"><a href="#cb3-343" aria-hidden="true" tabindex="-1"></a><span class="al">![ARI and NMI scores of **k-means++** (blue), **EM** (green), **Ward Clustering** (red), and **Spectral-Bridges** (purple) on the UCI Breast Cancer dataset](figures/cancer_summary.pdf)</span></span>
+<span id="cb3-344"><a href="#cb3-344" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-345"><a href="#cb3-345" aria-hidden="true" tabindex="-1"></a>.....</span>
+<span id="cb3-346"><a href="#cb3-346" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-347"><a href="#cb3-347" aria-hidden="true" tabindex="-1"></a><span class="al">![TODO](figures/synthetic_summary.pdf)</span></span>
+<span id="cb3-348"><a href="#cb3-348" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-349"><a href="#cb3-349" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-350"><a href="#cb3-350" aria-hidden="true" tabindex="-1"></a><span class="fu">## Platform</span></span>
+<span id="cb3-350"><a href="#cb3-350" aria-hidden="true" tabindex="-1"></a><span class="fu"># Conclusive remarks</span></span>
 <span id="cb3-351"><a href="#cb3-351" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-352"><a href="#cb3-352" aria-hidden="true" tabindex="-1"></a>All experiments were conducted on an Archlinux machine with Linux 6.9.3 Kernel, 8GB of RAM, and an AMD Ryzen 3 7320U processor.</span>
+<span id="cb3-352"><a href="#cb3-352" aria-hidden="true" tabindex="-1"></a>Possibility to kernelize</span>
 <span id="cb3-353"><a href="#cb3-353" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-354"><a href="#cb3-354" aria-hidden="true" tabindex="-1"></a><span class="fu">## Accuracy</span></span>
-<span id="cb3-355"><a href="#cb3-355" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-356"><a href="#cb3-356" aria-hidden="true" tabindex="-1"></a>We first evaluated our algorithm's accuracy on the MNIST dataset. Metrics were collected to compare our method with k-means++, EM, and Ward clustering. Metric were estimated by taking the empirical average over $100$ consecutive runs with the same random seed for each method.</span>
-<span id="cb3-357"><a href="#cb3-357" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-358"><a href="#cb3-358" aria-hidden="true" tabindex="-1"></a>Let $h$ denote the embedding dimension of the dataset. We tested our method on the raw MNIST dataset without preprocessing ($h = 784$) and after reducing its dimension using PCA to $h \in <span class="sc">\{</span>8, 16, 32, 64<span class="sc">\}</span>$ (see fig.1).</span>
+<span id="cb3-354"><a href="#cb3-354" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-355"><a href="#cb3-355" aria-hidden="true" tabindex="-1"></a><span class="fu"># Appendix  {.appendix}</span></span>
+<span id="cb3-356"><a href="#cb3-356" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-357"><a href="#cb3-357" aria-hidden="true" tabindex="-1"></a><span class="fu">## Derivation of the bridge gain {#gain}</span></span>
+<span id="cb3-358"><a href="#cb3-358" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-359"><a href="#cb3-359" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-360"><a href="#cb3-360" aria-hidden="true" tabindex="-1"></a><span class="al">![Comparison of **k-means++** (blue), **EM** (green), **Ward Clustering** (red), and **Spectral-Bridges** (purple) on PCA embedding and full MNIST](figures/ari_comparison.pdf)</span></span>
+<span id="cb3-360"><a href="#cb3-360" aria-hidden="true" tabindex="-1"></a>Notice that $B_{kl}$, the bridge inertia between centroids $k$ and $l$,  can be expressed as the sum of three terms:</span>
 <span id="cb3-361"><a href="#cb3-361" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-362"><a href="#cb3-362" aria-hidden="true" tabindex="-1"></a>For visualization purposes, we projected with UMAP the predicted clusters from our algorithm and other methods to compare them against the ground truth labels to better understand the cluster shapes (see table 2). Note that the projection was not used in our experiments as an embedding, and thus does not play any role in the clustering process itself. As a matter of fact, the embedding used was obtained with PCA, $h = 64$. Note that the label colors match the legend only in the case of the ground truth data. Indeed, the ordering of the labels have no impact on clustering quality.</span>
-<span id="cb3-363"><a href="#cb3-363" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-364"><a href="#cb3-364" aria-hidden="true" tabindex="-1"></a>::: {#fig-MNIST layout-ncol=3}</span>
-<span id="cb3-365"><a href="#cb3-365" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-366"><a href="#cb3-366" aria-hidden="true" tabindex="-1"></a><span class="al">![Ground Truth](figures/GTumap.pdf)</span></span>
+<span id="cb3-362"><a href="#cb3-362" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb3-363"><a href="#cb3-363" aria-hidden="true" tabindex="-1"></a>\begin{aligned}</span>
+<span id="cb3-364"><a href="#cb3-364" aria-hidden="true" tabindex="-1"></a>B_{kl} &amp;=&amp; \sum_{i \mid t_i=0} \|\boldsymbol x_i - \boldsymbol \mu_k\|^2  + \sum_{i \mid t_i=1} \|\boldsymbol x_i - \boldsymbol \mu_l\|^2 + \sum_{i \mid t_i\in ]0,1[} \|\boldsymbol x_i - \boldsymbol p_{kl}(\boldsymbol x_i)\|^2.</span>
+<span id="cb3-365"><a href="#cb3-365" aria-hidden="true" tabindex="-1"></a>\end{aligned}</span>
+<span id="cb3-366"><a href="#cb3-366" aria-hidden="true" tabindex="-1"></a>$$</span>
 <span id="cb3-367"><a href="#cb3-367" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-368"><a href="#cb3-368" aria-hidden="true" tabindex="-1"></a><span class="al">![Spectral-Bridges](figures/SBumap.pdf)</span></span>
+<span id="cb3-368"><a href="#cb3-368" aria-hidden="true" tabindex="-1"></a>The last term may be decomposed in two parts</span>
 <span id="cb3-369"><a href="#cb3-369" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-370"><a href="#cb3-370" aria-hidden="true" tabindex="-1"></a><span class="al">![k-means++](figures/KMumap.pdf)</span></span>
-<span id="cb3-371"><a href="#cb3-371" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-372"><a href="#cb3-372" aria-hidden="true" tabindex="-1"></a>UMAP projection of predicted clusters: **Ground Truth (left)**, **Spectral-Bridges (center)**, **k-means++ (right)**</span>
-<span id="cb3-373"><a href="#cb3-373" aria-hidden="true" tabindex="-1"></a>UMAP projection of predicted clusters : **Ground Truth (top)**, **Spectral-Bridges (middle)**, **k-means++ (bottom)**</span>
-<span id="cb3-374"><a href="#cb3-374" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb3-370"><a href="#cb3-370" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb3-371"><a href="#cb3-371" aria-hidden="true" tabindex="-1"></a>\begin{aligned}</span>
+<span id="cb3-372"><a href="#cb3-372" aria-hidden="true" tabindex="-1"></a>\sum_{i \mid t_i\in ]0,1<span class="co">[</span><span class="ot">} \|\boldsymbol x_i - \boldsymbol p_{kl}(\boldsymbol x_i)\|^2 &amp;= &amp;\sum_{i \mid t_i\in </span><span class="co">]</span>0,\frac{1}{2}[} \|\boldsymbol x_i - \boldsymbol p_{kl}(\boldsymbol x_i)\|^2 + \sum_{i \mid t_i\in [\frac{1}{2},1[} \|\boldsymbol x_i - \boldsymbol p_{kl}(\boldsymbol x_i)\|^2<span class="sc">\\</span></span>
+<span id="cb3-373"><a href="#cb3-373" aria-hidden="true" tabindex="-1"></a>\end{aligned}</span>
+<span id="cb3-374"><a href="#cb3-374" aria-hidden="true" tabindex="-1"></a>$$</span>
 <span id="cb3-375"><a href="#cb3-375" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-376"><a href="#cb3-376" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-377"><a href="#cb3-377" aria-hidden="true" tabindex="-1"></a>TODO CANCER</span>
-<span id="cb3-378"><a href="#cb3-378" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-379"><a href="#cb3-379" aria-hidden="true" tabindex="-1"></a><span class="al">![ARI and NMI scores of **k-means++** (blue), **EM** (green), **Ward Clustering** (red), and **Spectral-Bridges** (purple) on the UCI Breast Cancer dataset](figures/cancer_summary.pdf)</span></span>
-<span id="cb3-380"><a href="#cb3-380" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-381"><a href="#cb3-381" aria-hidden="true" tabindex="-1"></a>.....</span>
-<span id="cb3-382"><a href="#cb3-382" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-383"><a href="#cb3-383" aria-hidden="true" tabindex="-1"></a><span class="al">![TODO](figures/synthetic_summary.pdf)</span></span>
-<span id="cb3-384"><a href="#cb3-384" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-385"><a href="#cb3-385" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-386"><a href="#cb3-386" aria-hidden="true" tabindex="-1"></a><span class="fu"># Conclusive remarks</span></span>
-<span id="cb3-387"><a href="#cb3-387" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-388"><a href="#cb3-388" aria-hidden="true" tabindex="-1"></a>Possibility to kernelize</span>
-<span id="cb3-389"><a href="#cb3-389" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-376"><a href="#cb3-376" aria-hidden="true" tabindex="-1"></a>and each part further decomposed using Pythagore </span>
+<span id="cb3-377"><a href="#cb3-377" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb3-378"><a href="#cb3-378" aria-hidden="true" tabindex="-1"></a>\begin{aligned}</span>
+<span id="cb3-379"><a href="#cb3-379" aria-hidden="true" tabindex="-1"></a>\sum_{i \mid t_i\in ]0,\frac{1}{2}<span class="co">[</span><span class="ot">} \|\boldsymbol x_i - \boldsymbol p_{kl}(\boldsymbol x_i)\|^2 &amp;=&amp; \sum_{i \mid t_i\in </span><span class="co">]</span>0,\frac{1}{2}<span class="co">[</span><span class="ot">} \|\boldsymbol x_i - \boldsymbol \mu_k\|^2 - \sum_{i \mid t_i\in </span><span class="co">]</span>0,\frac{1}{2}[} \|\boldsymbol \mu_k - \boldsymbol p_{kl}(\boldsymbol x_i)\|^2<span class="sc">\\</span></span>
+<span id="cb3-380"><a href="#cb3-380" aria-hidden="true" tabindex="-1"></a>&amp;=&amp; \sum_{i \mid t_i\in ]0,\frac{1}{2}<span class="co">[</span><span class="ot">} \|\boldsymbol x_i - \boldsymbol \mu_k\|^2 - \sum_{i \mid t_i\in </span><span class="co">]</span>0,\frac{1}{2}[} \|t_i (\boldsymbol \mu_k - \boldsymbol \mu_{l})\|^2,</span>
+<span id="cb3-381"><a href="#cb3-381" aria-hidden="true" tabindex="-1"></a>\end{aligned}</span>
+<span id="cb3-382"><a href="#cb3-382" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb3-383"><a href="#cb3-383" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-384"><a href="#cb3-384" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb3-385"><a href="#cb3-385" aria-hidden="true" tabindex="-1"></a>\begin{aligned}</span>
+<span id="cb3-386"><a href="#cb3-386" aria-hidden="true" tabindex="-1"></a>\sum_{i \mid t_i\in ]\frac{1}{2},1<span class="co">[</span><span class="ot">} \|\boldsymbol x_i - \boldsymbol p_{kl}(\boldsymbol x_i)\|^2 &amp;=&amp; \sum_{i \mid t_i\in </span><span class="co">]</span>0,\frac{1}{2}<span class="co">[</span><span class="ot">} \|\boldsymbol x_i - \boldsymbol \mu_l\|^2 - \sum_{i \mid t_i\in </span><span class="co">]</span>0,\frac{1}{2}[} \|\boldsymbol \mu_l - \boldsymbol p_{kl}(\boldsymbol x_i)\|^2<span class="sc">\\</span></span>
+<span id="cb3-387"><a href="#cb3-387" aria-hidden="true" tabindex="-1"></a>&amp;=&amp; \sum_{i \mid t_i\in ]\frac{1}{2},1<span class="co">[</span><span class="ot">} \|\boldsymbol x_i - \boldsymbol \mu_k\|^2 - \sum_{i \mid t_i\in </span><span class="co">]</span>0,\frac{1}{2}[} \|(1-t_i) (\boldsymbol \mu_k - \boldsymbol \mu_{l})\|^2</span>
+<span id="cb3-388"><a href="#cb3-388" aria-hidden="true" tabindex="-1"></a>\end{aligned}</span>
+<span id="cb3-389"><a href="#cb3-389" aria-hidden="true" tabindex="-1"></a>$$</span>
 <span id="cb3-390"><a href="#cb3-390" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-391"><a href="#cb3-391" aria-hidden="true" tabindex="-1"></a><span class="fu"># Appendix  {.appendix}</span></span>
-<span id="cb3-392"><a href="#cb3-392" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-393"><a href="#cb3-393" aria-hidden="true" tabindex="-1"></a><span class="fu">## Derivation of the bridge gain {#gain}</span></span>
-<span id="cb3-394"><a href="#cb3-394" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-395"><a href="#cb3-395" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-396"><a href="#cb3-396" aria-hidden="true" tabindex="-1"></a>Notice that $B_{kl}$, the bridge inertia between centroids $k$ and$l$,  can be expressed as the sum of three terms:</span>
-<span id="cb3-397"><a href="#cb3-397" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-398"><a href="#cb3-398" aria-hidden="true" tabindex="-1"></a>$$</span>
-<span id="cb3-399"><a href="#cb3-399" aria-hidden="true" tabindex="-1"></a>\begin{aligned}</span>
-<span id="cb3-400"><a href="#cb3-400" aria-hidden="true" tabindex="-1"></a>B_{kl} &amp;=&amp; \sum_{i \mid t_i=0} \|\boldsymbol x_i - \boldsymbol \mu_k\|^2  + \sum_{i \mid t_i=1} \|\boldsymbol x_i - \boldsymbol \mu_l\|^2 + \sum_{i \mid t_i\in ]0,1[} \|\boldsymbol x_i - \boldsymbol p_{kl}(\boldsymbol x_i)\|^2.</span>
-<span id="cb3-401"><a href="#cb3-401" aria-hidden="true" tabindex="-1"></a>\end{aligned}</span>
-<span id="cb3-402"><a href="#cb3-402" aria-hidden="true" tabindex="-1"></a>$$</span>
-<span id="cb3-403"><a href="#cb3-403" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-404"><a href="#cb3-404" aria-hidden="true" tabindex="-1"></a>The last term may be decomposed in two parts</span>
-<span id="cb3-405"><a href="#cb3-405" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-406"><a href="#cb3-406" aria-hidden="true" tabindex="-1"></a>$$</span>
-<span id="cb3-407"><a href="#cb3-407" aria-hidden="true" tabindex="-1"></a>\begin{aligned}</span>
-<span id="cb3-408"><a href="#cb3-408" aria-hidden="true" tabindex="-1"></a>\sum_{i \mid t_i\in ]0,1<span class="co">[</span><span class="ot">} \|\boldsymbol x_i - \boldsymbol p_{kl}(\boldsymbol x_i)\|^2 &amp;= &amp;\sum_{i \mid t_i\in </span><span class="co">]</span>0,\frac{1}{2}[} \|\boldsymbol x_i - \boldsymbol p_{kl}(\boldsymbol x_i)\|^2 + \sum_{i \mid t_i\in [\frac{1}{2},1[} \|\boldsymbol x_i - \boldsymbol p_{kl}(\boldsymbol x_i)\|^2<span class="sc">\\</span></span>
-<span id="cb3-409"><a href="#cb3-409" aria-hidden="true" tabindex="-1"></a>\end{aligned}</span>
-<span id="cb3-410"><a href="#cb3-410" aria-hidden="true" tabindex="-1"></a>$$</span>
-<span id="cb3-411"><a href="#cb3-411" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-412"><a href="#cb3-412" aria-hidden="true" tabindex="-1"></a>and each part further decomposed using Pythagore </span>
-<span id="cb3-413"><a href="#cb3-413" aria-hidden="true" tabindex="-1"></a>$$</span>
-<span id="cb3-414"><a href="#cb3-414" aria-hidden="true" tabindex="-1"></a>\begin{aligned}</span>
-<span id="cb3-415"><a href="#cb3-415" aria-hidden="true" tabindex="-1"></a>\sum_{i \mid t_i\in ]0,\frac{1}{2}<span class="co">[</span><span class="ot">} \|\boldsymbol x_i - \boldsymbol p_{kl}(\boldsymbol x_i)\|^2 &amp;=&amp; \sum_{i \mid t_i\in </span><span class="co">]</span>0,\frac{1}{2}<span class="co">[</span><span class="ot">} \|\boldsymbol x_i - \boldsymbol \mu_k\|^2 - \sum_{i \mid t_i\in </span><span class="co">]</span>0,\frac{1}{2}[} \|\boldsymbol \mu_k - \boldsymbol p_{kl}(\boldsymbol x_i)\|^2<span class="sc">\\</span></span>
-<span id="cb3-416"><a href="#cb3-416" aria-hidden="true" tabindex="-1"></a>&amp;=&amp; \sum_{i \mid t_i\in ]0,\frac{1}{2}<span class="co">[</span><span class="ot">} \|\boldsymbol x_i - \boldsymbol \mu_k\|^2 - \sum_{i \mid t_i\in </span><span class="co">]</span>0,\frac{1}{2}[} \|t_i (\boldsymbol \mu_k - \boldsymbol \mu_{l})\|^2,</span>
-<span id="cb3-417"><a href="#cb3-417" aria-hidden="true" tabindex="-1"></a>\end{aligned}</span>
-<span id="cb3-418"><a href="#cb3-418" aria-hidden="true" tabindex="-1"></a>$$</span>
-<span id="cb3-419"><a href="#cb3-419" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-420"><a href="#cb3-420" aria-hidden="true" tabindex="-1"></a>$$</span>
-<span id="cb3-421"><a href="#cb3-421" aria-hidden="true" tabindex="-1"></a>\begin{aligned}</span>
-<span id="cb3-422"><a href="#cb3-422" aria-hidden="true" tabindex="-1"></a>\sum_{i \mid t_i\in ]\frac{1}{2},1<span class="co">[</span><span class="ot">} \|\boldsymbol x_i - \boldsymbol p_{kl}(\boldsymbol x_i)\|^2 &amp;=&amp; \sum_{i \mid t_i\in </span><span class="co">]</span>0,\frac{1}{2}<span class="co">[</span><span class="ot">} \|\boldsymbol x_i - \boldsymbol \mu_l\|^2 - \sum_{i \mid t_i\in </span><span class="co">]</span>0,\frac{1}{2}[} \|\boldsymbol \mu_l - \boldsymbol p_{kl}(\boldsymbol x_i)\|^2<span class="sc">\\</span></span>
-<span id="cb3-423"><a href="#cb3-423" aria-hidden="true" tabindex="-1"></a>&amp;=&amp; \sum_{i \mid t_i\in ]\frac{1}{2},1<span class="co">[</span><span class="ot">} \|\boldsymbol x_i - \boldsymbol \mu_k\|^2 - \sum_{i \mid t_i\in </span><span class="co">]</span>0,\frac{1}{2}[} \|(1-t_i) (\boldsymbol \mu_k - \boldsymbol \mu_{l})\|^2</span>
-<span id="cb3-424"><a href="#cb3-424" aria-hidden="true" tabindex="-1"></a>\end{aligned}</span>
-<span id="cb3-425"><a href="#cb3-425" aria-hidden="true" tabindex="-1"></a>$$</span>
-<span id="cb3-426"><a href="#cb3-426" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-427"><a href="#cb3-427" aria-hidden="true" tabindex="-1"></a>Thus $$</span>
-<span id="cb3-428"><a href="#cb3-428" aria-hidden="true" tabindex="-1"></a>\begin{aligned}</span>
-<span id="cb3-429"><a href="#cb3-429" aria-hidden="true" tabindex="-1"></a>B_{kl}- I_{kl} &amp;=&amp;  \sum_{i \mid t_i\in ]0,\frac{1}{2}<span class="co">[</span><span class="ot">} t_i^2 \|\boldsymbol \mu_k - \boldsymbol \mu_l\|^2 + \sum_{i \mid t_i\in </span><span class="co">]</span>\frac{1}{2},1[} (1-t_i)^2 \|\boldsymbol \mu_k - \boldsymbol \mu_l\|^2,<span class="sc">\\</span></span>
-<span id="cb3-430"><a href="#cb3-430" aria-hidden="true" tabindex="-1"></a>\frac{B_{kl}- I_{kl}}{\|\boldsymbol \mu_k - \boldsymbol \mu_l\|^2} &amp;=&amp; \sum_{i \mid t_i\in ]0,\frac{1}{2}<span class="co">[</span><span class="ot">} t_i^2  + \sum_{i \mid t_i\in </span><span class="co">]</span>\frac{1}{2},1[} (1-t_i)^2, <span class="sc">\\</span></span>
-<span id="cb3-431"><a href="#cb3-431" aria-hidden="true" tabindex="-1"></a>\frac{B_{kl}- I_{kl}}{(n_k+n_l)\|\boldsymbol \mu_k - \boldsymbol \mu_l\|^2} &amp;=&amp; \frac{\sum_{\boldsymbol{i} \in k} \langle \boldsymbol{x_i} - \boldsymbol{\mu}_k \vert \boldsymbol{\mu}_l - \boldsymbol{\mu}_k \rangle_+^2  \sum_{\boldsymbol{i} \in l} \langle \boldsymbol{x_i} - \boldsymbol{\mu}_l \vert \boldsymbol{\mu}_k - \boldsymbol{\mu}_l\rangle_+^2}{(n_k+n_l)\|\boldsymbol \mu_k - \boldsymbol \mu_l\|^4}.</span>
-<span id="cb3-432"><a href="#cb3-432" aria-hidden="true" tabindex="-1"></a>\end{aligned}</span>
-<span id="cb3-433"><a href="#cb3-433" aria-hidden="true" tabindex="-1"></a>$$</span>
-<span id="cb3-434"><a href="#cb3-434" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-435"><a href="#cb3-435" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-436"><a href="#cb3-436" aria-hidden="true" tabindex="-1"></a><span class="fu"># References {.unnumbered}</span></span>
-<span id="cb3-437"><a href="#cb3-437" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-438"><a href="#cb3-438" aria-hidden="true" tabindex="-1"></a>::: {#refs}</span>
-<span id="cb3-439"><a href="#cb3-439" aria-hidden="true" tabindex="-1"></a>:::</span>
-<span id="cb3-440"><a href="#cb3-440" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-441"><a href="#cb3-441" aria-hidden="true" tabindex="-1"></a><span class="fu"># Session information {.appendix .unnumbered}</span></span>
-<span id="cb3-442"><a href="#cb3-442" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-443"><a href="#cb3-443" aria-hidden="true" tabindex="-1"></a><span class="in">```{r session-info}</span></span>
-<span id="cb3-444"><a href="#cb3-444" aria-hidden="true" tabindex="-1"></a><span class="in">sessionInfo()</span></span>
-<span id="cb3-445"><a href="#cb3-445" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></pre></div>
+<span id="cb3-391"><a href="#cb3-391" aria-hidden="true" tabindex="-1"></a>Thus $$</span>
+<span id="cb3-392"><a href="#cb3-392" aria-hidden="true" tabindex="-1"></a>\begin{aligned}</span>
+<span id="cb3-393"><a href="#cb3-393" aria-hidden="true" tabindex="-1"></a>B_{kl}- I_{kl} &amp;=&amp;  \sum_{i \mid t_i\in ]0,\frac{1}{2}<span class="co">[</span><span class="ot">} t_i^2 \|\boldsymbol \mu_k - \boldsymbol \mu_l\|^2 + \sum_{i \mid t_i\in </span><span class="co">]</span>\frac{1}{2},1[} (1-t_i)^2 \|\boldsymbol \mu_k - \boldsymbol \mu_l\|^2,<span class="sc">\\</span></span>
+<span id="cb3-394"><a href="#cb3-394" aria-hidden="true" tabindex="-1"></a>\frac{B_{kl}- I_{kl}}{\|\boldsymbol \mu_k - \boldsymbol \mu_l\|^2} &amp;=&amp; \sum_{i \mid t_i\in ]0,\frac{1}{2}<span class="co">[</span><span class="ot">} t_i^2  + \sum_{i \mid t_i\in </span><span class="co">]</span>\frac{1}{2},1[} (1-t_i)^2, <span class="sc">\\</span></span>
+<span id="cb3-395"><a href="#cb3-395" aria-hidden="true" tabindex="-1"></a>\frac{B_{kl}- I_{kl}}{(n_k+n_l)\|\boldsymbol \mu_k - \boldsymbol \mu_l\|^2} &amp;=&amp; \frac{\sum_{\boldsymbol{i} \in k} \langle \boldsymbol{x_i} - \boldsymbol{\mu}_k \vert \boldsymbol{\mu}_l - \boldsymbol{\mu}_k \rangle_+^2  \sum_{\boldsymbol{i} \in l} \langle \boldsymbol{x_i} - \boldsymbol{\mu}_l \vert \boldsymbol{\mu}_k - \boldsymbol{\mu}_l\rangle_+^2}{(n_k+n_l)\|\boldsymbol \mu_k - \boldsymbol \mu_l\|^4}.</span>
+<span id="cb3-396"><a href="#cb3-396" aria-hidden="true" tabindex="-1"></a>\end{aligned}</span>
+<span id="cb3-397"><a href="#cb3-397" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb3-398"><a href="#cb3-398" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-399"><a href="#cb3-399" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-400"><a href="#cb3-400" aria-hidden="true" tabindex="-1"></a><span class="fu"># References {.unnumbered}</span></span>
+<span id="cb3-401"><a href="#cb3-401" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-402"><a href="#cb3-402" aria-hidden="true" tabindex="-1"></a>::: {#refs}</span>
+<span id="cb3-403"><a href="#cb3-403" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb3-404"><a href="#cb3-404" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-405"><a href="#cb3-405" aria-hidden="true" tabindex="-1"></a><span class="fu"># Session information {.appendix .unnumbered}</span></span>
+<span id="cb3-406"><a href="#cb3-406" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-407"><a href="#cb3-407" aria-hidden="true" tabindex="-1"></a><span class="in">```{r session-info}</span></span>
+<span id="cb3-408"><a href="#cb3-408" aria-hidden="true" tabindex="-1"></a><span class="in">sessionInfo()</span></span>
+<span id="cb3-409"><a href="#cb3-409" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></pre></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
-<script>
-(function(d) {
-  d.querySelectorAll(".pseudocode-container").forEach(function(el) {
-    let pseudocodeOptions = {
-      indentSize: el.dataset.indentSize || "1.2em",
-      commentDelimiter: el.dataset.commentDelimiter || "//",
-      lineNumber: el.dataset.lineNumber === "true" ? true : false,
-      lineNumberPunc: el.dataset.lineNumberPunc || ":",
-      noEnd: el.dataset.noEnd === "true" ? true : false,
-      titlePrefix: el.dataset.algTitle || "Algorithm"
-    };
-    pseudocode.renderElement(el.querySelector(".pseudocode"), pseudocodeOptions);
-  });
-})(document);
-(function(d) {
-  d.querySelectorAll(".pseudocode-container").forEach(function(el) {
-    titleSpan = el.querySelector(".ps-root > .ps-algorithm > .ps-line > .ps-keyword")
-    titlePrefix = el.dataset.algTitle;
-    titleIndex = el.dataset.chapterLevel ? el.dataset.chapterLevel + "." + el.dataset.pseudocodeIndex : el.dataset.pseudocodeIndex;
-    titleSpan.innerHTML = titlePrefix + " " + titleIndex + " ";
-  });
-})(document);
-</script>
 <script>
 (function(d) {
   d.querySelectorAll(".pseudocode-container").forEach(function(el) {
