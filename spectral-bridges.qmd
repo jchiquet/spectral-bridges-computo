@@ -45,91 +45,61 @@ editor:
 
 # Abstract
 
-In this paper, Spectral-Bridges, a novel clustering algorithm, is
-presented. This algorithm builds upon the traditional k-means and
-spectral clustering frameworks by subdividing data into small Voronoi
-regions, which are subsequently assessed for their connectivity. Drawing
-inspiration from Support vector machine, a non-parametric clustering
-approach is proposed. This approach is characterized by minimal
-hyperparameters and intuitive usability, thereby augmenting adaptability
-and enabling the delineation of intricate, non-convex cluster
-structures.
+In this paper, Spectral-Bridges, a novel clustering algorithm, is presented. This algorithm builds upon the traditional k-means and spectral clustering frameworks by subdividing data into small Voronoi regions, which are subsequently assessed for their connectivity. Drawing inspiration from Support vector machine, a non-parametric clustering approach is proposed. This approach is characterized by minimal hyperparameters and intuitive usability, thereby augmenting adaptability and enabling the delineation of intricate, non-convex cluster structures.
 
-Both global and local data arrangements are aimed to be discerned by
-Spectral-Bridges in a scale-invariant manner. 
+The empirical results underscore Spectral-Bridges as a fast, robust, and versatile tool for sophisticated clustering tasks spanning diverse domains. Its efficacy is observed to extend seamlessly to large-scale scenarios encompassing both real-world and synthetic datasets.
 
-The empirical results underscore Spectral-Bridges as a fast, robust, and
-versatile tool for sophisticated clustering tasks spanning diverse
-domains. Its efficacy is observed to extend seamlessly to large-scale
-scenarios encompassing both real-world and synthetic datasets.
 
 # Introduction
 
-<!--Interest of clustering-->
+Clustering is a fundamental technique for exploratory data analysis, organizing a set of objects into distinct homogeneous groups known as clusters. It is extensively utilized across various fields, such as biology for gene expression analysis [@Eisen1998], social sciences for community detection in social networks [@latouche2011], and psychology for identifying behavioral patterns. Clustering is often employed alongside supervised learning as a pre-processing step, helping to structure and simplify data, thus enhancing the performance and interpretability of subsequent predictive models [@Verhaak2010]. Additionally, clustering can be integrated into supervised learning algorithms, such as mixture of experts [@jacobs1991adaptive], as part of a multi-objective strategy.
 
-Clustering is a fundamental technique for exploratory data analysis. It
-partition a set of objects into a certain number of homogeneous groups,
-each referred to as a cluster. It is extensively utilized across diverse
-fields such biology, social sciences, and psychology. Clustering is
-frequently employed in conjunction with supervised learning as a
-pre-processing step, where it helps to structure and simplify data,
-thereby enhancing the performance and interpretability of subsequent
-predictive models.
+There are numerous approaches to clustering, each defined by how similarity between objects is measured, either through a similarity measure, a distance metric, or a statistical model.
 
-<!-- Importance of defining "similar" -->
+Density-based methods identify regions within the data with a high concentration of points, corresponding to the modes of the joint density. A notable non-parametric example of this approach is DBSCAN [@ester1996density]. In contrast, model-based clustering, such as Gaussian mixture models, represents a parametric approach to density-based methods. Model-based clustering assumes that the data is generated from a mixture of underlying probability distributions, typically Gaussian distributions. Each cluster is viewed as a component of this mixture model, and the Expectation-Maximization (EM) algorithm is often used to estimate the parameters. This approach provides a probabilistic framework for clustering, allowing for the incorporation of prior knowledge and the ability to handle more complex cluster shapes and distributions [@mclachlan2000finite].
 
-<!-- Clustering approaches -->
+Geometric approaches, such as k-means [@macqueen1967some], are distance-based methods that aim to partition data by optimizing a criterion reflecting group homogeneity. The k-means++ algorithm [@arthur2007kmeanspp] enhances this approach by providing fast, convenient, and interpretable results. However, a key limitation of these methods is the assumption of linear boundaries between clusters, implying that clusters are convex. To address non-convex clusters, the kernel trick can be applied, allowing for a more flexible k-means algorithm. This approach is comparable to spectral clustering in handling complex cluster boundaries [@dhillon2004kernel]. The k-means algorithm can also be interpreted within the framework of model-based clustering under specific assumptions [@govaert2003clustering], revealing that it is essentially a special case of the more general Gaussian mixture models, where clusters are assumed to be spherical Gaussian distributions with equal variance.
 
-There are numerous approaches to clustering, each defined by how
-similarity between objects is measured, either through a similarity
-measure or more strictly through a distance metric.
-
-Density-based methods identify regions within the data that have a high
-concentration of points, corresponding to the modes of the joint
-density. A notable non-parametric example of this approach is DBSCAN
-[@ester1996density]. In contrast, model-based clustering, such as
-Gaussian mixture models, represents a parametric approach to
-density-based methods.
-
-Geometric approaches, such as kmeans [@macqueen1967some] are
-distance-based and aim to partition the data in a way that optimizes a
-criterion reflecting group homogeneity.
-
-Graph-based methods treat data as a graph, with vertices representing
-data points and edges weighted to reflect the affinity between these
-points.
-
-```{=html}
-<!--
-
-Clustering is a fundamental problem in the field of data mining and machine learning [1], whose purpose is to partition a set of objects into a certain number of homogeneous groups, each referred to as a cluster. 
-Out of the large number of clustering algorithms that have been developed, spectral clustering in recent years has been gaining increasing attention due to its promising ability in dealing with non- linearly separable datasets [2], [3], [4], [5]. However, a critical limitation to conventional spectral clustering lies in its huge time and space complexity, which significantly restricts its application to large-scale problems.
-Conventional spectral clustering typically consists of two time- and memory-consuming phases, namely,
--->
-```
+Graph-based methods represent data as a graph, with vertices symbolizing data points and edges weighted to indicate the affinity between these points. Spectral clustering can be seen as a relaxed version of the graph cut algorithm [@shi2000normalized]. However, traditional spectral clustering faces significant limitations due to its high time and space complexity, greatly hindering its applicability to large-scale problems [@von2007tutorial].
 
 
-The algorithm proposed in this paper draws from numerous clustering techniques. The initial intuition is to detect high-density areas. To this end, a vector quantization is used to divide the space into a Voronoi tessellation. An original geometric criterion is then employed to detect pairs of Voronoi regions that are either distant from each other or separated by a low-density boundary. Finally, this affinity measure is considered as the weight of an edge in a complete graph connecting the centroids of the tessellation, and a spectral clustering algorithm is used to find a partition of this graph.
+The method we propose aims to find non-convex clusters in large datasets, without relying on parametric model,  by using spectral clustering based on an affinity that characterizes the local density of the data. The algorithm described in this paper draws from numerous clustering approaches. The initial intuition is to detect high-density areas. To this end, vector quantization is used to divide the space into a Voronoi tessellation. An original geometric criterion is then employed to detect pairs of Voronoi regions that are either distant from each other or separated by a low-density boundary. Finally, this affinity measure is considered as the weight of an edge in a complete graph connecting the centroids of the tessellation, and a spectral clustering algorithm is used to find a partition of this graph. The only parameters of the algorithm are the number of Voronoï Cells and the number of clusters.   
 
 The paper begins with a section dedicated to presenting the context and related algorithms, followed by a detailed description of the proposed algorithm. Experiments and comparisons with reference algorithms are then conducted on both real and synthetic data.
 
-
-
 # Background
 
-Spectral clustering is a graph-based approach that computes the
-eigenvectors of the graph's Laplacian matrix. This technique transforms
-the data into a lower-dimensional space, making the clusters more
-discernible. A standard algorithm like k-means is then applied to these
-transformed features to identify the clusters[@von2007tutorial].
 
-It enables to capture complex data structures and discern clusters based
-on the connectivity of data points in a transformed space. Notice that
-spectral clustering can be seen as a relaxed graph cut problem.
+Spectral clustering is a graph-based approach that computes the eigen-vectors of the graph's Laplacian matrix. This technique transforms the data into a lower-dimensional space, making the clusters more discernible. A standard algorithm like k-means is then applied to these transformed features to identify the clusters [@von2007tutorial]. Spectral clustering enables capturing complex data structures and discerning clusters based on the connectivity of data points in a transformed space, effectively treating it as a relaxed graph cut problem.
+
+Classical spectral clustering involves two phases: construction of the affinity matrix and  eigen-decomposition. Constructing the affinity matrix requires $O(n^2d)$ time  and $O(n)$ memory, while eigen-decomposition demands $O(n^3)$ time and $O(n^2)$ memory, where $n$ is the data size and $d$ is the dimension. As $n$ increases, the computational load escalates significantly [@von2007tutorial].
+
+To mitigate this computational burden, one common approach is to sparsify the affinity matrix and use sparse eigen-solvers, reducing memory costs but still requiring computation of all original matrix entries [@von2007tutorial]. Another strategy is sub-matrix construction. The Nyström method randomly selects $m$ representatives from the dataset to form an $n\times m$ affinity sub-matrix [@chen2010parallel]. Cai et al. extended this with the landmark-based spectral clustering method, which uses k-means to determine $m$ cluster centers as representatives [@cai2014large]. Ultra-scalable spectral clustering (U-SPEC) employs a hybrid representative selection strategy and a fast approximation method for constructing a sparse affinity sub-matrix [@huang2019ultra]. 
+
+Other approaches uses the properties of the small initial cluster for the affinity computation.   Clustering Based on Graph of Intensity Topology (GIT)  estimates a global topological graph (topo-graph) between local clusters [@gao2021git]. I then uses the Wasserstein Distance between predicted and prior class proportions to automatically cut noisy edges in the topo-graph and merge connected local clusters into final clusters. 
+
+The issue of characterizing the affinity between two clusters to create an edge weight is central to the efficiency of a spectral clustering algorithm operating from a submatrix.
+
+Notice that the  clustering robustness of many Spectral clustering algorithm heavily relies on the proper selection of kernel parameter, which is difficult to find without prior knowledge [@ng2001spectral].
+
+
+
+<!--
+The approach using k-means to determine $m$ clusters and then creating a graph from these clusters is similar to certain penalized versions of Kohonen self-organizing maps, where the graph nodes are the centers of the $m$ clusters and the edge weights are related to the distance between the centroids.
+
+
+$$
+\text{Objective Function} = \sum_{\text{data points}} \left( \text{reconstruction error} \right) + \lambda \sum_{\text{neighbors}} (\text{weight}_{i} - \text{weight}_{j})^2
+$$
+
+
+Ainsi le terme de pénalité utilisé pour les carte de Kohonen pourrais être utilisé par caractériser la similiarté entre deux
+-->
+
 
 # Spectral bridges
 
-The proposed algorithm uses K-means centroids for vector quantization defining Voronoi region, and a strategy is proposed to link these regions, with the "affinity" gauged in terms of minimal margin between pairs of classes. These affinities are considered as weight of edges defining a completely connected graph whose vertices are the regions. Spectral clustering on the region provide a partition of the input space. The sole parameters of the algorithm are the number of Voronoi region and the number of final cluster. 
+The proposed algorithm uses K-means centroids for vector quantization defining Voronoi region, and a strategy is proposed to link these regions, with an "affinity" gauged in terms of minimal margin between pairs of classes. These affinities are considered as weight of edges defining a completely connected graph whose vertices are the regions. Spectral clustering on the region provide a partition of the input space. The sole parameters of the algorithm are the number of Voronoi region and the number of final cluster. 
 
 
 ## Bridge gain affinity
@@ -265,7 +235,7 @@ Illustration of the Spectral bridges algorithm with the Iris dataset (first prin
     \State $voronoiRegions \gets$ \Call{Subdivide}{$X, centroids$} \Comment{Subdivide data into Voronoi regions}
        \State \textbf{Step 2: Affinity Matrix Computation} $A = \{a_{kl}\}$
         \State \textbf{Step 3: Spectral Clustering} \Comment{Affect each region to a cluster}
-        \State $labels \gets$ \Call{SpectralClustering}{$X, k$}
+        \State $labels \gets$ \Call{SpectralClustering}{$A, k$}
       \State \textbf{Step 4: Propagate} \Comment{Each data point is affected to the cluster of its region}
       \State $clusters \gets$ \Call{Propagate}{$X, labels, centroids$}
      \State \Return $clusters$ \Comment{Cluster labels for data points in $X$}
@@ -277,7 +247,7 @@ Illustration of the Spectral bridges algorithm with the Iris dataset (first prin
 # Numerical experiments
 
 
-In this section, we present the results obtained from testing our algorithm on various datasets, both small and large scale, including real-world and well-known synthetic datasets. These experiments assess the accuracy, time and space complexity, ease of use, robustness, and adaptability of our algorithm. We compare **Spectral-Bridges** (**SB**) against several state-of-the-art methods, including **k-means++** (**KM**) [@macqueen1967some; @arthur2007k], **Expectation-Maximization** (**EM**) [@dempster1977maximum], **Ward Clustering** (**WC**) [@ward1963hierarchical], and **DBSCAN** (**DB**) [@ester1996density]. This comparison establishes baselines across centroid-based clustering algorithms, hierarchical methods, and density-based methods. We evaluate the algorithms on both raw and PCA-processed data with varying dimensionality. For synthetic datasets, we introduce Gaussian and/or uniform noise to evaluate the robustness of our algorithm.
+In this section, we present the results obtained from testing our algorithm on various datasets, both small and large scale, including real-world and well-known synthetic datasets. These experiments assess the accuracy, time and space complexity, ease of use, robustness, and adaptability of our algorithm. We compare **Spectral-Bridges** (**SB**) against several state-of-the-art methods, including **k-means++** (**KM**) [@macqueen1967some; @arthur2007kmeanspp], **Expectation-Maximization** (**EM**) [@dempster1977maximum], **Ward Clustering** (**WC**) [@ward1963hierarchical], and **DBSCAN** (**DB**) [@ester1996density]. This comparison establishes baselines across centroid-based clustering algorithms, hierarchical methods, and density-based methods. We evaluate the algorithms on both raw and PCA-processed data with varying dimensionality. For synthetic datasets, we introduce Gaussian and/or uniform noise to evaluate the robustness of our algorithm.
 
 ## Real-world Data
 
