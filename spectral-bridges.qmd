@@ -45,9 +45,9 @@ editor:
 
 # Abstract
 
-In this paper, Spectral-Bridges, a novel clustering algorithm, is introduced. This algorithm builds upon the traditional k-means and spectral clustering frameworks by subdividing data into small Voronoï regions, which are subsequently assessed for their connectivity. Drawing inspiration from Support vector machine, a non-parametric clustering approach is proposed, based on an affinity margin between two Voronoï region. This approach is characterized by minimal hyperparameters and intuitive usability, thereby augmenting adaptability and enabling the delineation of intricate, non-convex cluster structures.
+In this paper, Spectral-Bridges, a novel clustering algorithm, is introduced. This algorithm builds upon the traditional k-means and spectral clustering frameworks by subdividing data into small Voronoï regions, which are subsequently assessed for their connectivity. Drawing inspiration from Support vector machine margin concept, a non-parametric clustering approach is proposed, building  an affinity margin between each pair of Voronoï regions. This approach is characterized by minimal hyperparameters and delineation of intricate, non-convex cluster structures.
 
-The empirical results underscore Spectral-Bridges as a fast, robust, and versatile tool for sophisticated clustering tasks spanning diverse domains. Its efficacy is observed to extend seamlessly to large-scale scenarios encompassing both real-world and synthetic datasets.
+The numerical experiments underscore Spectral-Bridges as a fast, robust, and versatile tool for sophisticated clustering tasks spanning diverse domains. Its efficacy is observed to extend to large-scale scenarios encompassing both real-world and synthetic datasets.
 
 
 # Introduction
@@ -67,7 +67,7 @@ The method we propose aims to find non-convex clusters in large datasets, withou
 
 The paper begins with a section dedicated to presenting the context and related algorithms, followed by a detailed description of the proposed algorithm. Experiments and comparisons with reference algorithms are then conducted on both real and synthetic data.
 
-# Background
+# Related Work
 
 
 Spectral clustering is a graph-based approach that computes the eigen-vectors of the graph's Laplacian matrix. This technique transforms the data into a lower-dimensional space, making the clusters more discernible. A standard algorithm like k-means is then applied to these transformed features to identify the clusters [@von2007tutorial]. Spectral clustering enables capturing complex data structures and discerning clusters based on the connectivity of data points in a transformed space, effectively treating it as a relaxed graph cut problem.
@@ -106,8 +106,7 @@ The proposed algorithm uses K-means centroids for vector quantization defining V
 
 The basic idea involves calculating the difference in inertia achieved
 by projecting onto a segment connecting two centroids, rather than using
-the two centroids separately. If the difference is small, it suggests a
-low density between the classes. Conversely, if this diffrence is large,
+the two centroids separately (See Figure @fig-balls-vs-bridge). If the difference is small, it suggests a low density between the classes. Conversely, if this diffrence is large,
 it indicates that the two classes may reside within the same densely
 populated region.
 
@@ -200,21 +199,7 @@ Note that the criterion is local and indicates the relative difference in densit
 
 ## Algorithm
 
-
-
-::: {#fig-steps layout-ncol=3}
-![Vector quantization](figures/spectral-briges-1.pdf)
-
-![Affinity computation](figures/spectral-briges-2.pdf)
-
-![Spectral clustering](figures/spectral-briges-3-4.pdf)
-
-Illustration of the Spectral bridges algorithm with the Iris dataset (first principal plane). Vector quantization (left), Affinity computation (center), Spectral clustering and spreading (right).
-:::
-
-
-
-
+The Spectral Bridges algorithm first identifies local clusters to define Voronoi regions, computes edges with affinity weights between these regions, and ultimately cuts edges between regions with low inter-region density to determine the final clusters (See Algorithm @alg-spectral-bridges and Figure @fig-steps).
 
 ```pseudocode
 #| label: alg-spectral-bridges
@@ -243,6 +228,20 @@ Illustration of the Spectral bridges algorithm with the Iris dataset (first prin
 \end{algorithmic}
 \end{algorithm}
 ```
+
+
+
+
+::: {#fig-steps layout-ncol=3}
+![Vector quantization](figures/spectral-briges-1.pdf)
+
+![Affinity computation](figures/spectral-briges-2.pdf)
+
+![Spectral clustering](figures/spectral-briges-3-4.pdf)
+
+Illustration of the Spectral bridges algorithm with the Iris dataset (first principal plane). Vector quantization (Step 1 of Algorithm @alg-spectral-bridges), Affinity computation (Step 2 of Algorithm @alg-spectral-bridges), Spectral clustering and spreading (Step 3-4 of Algorithm @alg-spectral-bridges).
+:::
+
 
 # Numerical experiments
 
@@ -297,14 +296,16 @@ For visualization purposes, we projected with UMAP the predicted clusters from o
 
 ::: {#fig-MNIST layout-ncol=3}
 
-![Ground Truth](figures/GTumap.pdf)
 
-![Spectral-Bridges](figures/SBumap.pdf)
 
 ![k-means++](figures/KMumap.pdf)
 
-UMAP projection of predicted clusters: **Ground Truth (left)**, **Spectral-Bridges (center)**, **k-means++ (right)**
-UMAP projection of predicted clusters : **Ground Truth (top)**, **Spectral-Bridges (middle)**, **k-means++ (bottom)**
+![Spectral-Bridges](figures/SBumap.pdf)
+
+![Ground Truth](figures/GTumap.pdf)
+
+
+UMAP projection of predicted clusters: **k-means++ (left)**,  **Spectral-Bridges (center)**, **Ground Truth (right)**.
 :::
 
 
@@ -324,7 +325,7 @@ Possibility to kernelize
 
 # Appendix  {.appendix}
 
-## Derivation of the bridge gain {#gain}
+## Derivation of the bridge affinity {#gain}
 
 
 Notice that $B_{kl}$, the bridge inertia between centroids $k$ and $l$,  can be expressed as the sum of three terms:
