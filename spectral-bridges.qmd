@@ -117,7 +117,7 @@ populated region.
 Balls (left) versus Bridge (right). The inertia of each structure is the sum of the squared distances represented by grey lines.
 :::
 
-Let us consider a sample $X=(\boldsymbol x_i)_{i \in \{1,\cdots,n\}}$ of vectors $\boldsymbol x_i \in \mathbb R^p$ and a set of $m$ coding vectors $(\boldsymbol \mu_k)_{k \in \{1,cdots,m\}}$ defining a partition $P=\{\mathcal{V}_1,\cdots,\mathcal{V}_m \}$ of $\mathbb R^p$ into $m$ Voronoï regions:
+Let us consider a sample $X=(\boldsymbol x_i)_{i \in \{1,\cdots,n\}}$ of vectors $\boldsymbol x_i \in \mathbb R^p$ and a set of $m$ coding vectors $(\boldsymbol \mu_k)_{k \in \{1,\cdots,m\}}$ defining a partition $P=\{\mathcal{V}_1,\cdots,\mathcal{V}_m \}$ of $\mathbb R^p$ into $m$ Voronoï regions:
 $$
 \mathcal{V}_k = \left\{ \mathbf{x} \in \mathbb{R}^n \mid \|\mathbf{x} - \boldsymbol{\mu}_k\| \leq \|\mathbf{x} - \boldsymbol{\mu}_j\| \text{ for all } j \neq k \right\}.
 $$
