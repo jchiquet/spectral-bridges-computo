@@ -286,17 +286,15 @@ All experiments were conducted on an Archlinux machine with Linux 6.9.3 Kernel, 
 
 ## Accuracy
 
-We first evaluated our algorithm's accuracy on the MNIST dataset. Metrics were collected to compare our method with k-means++, EM, and Ward clustering. Metric were estimated by taking the empirical average over $100$ consecutive runs with the same random seed for each method.
+We first evaluated our algorithm's accuracy on the MNIST dataset. Metrics were collected to compare our method with k-means++, EM, and Ward clustering. Metric were estimated by taking the empirical average over $10$ consecutive runs with the same random seed for each method. Since our computational capabilites were too limited, we sampled $20000$ (one third) data points at random. This sample is not fixed and changes for each iteration.
 
 Let $h$ denote the embedding dimension of the dataset. We tested our method on the raw MNIST dataset without preprocessing ($h = 784$) and after reducing its dimension using PCA to $h \in \{8, 16, 32, 64\}$ (see fig.1).
 
-![Comparison of **k-means++** (blue), **EM** (green), **Ward Clustering** (red), and **Spectral-Bridges** (purple) on PCA embedding and full MNIST](figures/ari_comparison.pdf)
+![ARI and NMI scores of **k-means++** (blue), **EM** (green), **Ward Clustering** (red), and **Spectral-Bridges** (purple) on PCA embedding and full MNIST](figures/mnist_summary.pdf)
 
 For visualization purposes, we projected with UMAP the predicted clusters from our algorithm and other methods to compare them against the ground truth labels to better understand the cluster shapes (see table 2). Note that the projection was not used in our experiments as an embedding, and thus does not play any role in the clustering process itself. As a matter of fact, the embedding used was obtained with PCA, $h = 64$. Note that the label colors match the legend only in the case of the ground truth data. Indeed, the ordering of the labels have no impact on clustering quality.
 
 ::: {#fig-MNIST layout-ncol=3}
-
-
 
 ![k-means++](figures/KMumap.pdf)
 
@@ -308,14 +306,30 @@ For visualization purposes, we projected with UMAP the predicted clusters from o
 UMAP projection of predicted clusters: **k-means++ (left)**,  **Spectral-Bridges (center)**, **Ground Truth (right)**.
 :::
 
-
-TODO CANCER
+We also put our algorithm to the test against the same competitors using scikit-learn's UCI Breast Cancer data. Once again, our method performs well although the advantage is not as obvious in this case. However, in none of our tests has it ranked worse than k-means++.
 
 ![ARI and NMI scores of **k-means++** (blue), **EM** (green), **Ward Clustering** (red), and **Spectral-Bridges** (purple) on the UCI Breast Cancer dataset](figures/cancer_summary.pdf)
 
 .....
 
-![TODO](figures/synthetic_summary.pdf)
+Since we expect our algorithm to shine at discerning complex and intricate cluster structures, we collected an array four toy datasets illustrated below.
+
+::: {#fig-ToyDatasets layout-ncol=4}
+
+![Impossible](figures/impossible.pdf)
+
+![Moons](figures/moons.pdf)
+
+![Circles](figures/circles.pdf)
+
+![Smile](figures/smile.pdf)
+
+Visualization of the four toy datasets.
+:::
+
+TODO
+
+![ARI and NMI scores of **Spectral-Bridges** and competitors on standard synthetic toy datasets](figures/synthetic_summary.pdf)
 
 
 # Conclusive remarks
