@@ -101,7 +101,7 @@ Ainsi le terme de pénalité utilisé pour les carte de Kohonen pourrais être u
 
 The proposed algorithm uses K-means centroids for vector quantization defining Voronoi region, and a strategy is proposed to link these regions, with an "affinity" gauged in terms of minimal margin between pairs of classes. These affinities are considered as weight of edges defining a completely connected graph whose vertices are the regions. Spectral clustering on the region provide a partition of the input space. The sole parameters of the algorithm are the number of Voronoi region and the number of final cluster. 
 
-test
+
 ## Bridge affinity {#sec-bridge-affinity}
 
 The basic idea involves calculating the difference in inertia achieved
@@ -297,7 +297,15 @@ All experiments were conducted on an Archlinux machine with Linux 6.9.3 Kernel, 
 
 ## Hyperparameter settings
 
-We set the hyperparameters of our algorithm to "reasonable" values based on the size of each dataset and the number of clusters. A larger number of clusters typically suggests that a higher value for the Voronoï regions is optimal. Conversely, using a high number of Voronoï regions for a small dataset might result in nearly empty regions that do not adequately represent any local structure. We will discuss our method's sensitivity to this parameter, but at no point did we use labels to determine its empirically optimal value.
+<!-- We set the hyperparameters of our algorithm to "reasonable" values based on the size of each dataset and the number of clusters. A larger number of clusters typically suggests that a higher value for the Voronoï regions is optimal. Conversely, using a high number of Voronoï regions for a small dataset might result in nearly empty regions that do not adequately represent any local structure. We will discuss our method's sensitivity to this parameter, but at no point did we use labels to determine its empirically optimal value.
+-->
+
+We set the hyperparameters of our algorithm based on the size of each dataset, $n$, and the number of clusters, $K$. Choosing the number of Voronoi regions to be approximately $m\approx \frac{n}{K}$  provides a reasonable trade-off.
+
+A larger number of clusters typically suggests that a higher value for the number of Voronoi regions is optimal. Conversely, using a high number of Voronoi regions for a small dataset might result in nearly empty regions that do not adequately represent any local structure.
+
+By adjusting $m$ in this manner, we aim to balance the need for detailed representation with the risk of overfitting, ensuring that each Voronoi region meaningfully captures the underlying data distribution.
+
 
 For other algorithms, such as DBSCAN, we used labels to determine the best hyperparameter values to compare our method against the "best case scenario", thus putting our algorithm at a voluntary disadvantage.
 
