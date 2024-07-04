@@ -437,7 +437,7 @@ t_i, &amp;  \text{ if } t_i\in[0,1/2]\\
 <section id="algorithm" class="level2" data-number="3.2">
 <h2 data-number="3.2" class="anchored" data-anchor-id="algorithm"><span class="header-section-number">3.2</span> Algorithm</h2>
 <p>The Spectral Bridges algorithm first identifies local clusters to define Voronoi regions, computes edges with affinity weights between these regions, and ultimately cuts edges between regions with low inter-region density to determine the final clusters (See Algorithm <a href="#alg-spectral-bridges">Algorithm 1</a> and Figure <a href="#fig-steps" class="quarto-xref">Figure&nbsp;2</a>).</p>
-<div id="alg-spectral-bridges" class="pseudocode-container" data-line-number="true" data-line-number-punc=":" data-no-end="false" data-comment-delimiter="//" data-indent-size="1.2em" data-alg-title="Algorithm" data-pseudocode-index="1">
+<div id="alg-spectral-bridges" class="pseudocode-container" data-no-end="false" data-line-number="true" data-indent-size="1.2em" data-line-number-punc=":" data-alg-title="Algorithm" data-comment-delimiter="//" data-pseudocode-index="1">
 <div class="pseudocode">
 \begin{algorithm} \caption{Spectral Bridges} \begin{algorithmic} \Procedure{SpectralBridges}{$X, k, m$} \Comment{$X$: input dataset, $k$: number of clusters, $m$: number of Voronoi regions} \State \textbf{Step 1: Vector Quantization} \State $centroids \gets$ \Call{KMeans}{$X, m$} \Comment{Initial centroids using k-means++} \State $voronoiRegions \gets$ \Call{Subdivide}{$X, centroids$} \Comment{Subdivide data into Voronoi regions} \State \textbf{Step 2: Affinity Matrix Computation} $A = \{a_{kl}\}$ \State \textbf{Step 3: Spectral Clustering} \Comment{Affect each region to a cluster} \State $labels \gets$ \Call{SpectralClustering}{$A, k$} \State \textbf{Step 4: Propagate} \Comment{Each data point is affected to the cluster of its region} \State $clusters \gets$ \Call{Propagate}{$X, labels, centroids$} \State \Return $clusters$ \Comment{Cluster labels for data points in $X$} \EndProcedure \end{algorithmic} \end{algorithm}
 </div>
@@ -620,7 +620,7 @@ Figure&nbsp;2: Illustration of the Spectral bridges algorithm with the Iris data
 </div>
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-MNIST-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;3: UMAP projection of predicted clusters: <strong>k-means++ (left)</strong>, <strong>Spectral-Bridges (center)</strong>, <strong>Ground Truth (right)</strong>.
+Figure&nbsp;3: UMAP projection of predicted clusters against the ground truth labels.
 </figcaption>
 </figure>
 </div>
@@ -1666,7 +1666,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb3-309"><a href="#cb3-309" aria-hidden="true" tabindex="-1"></a><span class="al">![Ground Truth](figures/GTumap.pdf)</span></span>
 <span id="cb3-310"><a href="#cb3-310" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-311"><a href="#cb3-311" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-312"><a href="#cb3-312" aria-hidden="true" tabindex="-1"></a>UMAP projection of predicted clusters: **k-means++ (left)**,  **Spectral-Bridges (center)**, **Ground Truth (right)**.</span>
+<span id="cb3-312"><a href="#cb3-312" aria-hidden="true" tabindex="-1"></a>UMAP projection of predicted clusters against the ground truth labels.</span>
 <span id="cb3-313"><a href="#cb3-313" aria-hidden="true" tabindex="-1"></a>:::</span>
 <span id="cb3-314"><a href="#cb3-314" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-315"><a href="#cb3-315" aria-hidden="true" tabindex="-1"></a>We also put our algorithm to the test against the same competitors using scikit-learn's UCI Breast Cancer data. Once again, our method performs well although the advantage is not as obvious in this case. However, in none of our tests has it ranked worse than k-means++. The results are displayed as a boxplot generated from $200$ iterations of each algorithm using a different seed, in order to better grasp the variability lying in the seed dependent nature of the k-means++, Expectation Maximization and Spectral-Bridges algorithms.</span>

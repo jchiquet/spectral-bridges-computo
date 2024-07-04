@@ -309,7 +309,7 @@ For visualization purposes, we projected with UMAP the predicted clusters from o
 ![Ground Truth](figures/GTumap.pdf)
 
 
-UMAP projection of predicted clusters: **k-means++ (left)**,  **Spectral-Bridges (center)**, **Ground Truth (right)**.
+UMAP projection of predicted clusters against the ground truth labels.
 :::
 
 We also put our algorithm to the test against the same competitors using scikit-learn's UCI Breast Cancer data. Once again, our method performs well although the advantage is not as obvious in this case. However, in none of our tests has it ranked worse than k-means++. The results are displayed as a boxplot generated from $200$ iterations of each algorithm using a different seed, in order to better grasp the variability lying in the seed dependent nature of the k-means++, Expectation Maximization and Spectral-Bridges algorithms.
