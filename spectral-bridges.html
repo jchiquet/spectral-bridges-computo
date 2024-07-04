@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.5.52">
+<meta name="generator" content="quarto-1.5.45">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -437,7 +437,7 @@ t_i, &amp;  \text{ if } t_i\in[0,1/2]\\
 <section id="algorithm" class="level2" data-number="3.2">
 <h2 data-number="3.2" class="anchored" data-anchor-id="algorithm"><span class="header-section-number">3.2</span> Algorithm</h2>
 <p>The Spectral Bridges algorithm first identifies local clusters to define Voronoi regions, computes edges with affinity weights between these regions, and ultimately cuts edges between regions with low inter-region density to determine the final clusters (See Algorithm <a href="#alg-spectral-bridges">Algorithm 1</a> and Figure <a href="#fig-steps" class="quarto-xref">Figure&nbsp;2</a>).</p>
-<div id="alg-spectral-bridges" class="pseudocode-container" data-line-number-punc=":" data-line-number="true" data-pseudocode-index="1" data-indent-size="1.2em" data-comment-delimiter="//" data-no-end="false" data-alg-title="Algorithm">
+<div id="alg-spectral-bridges" class="pseudocode-container" data-line-number="true" data-indent-size="1.2em" data-alg-title="Algorithm" data-comment-delimiter="//" data-line-number-punc=":" data-no-end="false" data-pseudocode-index="1">
 <div class="pseudocode">
 \begin{algorithm} \caption{Spectral Bridges} \begin{algorithmic} \Procedure{SpectralBridges}{$X, k, m$} \Comment{$X$: input dataset, $k$: number of clusters, $m$: number of Voronoi regions} \State \textbf{Step 1: Vector Quantization} \State $centroids \gets$ \Call{KMeans}{$X, m$} \Comment{Initial centroids using k-means++} \State $voronoiRegions \gets$ \Call{Subdivide}{$X, centroids$} \Comment{Subdivide data into Voronoi regions} \State \textbf{Step 2: Affinity Matrix Computation} $A = \{a_{kl}\}$ \State \textbf{Step 3: Spectral Clustering} \Comment{Affect each region to a cluster} \State $labels \gets$ \Call{SpectralClustering}{$A, k$} \State \textbf{Step 4: Propagate} \Comment{Each data point is affected to the cluster of its region} \State $clusters \gets$ \Call{Propagate}{$X, labels, centroids$} \State \Return $clusters$ \Comment{Cluster labels for data points in $X$} \EndProcedure \end{algorithmic} \end{algorithm}
 </div>
@@ -837,17 +837,16 @@ B_{kl}- I_{kl} &amp;=&amp;  \sum_{i \mid t_i\in ]0,\frac{1}{2}[} t_i^2 \|\boldsy
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sessionInfo</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
-<pre><code>R version 4.4.1 (2024-06-14 ucrt)
-Platform: x86_64-w64-mingw32/x64
-Running under: Windows 11 x64 (build 22631)
+<pre><code>R version 4.3.2 (2023-10-31)
+Platform: x86_64-apple-darwin20 (64-bit)
+Running under: macOS Sonoma 14.3.1
 
 Matrix products: default
-
+BLAS:   /Library/Frameworks/R.framework/Versions/4.3-x86_64/Resources/lib/libRblas.0.dylib 
+LAPACK: /Library/Frameworks/R.framework/Versions/4.3-x86_64/Resources/lib/libRlapack.dylib;  LAPACK version 3.11.0
 
 locale:
-[1] LC_COLLATE=French_France.utf8  LC_CTYPE=French_France.utf8   
-[3] LC_MONETARY=French_France.utf8 LC_NUMERIC=C                  
-[5] LC_TIME=French_France.utf8    
+[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
 
 time zone: Europe/Paris
 tzcode source: internal
@@ -856,10 +855,10 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 loaded via a namespace (and not attached):
- [1] compiler_4.4.1    fastmap_1.2.0     cli_3.6.3         tools_4.4.1      
- [5] htmltools_0.5.8.1 yaml_2.3.8        rmarkdown_2.27    knitr_1.47       
- [9] jsonlite_1.8.8    xfun_0.45         digest_0.6.36     rlang_1.1.4      
-[13] evaluate_0.24.0  </code></pre>
+ [1] htmlwidgets_1.6.4 compiler_4.3.2    fastmap_1.1.1     cli_3.6.2        
+ [5] tools_4.3.2       htmltools_0.5.7   rstudioapi_0.15.0 yaml_2.3.8       
+ [9] rmarkdown_2.26    knitr_1.45        jsonlite_1.8.8    xfun_0.42        
+[13] digest_0.6.34     rlang_1.1.3       evaluate_0.23    </code></pre>
 </div>
 </div>
 <!-- -->
