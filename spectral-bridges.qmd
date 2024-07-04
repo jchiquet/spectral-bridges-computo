@@ -102,11 +102,7 @@ Ainsi le terme de pénalité utilisé pour les carte de Kohonen pourrais être u
 The proposed algorithm uses K-means centroids for vector quantization defining Voronoi region, and a strategy is proposed to link these regions, with an "affinity" gauged in terms of minimal margin between pairs of classes. These affinities are considered as weight of edges defining a completely connected graph whose vertices are the regions. Spectral clustering on the region provide a partition of the input space. The sole parameters of the algorithm are the number of Voronoi region and the number of final cluster. 
 
 
-<<<<<<< HEAD
 ## Bridge affinity {#sec-bridge-affinity}
-=======
-## Bridge gain affinity
->>>>>>> refs/remotes/origin/main
 
 The basic idea involves calculating the difference in inertia achieved
 by projecting onto a segment connecting two centroids, rather than using
