@@ -437,7 +437,7 @@ t_i, &amp;  \text{ if } t_i\in[0,1/2]\\
 <section id="algorithm" class="level2" data-number="3.2">
 <h2 data-number="3.2" class="anchored" data-anchor-id="algorithm"><span class="header-section-number">3.2</span> Algorithm</h2>
 <p>The Spectral Bridges algorithm first identifies local clusters to define Voronoi regions, computes edges with affinity weights between these regions, and ultimately cuts edges between regions with low inter-region density to determine the final clusters (See Algorithm <a href="#alg-spectral-bridges">Algorithm 1</a> and Figure <a href="#fig-steps" class="quarto-xref">Figure&nbsp;2</a>).</p>
-<div id="alg-spectral-bridges" class="pseudocode-container" data-no-end="false" data-line-number="true" data-indent-size="1.2em" data-line-number-punc=":" data-alg-title="Algorithm" data-comment-delimiter="//" data-pseudocode-index="1">
+<div id="alg-spectral-bridges" class="pseudocode-container" data-line-number-punc=":" data-line-number="true" data-pseudocode-index="1" data-indent-size="1.2em" data-comment-delimiter="//" data-no-end="false" data-alg-title="Algorithm">
 <div class="pseudocode">
 \begin{algorithm} \caption{Spectral Bridges} \begin{algorithmic} \Procedure{SpectralBridges}{$X, k, m$} \Comment{$X$: input dataset, $k$: number of clusters, $m$: number of Voronoi regions} \State \textbf{Step 1: Vector Quantization} \State $centroids \gets$ \Call{KMeans}{$X, m$} \Comment{Initial centroids using k-means++} \State $voronoiRegions \gets$ \Call{Subdivide}{$X, centroids$} \Comment{Subdivide data into Voronoi regions} \State \textbf{Step 2: Affinity Matrix Computation} $A = \{a_{kl}\}$ \State \textbf{Step 3: Spectral Clustering} \Comment{Affect each region to a cluster} \State $labels \gets$ \Call{SpectralClustering}{$A, k$} \State \textbf{Step 4: Propagate} \Comment{Each data point is affected to the cluster of its region} \State $clusters \gets$ \Call{Propagate}{$X, labels, centroids$} \State \Return $clusters$ \Comment{Cluster labels for data points in $X$} \EndProcedure \end{algorithmic} \end{algorithm}
 </div>
@@ -712,7 +712,7 @@ Figure&nbsp;4: Visualization of the four toy datasets.
 </div>
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-NoiseRobustness-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;5: Effects of noise on Spectral-Bridges output.
+Figure&nbsp;5: Effects of noise on Spectral-Bridges’s output.
 </figcaption>
 </figure>
 </div>
@@ -1705,7 +1705,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb3-348"><a href="#cb3-348" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-349"><a href="#cb3-349" aria-hidden="true" tabindex="-1"></a><span class="al">![Gaussian noise](figures/gaussian_noise_impossible.pdf)</span></span>
 <span id="cb3-350"><a href="#cb3-350" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-351"><a href="#cb3-351" aria-hidden="true" tabindex="-1"></a>Effects of noise on Spectral-Bridges output.</span>
+<span id="cb3-351"><a href="#cb3-351" aria-hidden="true" tabindex="-1"></a>Effects of noise on Spectral-Bridges's output.</span>
 <span id="cb3-352"><a href="#cb3-352" aria-hidden="true" tabindex="-1"></a>:::</span>
 <span id="cb3-353"><a href="#cb3-353" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-354"><a href="#cb3-354" aria-hidden="true" tabindex="-1"></a><span class="fu"># Conclusive remarks</span></span>

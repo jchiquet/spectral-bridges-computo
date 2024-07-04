@@ -348,7 +348,7 @@ Here are three representations of our algorithm's predicted cluster centers disp
 
 ![Gaussian noise](figures/gaussian_noise_impossible.pdf)
 
-Effects of noise on Spectral-Bridges output.
+Effects of noise on Spectral-Bridges's output.
 :::
 
 # Conclusive remarks
