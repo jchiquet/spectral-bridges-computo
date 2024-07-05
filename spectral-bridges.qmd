@@ -380,23 +380,29 @@ Possibility to kernelize
 
 ## Derivation of the bridge affinity {#gain}
 
+We denote a bridge as a segment connecting two centroids $\boldsymbol \mu_k$ and $\boldsymbol \mu_l$. The inertia of a bridge between $\mathcal{V}_k$ and $\mathcal{V}_l$ is defined as 
+$$
+B_{kl} = \sum_{\boldsymbol x_i\in \mathcal{V}_k \cup \mathcal{V}_l} \|\boldsymbol x_i - \boldsymbol p_{kl}(\boldsymbol x_i)\|^2,
+$$ where 
+$$
+\boldsymbol p_{kl}(\boldsymbol x_i) = \boldsymbol \mu_{k} + t_i(\boldsymbol \mu_{l} - \boldsymbol \mu_{k}),
+$$ with $$
+t_i  = \min\left(1, \max\left(0, \frac{\langle \boldsymbol x_i - \boldsymbol \mu_k | \boldsymbol \mu_l - \boldsymbol \mu_k\rangle}{\|  \boldsymbol \mu_l - \boldsymbol \mu_k \|^2}\right)\right). 
+$$ 
 
-Notice that $B_{kl}$, the bridge inertia between centroids $k$ and $l$,  can be expressed as the sum of three terms:
-
+$B_{kl}$, the bridge inertia between centroids $k$ and $l$,  can be expressed as the sum of three terms, which represents the projection onto each centroïds and onto the segment:
 $$
 \begin{aligned}
 B_{kl} &=& \sum_{i \mid t_i=0} \|\boldsymbol x_i - \boldsymbol \mu_k\|^2  + \sum_{i \mid t_i=1} \|\boldsymbol x_i - \boldsymbol \mu_l\|^2 + \sum_{i \mid t_i\in ]0,1[} \|\boldsymbol x_i - \boldsymbol p_{kl}(\boldsymbol x_i)\|^2.
 \end{aligned}
 $$
 
-The last term may be decomposed in two parts
-
+The last term may be decomposed in two parts corresponding to the points of the two Voronoï regions which are projected on the segment:
 $$
 \begin{aligned}
 \sum_{i \mid t_i\in ]0,1[} \|\boldsymbol x_i - \boldsymbol p_{kl}(\boldsymbol x_i)\|^2 &= &\sum_{i \mid t_i\in ]0,\frac{1}{2}[} \|\boldsymbol x_i - \boldsymbol p_{kl}(\boldsymbol x_i)\|^2 + \sum_{i \mid t_i\in [\frac{1}{2},1[} \|\boldsymbol x_i - \boldsymbol p_{kl}(\boldsymbol x_i)\|^2\\
 \end{aligned}
 $$
-
 and each part further decomposed using Pythagore 
 $$
 \begin{aligned}
@@ -419,6 +425,7 @@ B_{kl}- I_{kl} &=&  \sum_{i \mid t_i\in ]0,\frac{1}{2}[} t_i^2 \|\boldsymbol \mu
 \frac{B_{kl}- I_{kl}}{(n_k+n_l)\|\boldsymbol \mu_k - \boldsymbol \mu_l\|^2} &=& \frac{\sum_{\boldsymbol{i} \in k} \langle \boldsymbol{x_i} - \boldsymbol{\mu}_k \vert \boldsymbol{\mu}_l - \boldsymbol{\mu}_k \rangle_+^2  \sum_{\boldsymbol{i} \in l} \langle \boldsymbol{x_i} - \boldsymbol{\mu}_l \vert \boldsymbol{\mu}_k - \boldsymbol{\mu}_l\rangle_+^2}{(n_k+n_l)\|\boldsymbol \mu_k - \boldsymbol \mu_l\|^4}.
 \end{aligned}
 $$
+
 
 
 # References {.unnumbered}
