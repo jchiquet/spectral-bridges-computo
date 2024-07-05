@@ -213,7 +213,7 @@ In spectral clustering, the time complexity is usually dominated by the eigendec
     \State \textbf{Step 1: Vector Quantization}
     \State $centroids, voronoiRegions \gets$ \Call{KMeans}{$X, m$} \Comment{Initial centroids and Voronoi Regions  using k-means++}
        \State \textbf{Step 2: Affinity Computation}
-       \State $A = \{g(a_{kl)}\}_{kl} \gets$ \Call{Affinity}{$X, centroids, voronoiRegions$}
+       \State $A = \{g(a_{kl})\}_{kl} \gets$ \Call{Affinity}{$X, centroids, voronoiRegions$}
         \State \textbf{Step 3: Spectral Clustering} \Comment{Affect each region to a cluster}
         \State $labels \gets$ \Call{SpectralClustering}{$A, k$}
       \State \textbf{Step 4: Propagate} \Comment{Affect each data point to the cluster of its region}
@@ -310,7 +310,7 @@ We first evaluated our algorithm's accuracy on the MNIST dataset. Metrics were c
 
 Let $h$ denote the embedding dimension of the dataset. We tested our method on the raw MNIST dataset without preprocessing ($h = 784$) and after reducing its dimension using PCA to $h \in \{8, 16, 32, 64\}$ (see @fig-mnist-scores).
 
-![ARI and NMI scores of **k-means++** (blue), **EM** (green), **Ward Clustering** (red), and **Spectral Bridges** (purple) on PCA embedding and full MNIST.](figures/mnist_summary.pdf){#fig-mnist-scores layout-ncol=1}
+![ARI and NMI scores of **k-means++** (blue), **EM** (green), **Ward Clustering** (red), and **Spectral Bridges** (purple) on PCA embedding and full MNIST.](figures/mnist_summary.pdf){#fig-mnist-scores}
 
 For visualization purposes, we projected with UMAP the predicted clusters from our algorithm and other methods to compare them against the ground truth labels to better understand the cluster shapes (see table 2). Note that the projection was not used in our experiments as an embedding, and thus does not play any role in the clustering process itself. As a matter of fact, the embedding used was obtained with PCA, $h = 32$ and $250$ Voronoi regions. Note that the label colors match the legend only in the case of the ground truth data. Indeed, the ordering of the labels have no impact on clustering quality.
 
@@ -325,16 +325,17 @@ For visualization purposes, we projected with UMAP the predicted clusters from o
 UMAP projection of predicted clusters against the ground truth labels.
 :::
 
-We also put our algorithm to the test against the same competitors using scikit-learn's UCI Breast Cancer data. Once again, our method performs well although the advantage is not as obvious in this case. However, in none of our tests has it ranked worse than k-means++. The results are displayed as a boxplot generated from $200$ iterations of each algorithm using a different seed, in order to better grasp the variability lying in the seed dependent nature of the k-means++, Expectation Maximization and Spectral Bridges algorithms.
-![ARI and NMI scores of **k-means++** (blue), **EM** (green), **Ward Clustering** (red), and **Spectral Bridges** (purple) on the UCI Breast Cancer dataset](figures/cancer_summary.pdf)
+We also put our algorithm to the test against the same competitors using scikit-learn's UCI Breast Cancer data. Once again, our method performs well although the advantage is not as obvious in this case (see @fig-cancer-scores). However, in none of our tests has it ranked worse than k-means++. The results are displayed as a boxplot generated from $200$ iterations of each algorithm using a different seed, in order to better grasp the variability lying in the seed dependent nature of the k-means++, Expectation Maximization and Spectral Bridges algorithms.
 
-<!--Since we expect our algorithm to shine at discerning complex and intricate cluster structures, we collected an array four toy datasets illustrated in Figure @fig-ToyDatasets. 
+![ARI and NMI scores of **k-means++** (blue), **EM** (green), **Ward Clustering** (red), and **Spectral Bridges** (purple) on the UCI Breast Cancer dataset.](figures/cancer_summary.pdf){#fig-cancer-scores}
+
+<!--Since we expect our algorithm to shine at discerning complex and intricate cluster structures, we collected an array four toy datasets illustrated in Figure @fig-toy-datasets. 
 -->
 
-Since the Spectral Bridges algorithm is expected to excel at discerning complex and intricate cluster structures, an array of four toy datasets was collected, as illustrated in Figure @fig-ToyDatasets.
+Since the Spectral Bridges algorithm is expected to excel at discerning complex and intricate cluster structures, an array of four toy datasets was collected, as illustrated in Figure @fig-toy-datasets.
 
 
-::: {#fig-ToyDatasets layout-ncol=4}
+::: {#fig-toy-datasets layout-ncol=4}
 
 ![Impossible](figures/impossible.pdf)
 
