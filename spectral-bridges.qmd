@@ -187,8 +187,15 @@ a_{kl}=
 $$ 
 To allow points with large margin to dominate and make the algorithm more robust to noise and outliers we consider the following exponential transformation:
 $$
-\tilde{a}_{kl} = g(a_{kl})=\exp\sqrt{(a_{kl})}.
+\tilde{a}_{kl} = g(a_{kl})=\exp(\gamma\sqrt{a_{kl}}).
 $$
+
+where $\gamma$ is a scaling factor. This factor is set to ensure a large enough separation between the final coefficients. This factor is determined by the equation:
+$$
+\gamma = \frac{log(𝑀)}{q_{90} - q_{10}}
+$$
+
+where $q_{10}$ and $q_{90}$ are respectively the 10th and 90th percentiles of the original affinity matrix. Thus, since the transformation is order-preserving, the 90th percentile of the newly constructed matrix is $M$ times greater than the 10th percentile. By default, $M$ is arbitrarily set to a large value of $10^4$.
 
 ## Algorithm
 
@@ -312,7 +319,7 @@ Let $h$ denote the embedding dimension of the dataset. We tested our method on t
 
 ![ARI and NMI scores of **k-means++** (blue), **EM** (green), **Ward Clustering** (red), and **Spectral Bridges** (purple) on PCA embedding and full MNIST.](figures/mnist_summary.pdf){#fig-mnist-scores}
 
-For visualization purposes, we projected with UMAP the predicted clusters from our algorithm and other methods to compare them against the ground truth labels to better understand the cluster shapes (see table 2). Note that the projection was not used in our experiments as an embedding, and thus does not play any role in the clustering process itself. As a matter of fact, the embedding used was obtained with PCA, $h = 32$ and $250$ Voronoi regions. Note that the label colors match the legend only in the case of the ground truth data. Indeed, the ordering of the labels have no impact on clustering quality.
+For visualization purposes, we projected with UMAP the predicted clusters from our algorithm and other methods to compare them against the ground truth labels to better understand the cluster shapes (see table 2). Note that the projection was not used in our experiments as an embedding, and thus does not play any role in the clustering process itself. As a matter of fact, the embedding used was obtained with PCA, $h = 32$ and 250 Voronoi regions. Note that the label colors match the legend only in the case of the ground truth data. Indeed, the ordering of the labels have no impact on clustering quality.
 
 ::: {#fig-MNIST layout-ncol=3}
 
