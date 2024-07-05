@@ -205,7 +205,12 @@ $$
 
 ## Algorithm
 
-The Spectral Bridges algorithm first identifies local clusters to define Voronoi regions, computes edges with affinity weights between these regions, and ultimately cuts edges between regions with low inter-region density to determine the final clusters (See Algorithm @alg-spectral-bridges and Figure @fig-steps).
+The Spectral Bridges algorithm first identifies local clusters to define Voronoï regions, computes edges with affinity weights between these regions, and ultimately cuts edges between regions with low inter-region density to determine the final clusters (See Algorithm @alg-spectral-bridges and Figure @fig-steps).
+
+
+
+
+In spectral clustering, the time complexity is usually dominated by the eigendecomposition step, which is \(O(n^3)\). However, in the case of Spectral Bridges, the \(k\)-means algorithm has a time complexity of \(O(n \times m \times p)\). For datasets with large \(n\), this can be more significant than the \(O(m^3)\) time complexity of the Spectral Bridges eigendecomposition.
 
 ```pseudocode
 #| label: alg-spectral-bridges
@@ -222,13 +227,13 @@ The Spectral Bridges algorithm first identifies local clusters to define Voronoi
 \begin{algorithmic}
 \Procedure{SpectralBridges}{$X, k, m$} \Comment{$X$: input dataset, $k$: number of clusters, $m$: number of Voronoi regions}
     \State \textbf{Step 1: Vector Quantization}
-    \State $centroids \gets$ \Call{KMeans}{$X, m$} \Comment{Initial centroids using k-means++}
-    \State $voronoiRegions \gets$ \Call{Subdivide}{$X, centroids$} \Comment{Subdivide data into Voronoi regions}
-       \State \textbf{Step 2: Affinity Matrix Computation} $A = \{a_{kl}\}$
+    \State $centroids, voronoiRegions \gets$ \Call{KMeans}{$X, m$} \Comment{Initial centroids and Voronoï Regions  using k-means++}
+       \State \textbf{Step 2: Affinity Computation}
+       \State $A = \{g(a_{kl)}\}_{kl} \gets$ \Call{Affinity}{$X, centroids, voronoiRegions$}
         \State \textbf{Step 3: Spectral Clustering} \Comment{Affect each region to a cluster}
         \State $labels \gets$ \Call{SpectralClustering}{$A, k$}
-      \State \textbf{Step 4: Propagate} \Comment{Each data point is affected to the cluster of its region}
-      \State $clusters \gets$ \Call{Propagate}{$X, labels, centroids$}
+      \State \textbf{Step 4: Propagate} \Comment{Affect each data point to the cluster of its region}
+      \State $clusters \gets$ \Call{Propagate}{$X, labels, voronoiRegions$}
      \State \Return $clusters$ \Comment{Cluster labels for data points in $X$}
 \EndProcedure
 \end{algorithmic}
@@ -247,6 +252,7 @@ The Spectral Bridges algorithm first identifies local clusters to define Voronoi
 
 Illustration of the Spectral bridges algorithm with the Iris dataset (first principal plane). Vector quantization (Step 1 of Algorithm @alg-spectral-bridges), Affinity computation (Step 2 of Algorithm @alg-spectral-bridges), Spectral clustering and spreading (Step 3-4 of Algorithm @alg-spectral-bridges).
 :::
+
 
 
 # Numerical experiments
