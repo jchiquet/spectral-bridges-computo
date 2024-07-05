@@ -47,9 +47,9 @@ editor:
 
 In this paper, Spectral Bridges, a novel clustering algorithm, is introduced. This algorithm builds upon the traditional k-means and spectral clustering frameworks by subdividing data into small Voronoi regions, which are subsequently merged according to a connectivity measure. Drawing inspiration from Support Vector Machine's margin concept, a non-parametric clustering approach is proposed, building an affinity margin between each pair of Voronoi regions. This approach is characterized by minimal hyperparameters and delineation of intricate, non-convex cluster structures.
 
-The numerical experiments underscore Spectral Bridges as a fast, robust, and versatile tool for sophisticated clustering tasks spanning diverse domains. Its efficacy is observed to extend to large-scale scenarios encompassing both real-world and synthetic datasets. 
+The numerical experiments underscore Spectral Bridges as a fast, robust, and versatile tool for sophisticated clustering tasks spanning diverse domains. Its efficacy extends to large-scale scenarios encompassing both real-world and synthetic datasets. 
 
-The Spectral Bridge algorithm is implemented both in Python (<https://github.com/flheight/Spectral-Bridges>) and R <https://github.com/cambroise/spectral-bridges>).
+The Spectral Bridge algorithm is implemented both in Python (<https://github.com/flheight/Spectral-Bridges>) and R <https://github.com/cambroise/spectral-bridges-Rpackage>).
 
 
 
@@ -454,7 +454,7 @@ $$
 
 ## Code
 
-Numerical experiments have been conducted in Python. The python scripts to reproduce the simulations and figures are available at <https://github.com/flheight/Spectral-Bridges>. A R package implementing the algorithm is also available (<https://github.com/cambroise/spectral-bridges>).
+Numerical experiments have been conducted in Python. The python scripts to reproduce the simulations and figures are available at <https://github.com/flheight/Spectral-Bridges>. A R package implementing the algorithm is also available (<https://github.com/cambroise/spectral-bridges-Rpackage>).
 
 # References {.unnumbered}
 
