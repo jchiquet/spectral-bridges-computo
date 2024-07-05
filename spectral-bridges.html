@@ -296,8 +296,8 @@ ISSN 2824-7795</p>
     <div class="abstract">
     <div class="abstract-title">Abstract</div>
       <p>In this paper, Spectral Bridges, a novel clustering algorithm, is introduced. This algorithm builds upon the traditional k-means and spectral clustering frameworks by subdividing data into small Voronoi regions, which are subsequently merged according to a connectivity measure. Drawing inspiration from Support Vector Machine’s margin concept, a non-parametric clustering approach is proposed, building an affinity margin between each pair of Voronoi regions. This approach is characterized by minimal hyperparameters and delineation of intricate, non-convex cluster structures.</p>
-      <p>The numerical experiments underscore Spectral Bridges as a fast, robust, and versatile tool for sophisticated clustering tasks spanning diverse domains. Its efficacy is observed to extend to large-scale scenarios encompassing both real-world and synthetic datasets.</p>
-      <p>The Spectral Bridge algorithm is implemented both in Python (<a href="https://github.com/flheight/Spectral-Bridges" class="uri">https://github.com/flheight/Spectral-Bridges</a>) and R <a href="https://github.com/cambroise/spectral-bridges" class="uri">https://github.com/cambroise/spectral-bridges</a>).</p>
+      <p>The numerical experiments underscore Spectral Bridges as a fast, robust, and versatile tool for sophisticated clustering tasks spanning diverse domains. Its efficacy extends to large-scale scenarios encompassing both real-world and synthetic datasets.</p>
+      <p>The Spectral Bridge algorithm is implemented both in Python (<a href="https://github.com/flheight/Spectral-Bridges" class="uri">https://github.com/flheight/Spectral-Bridges</a>) and R <a href="https://github.com/cambroise/spectral-bridges-Rpackage" class="uri">https://github.com/cambroise/spectral-bridges-Rpackage</a>).</p>
     </div>
   </div>
 
@@ -433,15 +433,15 @@ a_{kl}=
 \tilde{a}_{kl} = g(a_{kl})=\exp(\gamma\sqrt{a_{kl}}).
 </span></p>
 <p>where <span class="math inline">\gamma</span> is a scaling factor. This factor is set to ensure a large enough separation between the final coefficients. This factor is determined by the equation: <span class="math display">
-\gamma = \frac{log(𝑀)}{q_{90} - q_{10}}
+\gamma = \frac{log(𝑀)}{\sqrt{q_{90}} - \sqrt{q_{10}}}
 </span></p>
-<p>where <span class="math inline">q_{10}</span> and <span class="math inline">q_{90}</span> are respectively the 10th and 90th percentiles of the original affinity matrix. Thus, since the transformation is order-preserving, the 90th percentile of the newly constructed matrix is <span class="math inline">M</span> times greater than the 10th percentile. By default, <span class="math inline">M</span> is arbitrarily set to a large value of <span class="math inline">10^4</span>.</p>
+<p>where <span class="math inline">q_{10}</span> and <span class="math inline">q_{90}</span> are respectively the 10th and 90th percentiles of the original affinity matrix and <span class="math inline">M &gt; 0</span>. Thus, since the transformation is order-preserving, the 90th percentile of the newly constructed matrix is <span class="math inline">M</span> times greater than the 10th percentile. By default, <span class="math inline">M</span> is arbitrarily set to a large value of <span class="math inline">10^4</span>.</p>
 </section>
 <section id="algorithm" class="level2" data-number="3.2">
 <h2 data-number="3.2" class="anchored" data-anchor-id="algorithm"><span class="header-section-number">3.2</span> Algorithm</h2>
 <p>The Spectral Bridges algorithm first identifies local clusters to define Voronoi regions, computes edges with affinity weights between these regions, and ultimately cuts edges between regions with low inter-region density to determine the final clusters (See Algorithm <a href="#alg-spectral-bridges">Algorithm 1</a> and Figure <a href="#fig-steps" class="quarto-xref">Figure&nbsp;2</a>).</p>
 <p>In spectral clustering, the time complexity is usually dominated by the eigendecomposition step, which is <span class="math inline">O(n^3)</span>. However, in the case of Spectral Bridges, the kmeans algorithm has a time complexity of <span class="math inline">O(n \times m \times p)</span>. For datasets with large <span class="math inline">n</span>, this can be more significant than the <span class="math inline">O(m^3)</span> time complexity of the Spectral Bridges eigendecomposition.</p>
-<div id="alg-spectral-bridges" class="pseudocode-container" data-comment-delimiter="//" data-line-number="true" data-line-number-punc=":" data-no-end="false" data-indent-size="1.2em" data-pseudocode-index="1" data-alg-title="Algorithm">
+<div id="alg-spectral-bridges" class="pseudocode-container" data-line-number="true" data-comment-delimiter="//" data-line-number-punc=":" data-no-end="false" data-alg-title="Algorithm" data-pseudocode-index="1" data-indent-size="1.2em">
 <div class="pseudocode">
 \begin{algorithm} \caption{Spectral Bridges} \begin{algorithmic} \Procedure{SpectralBridges}{$X, k, m$} \Comment{$X$: input dataset, $k$: number of clusters, $m$: number of Voronoi regions} \State \textbf{Step 1: Vector Quantization} \State $centroids, voronoiRegions \gets$ \Call{KMeans}{$X, m$} \Comment{Initial centroids and Voronoi Regions using k-means++} \State \textbf{Step 2: Affinity Computation} \State $A = \{g(a_{kl})\}_{kl} \gets$ \Call{Affinity}{$X, centroids, voronoiRegions$} \State \textbf{Step 3: Spectral Clustering} \Comment{Affect each region to a cluster} \State $labels \gets$ \Call{SpectralClustering}{$A, k$} \State \textbf{Step 4: Propagate} \Comment{Affect each data point to the cluster of its region} \State $clusters \gets$ \Call{Propagate}{$X, labels, voronoiRegions$} \State \Return $clusters$ \Comment{Cluster labels for data points in $X$} \EndProcedure \end{algorithmic} \end{algorithm}
 </div>
@@ -875,7 +875,7 @@ B_{kl}- I_{kl} &amp;=&amp;  \sum_{i \mid t_i\in ]0,\frac{1}{2}[} t_i^2 \|\boldsy
 </section>
 <section id="code" class="level2" data-number="6.2">
 <h2 data-number="6.2" class="anchored" data-anchor-id="code"><span class="header-section-number">6.2</span> Code</h2>
-<p>Numerical experiments have been conducted in Python. The python scripts to reproduce the simulations and figures are available at <a href="https://github.com/flheight/Spectral-Bridges" class="uri">https://github.com/flheight/Spectral-Bridges</a>. A R package implementing the algorithm is also available (<a href="https://github.com/cambroise/spectral-bridges" class="uri">https://github.com/cambroise/spectral-bridges</a>).</p>
+<p>Numerical experiments have been conducted in Python. The python scripts to reproduce the simulations and figures are available at <a href="https://github.com/flheight/Spectral-Bridges" class="uri">https://github.com/flheight/Spectral-Bridges</a>. A R package implementing the algorithm is also available (<a href="https://github.com/cambroise/spectral-bridges-Rpackage" class="uri">https://github.com/cambroise/spectral-bridges-Rpackage</a>).</p>
 </section>
 </div></section><section id="session-information" class="level1 appendix unnumbered"><h2 class="anchored quarto-appendix-heading">Session information</h2><div class="quarto-appendix-contents">
 
@@ -1452,9 +1452,9 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a>In this paper, Spectral Bridges, a novel clustering algorithm, is introduced. This algorithm builds upon the traditional k-means and spectral clustering frameworks by subdividing data into small Voronoi regions, which are subsequently merged according to a connectivity measure. Drawing inspiration from Support Vector Machine's margin concept, a non-parametric clustering approach is proposed, building an affinity margin between each pair of Voronoi regions. This approach is characterized by minimal hyperparameters and delineation of intricate, non-convex cluster structures.</span>
 <span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a>The numerical experiments underscore Spectral Bridges as a fast, robust, and versatile tool for sophisticated clustering tasks spanning diverse domains. Its efficacy is observed to extend to large-scale scenarios encompassing both real-world and synthetic datasets. </span>
+<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a>The numerical experiments underscore Spectral Bridges as a fast, robust, and versatile tool for sophisticated clustering tasks spanning diverse domains. Its efficacy extends to large-scale scenarios encompassing both real-world and synthetic datasets. </span>
 <span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a>The Spectral Bridge algorithm is implemented both in Python (<span class="ot">&lt;https://github.com/flheight/Spectral-Bridges&gt;</span>) and R <span class="ot">&lt;https://github.com/cambroise/spectral-bridges&gt;</span>).</span>
+<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a>The Spectral Bridge algorithm is implemented both in Python (<span class="ot">&lt;https://github.com/flheight/Spectral-Bridges&gt;</span>) and R <span class="ot">&lt;https://github.com/cambroise/spectral-bridges-Rpackage&gt;</span>).</span>
 <span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a></span>
@@ -1597,10 +1597,10 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb3-192"><a href="#cb3-192" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-193"><a href="#cb3-193" aria-hidden="true" tabindex="-1"></a>where $\gamma$ is a scaling factor. This factor is set to ensure a large enough separation between the final coefficients. This factor is determined by the equation:</span>
 <span id="cb3-194"><a href="#cb3-194" aria-hidden="true" tabindex="-1"></a>$$</span>
-<span id="cb3-195"><a href="#cb3-195" aria-hidden="true" tabindex="-1"></a>\gamma = \frac{log(𝑀)}{q_{90} - q_{10}}</span>
+<span id="cb3-195"><a href="#cb3-195" aria-hidden="true" tabindex="-1"></a>\gamma = \frac{log(𝑀)}{\sqrt{q_{90}} - \sqrt{q_{10}}}</span>
 <span id="cb3-196"><a href="#cb3-196" aria-hidden="true" tabindex="-1"></a>$$</span>
 <span id="cb3-197"><a href="#cb3-197" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-198"><a href="#cb3-198" aria-hidden="true" tabindex="-1"></a>where $q_{10}$ and $q_{90}$ are respectively the 10th and 90th percentiles of the original affinity matrix. Thus, since the transformation is order-preserving, the 90th percentile of the newly constructed matrix is $M$ times greater than the 10th percentile. By default, $M$ is arbitrarily set to a large value of $10^4$.</span>
+<span id="cb3-198"><a href="#cb3-198" aria-hidden="true" tabindex="-1"></a>where $q_{10}$ and $q_{90}$ are respectively the 10th and 90th percentiles of the original affinity matrix and $M &gt; 0$. Thus, since the transformation is order-preserving, the 90th percentile of the newly constructed matrix is $M$ times greater than the 10th percentile. By default, $M$ is arbitrarily set to a large value of $10^4$.</span>
 <span id="cb3-199"><a href="#cb3-199" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-200"><a href="#cb3-200" aria-hidden="true" tabindex="-1"></a><span class="fu">## Algorithm</span></span>
 <span id="cb3-201"><a href="#cb3-201" aria-hidden="true" tabindex="-1"></a></span>
@@ -1859,7 +1859,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb3-454"><a href="#cb3-454" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-455"><a href="#cb3-455" aria-hidden="true" tabindex="-1"></a><span class="fu">## Code</span></span>
 <span id="cb3-456"><a href="#cb3-456" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-457"><a href="#cb3-457" aria-hidden="true" tabindex="-1"></a>Numerical experiments have been conducted in Python. The python scripts to reproduce the simulations and figures are available at <span class="ot">&lt;https://github.com/flheight/Spectral-Bridges&gt;</span>. A R package implementing the algorithm is also available (<span class="ot">&lt;https://github.com/cambroise/spectral-bridges&gt;</span>).</span>
+<span id="cb3-457"><a href="#cb3-457" aria-hidden="true" tabindex="-1"></a>Numerical experiments have been conducted in Python. The python scripts to reproduce the simulations and figures are available at <span class="ot">&lt;https://github.com/flheight/Spectral-Bridges&gt;</span>. A R package implementing the algorithm is also available (<span class="ot">&lt;https://github.com/cambroise/spectral-bridges-Rpackage&gt;</span>).</span>
 <span id="cb3-458"><a href="#cb3-458" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-459"><a href="#cb3-459" aria-hidden="true" tabindex="-1"></a><span class="fu"># References {.unnumbered}</span></span>
 <span id="cb3-460"><a href="#cb3-460" aria-hidden="true" tabindex="-1"></a></span>

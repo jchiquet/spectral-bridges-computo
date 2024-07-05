@@ -192,10 +192,10 @@ $$
 
 where $\gamma$ is a scaling factor. This factor is set to ensure a large enough separation between the final coefficients. This factor is determined by the equation:
 $$
-\gamma = \frac{log(𝑀)}{q_{90} - q_{10}}
+\gamma = \frac{log(𝑀)}{\sqrt{q_{90}} - \sqrt{q_{10}}}
 $$
 
-where $q_{10}$ and $q_{90}$ are respectively the 10th and 90th percentiles of the original affinity matrix. Thus, since the transformation is order-preserving, the 90th percentile of the newly constructed matrix is $M$ times greater than the 10th percentile. By default, $M$ is arbitrarily set to a large value of $10^4$.
+where $q_{10}$ and $q_{90}$ are respectively the 10th and 90th percentiles of the original affinity matrix and $M > 0$. Thus, since the transformation is order-preserving, the 90th percentile of the newly constructed matrix is $M$ times greater than the 10th percentile. By default, $M$ is arbitrarily set to a large value of $10^4$.
 
 ## Algorithm
 
