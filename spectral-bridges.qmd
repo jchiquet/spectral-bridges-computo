@@ -45,7 +45,7 @@ editor:
 
 # Abstract
 
-In this paper, Spectral Bridges, a novel clustering algorithm, is introduced. This algorithm builds upon the traditional k-means and spectral clustering frameworks by subdividing data into small Voronoï regions, which are subsequently assessed for their connectivity. Drawing inspiration from Support vector machine margin concept, a non-parametric clustering approach is proposed, building  an affinity margin between each pair of Voronoï regions. This approach is characterized by minimal hyperparameters and delineation of intricate, non-convex cluster structures.
+In this paper, Spectral Bridges, a novel clustering algorithm, is introduced. This algorithm builds upon the traditional k-means and spectral clustering frameworks by subdividing data into small Voronoi regions, which are subsequently assessed for their connectivity. Drawing inspiration from Support vector machine margin concept, a non-parametric clustering approach is proposed, building  an affinity margin between each pair of Voronoi regions. This approach is characterized by minimal hyperparameters and delineation of intricate, non-convex cluster structures.
 
 The numerical experiments underscore Spectral Bridges as a fast, robust, and versatile tool for sophisticated clustering tasks spanning diverse domains. Its efficacy is observed to extend to large-scale scenarios encompassing both real-world and synthetic datasets. 
 
@@ -66,7 +66,7 @@ Geometric approaches, such as k-means [@macqueen1967some], are distance-based me
 Graph-based methods represent data as a graph, with vertices symbolizing data points and edges weighted to indicate the affinity between these points. Spectral clustering can be seen as a relaxed version of the graph cut algorithm [@shi2000normalized]. However, traditional spectral clustering faces significant limitations due to its high time and space complexity, greatly hindering its applicability to large-scale problems [@von2007tutorial].
 
 
-The method we propose aims to find non-convex clusters in large datasets, without relying on parametric model,  by using spectral clustering based on an affinity that characterizes the local density of the data. The algorithm described in this paper draws from numerous clustering approaches. The initial intuition is to detect high-density areas. To this end, vector quantization is used to divide the space into a Voronoi tessellation. An original geometric criterion is then employed to detect pairs of Voronoi regions that are either distant from each other or separated by a low-density boundary. Finally, this affinity measure is considered as the weight of an edge in a complete graph connecting the centroids of the tessellation, and a spectral clustering algorithm is used to find a partition of this graph. The only parameters of the algorithm are the number of Voronoï Cells and the number of clusters.   
+The method we propose aims to find non-convex clusters in large datasets, without relying on parametric model,  by using spectral clustering based on an affinity that characterizes the local density of the data. The algorithm described in this paper draws from numerous clustering approaches. The initial intuition is to detect high-density areas. To this end, vector quantization is used to divide the space into a Voronoi tessellation. An original geometric criterion is then employed to detect pairs of Voronoi regions that are either distant from each other or separated by a low-density boundary. Finally, this affinity measure is considered as the weight of an edge in a complete graph connecting the centroids of the tessellation, and a spectral clustering algorithm is used to find a partition of this graph. The only parameters of the algorithm are the number of Voronoi Cells and the number of clusters.   
 
 The paper begins with a section dedicated to presenting the context and related algorithms, followed by a detailed description of the proposed algorithm. Experiments and comparisons with reference algorithms are then conducted on both real and synthetic data.
 
@@ -120,12 +120,12 @@ populated region.
 Balls (left) versus Bridge (right). The inertia of each structure is the sum of the squared distances represented by grey lines.
 :::
 
-Let us consider a sample $X=(\boldsymbol x_i)_{i \in \{1,\cdots,n\}}$ of vectors $\boldsymbol x_i \in \mathbb R^p$ and a set of $m$ coding vectors $(\boldsymbol \mu_k)_{k \in \{1,\cdots,m\}}$ defining a partition $P=\{\mathcal{V}_1,\cdots,\mathcal{V}_m \}$ of $\mathbb R^p$ into $m$ Voronoï regions:
+Let us consider a sample $X=(\boldsymbol x_i)_{i \in \{1,\cdots,n\}}$ of vectors $\boldsymbol x_i \in \mathbb R^p$ and a set of $m$ coding vectors $(\boldsymbol \mu_k)_{k \in \{1,\cdots,m\}}$ defining a partition $P=\{\mathcal{V}_1,\cdots,\mathcal{V}_m \}$ of $\mathbb R^p$ into $m$ Voronoi regions:
 $$
 \mathcal{V}_k = \left\{ \mathbf{x} \in \mathbb{R}^n \mid \|\mathbf{x} - \boldsymbol{\mu}_k\| \leq \|\mathbf{x} - \boldsymbol{\mu}_j\| \text{ for all } j \neq k \right\}.
 $$
 
-In the following a ball denotes the subset of $X$ in a Voronoï region.  The inertia of two balls $\mathcal{V}_k$ and $\mathcal{V}_l$ is 
+In the following a ball denotes the subset of $X$ in a Voronoi region.  The inertia of two balls $\mathcal{V}_k$ and $\mathcal{V}_l$ is 
 $$
 I_{kl} = \sum_{\boldsymbol x_i\in \mathcal{V}_k} \|\boldsymbol x_i - \boldsymbol \mu_k\|^2  + \sum_{\boldsymbol x_i\in \mathcal{V}_l} \|\boldsymbol x_i - \boldsymbol \mu_l\|^2.
 $$ 
@@ -196,7 +196,7 @@ $$
 
 ## Algorithm
 
-The Spectral Bridges algorithm first identifies local clusters to define Voronoï regions, computes edges with affinity weights between these regions, and ultimately cuts edges between regions with low inter-region density to determine the final clusters (See Algorithm @alg-spectral-bridges and Figure @fig-steps).
+The Spectral Bridges algorithm first identifies local clusters to define Voronoi regions, computes edges with affinity weights between these regions, and ultimately cuts edges between regions with low inter-region density to determine the final clusters (See Algorithm @alg-spectral-bridges and Figure @fig-steps).
 
 In spectral clustering, the time complexity is usually dominated by the eigendecomposition step, which is $O(n^3)$. However, in the case of Spectral Bridges, the kmeans algorithm has a time complexity of $O(n \times m \times p)$. For datasets with large $n$, this can be more significant than the $O(m^3)$ time complexity of the Spectral Bridges eigendecomposition.
 
@@ -215,7 +215,7 @@ In spectral clustering, the time complexity is usually dominated by the eigendec
 \begin{algorithmic}
 \Procedure{SpectralBridges}{$X, k, m$} \Comment{$X$: input dataset, $k$: number of clusters, $m$: number of Voronoi regions}
     \State \textbf{Step 1: Vector Quantization}
-    \State $centroids, voronoiRegions \gets$ \Call{KMeans}{$X, m$} \Comment{Initial centroids and Voronoï Regions  using k-means++}
+    \State $centroids, voronoiRegions \gets$ \Call{KMeans}{$X, m$} \Comment{Initial centroids and Voronoi Regions  using k-means++}
        \State \textbf{Step 2: Affinity Computation}
        \State $A = \{g(a_{kl)}\}_{kl} \gets$ \Call{Affinity}{$X, centroids, voronoiRegions$}
         \State \textbf{Step 3: Spectral Clustering} \Comment{Affect each region to a cluster}
@@ -295,7 +295,7 @@ All experiments were conducted on an Archlinux machine with Linux 6.9.3 Kernel, 
 
 ## Hyperparameter settings
 
-<!-- We set the hyperparameters of our algorithm to "reasonable" values based on the size of each dataset and the number of clusters. A larger number of clusters typically suggests that a higher value for the Voronoï regions is optimal. Conversely, using a high number of Voronoï regions for a small dataset might result in nearly empty regions that do not adequately represent any local structure. We will discuss our method's sensitivity to this parameter, but at no point did we use labels to determine its empirically optimal value.
+<!-- We set the hyperparameters of our algorithm to "reasonable" values based on the size of each dataset and the number of clusters. A larger number of clusters typically suggests that a higher value for the Voronoi regions is optimal. Conversely, using a high number of Voronoi regions for a small dataset might result in nearly empty regions that do not adequately represent any local structure. We will discuss our method's sensitivity to this parameter, but at no point did we use labels to determine its empirically optimal value.
 -->
 
 We set the hyperparameters of our algorithm based on the size of each dataset, $n$, and the number of clusters, $K$.
@@ -316,7 +316,7 @@ Let $h$ denote the embedding dimension of the dataset. We tested our method on t
 
 ![ARI and NMI scores of **k-means++** (blue), **EM** (green), **Ward Clustering** (red), and **Spectral Bridges** (purple) on PCA embedding and full MNIST.](figures/mnist_summary.pdf){#fig-mnist-scores layout-ncol=1}
 
-For visualization purposes, we projected with UMAP the predicted clusters from our algorithm and other methods to compare them against the ground truth labels to better understand the cluster shapes (see table 2). Note that the projection was not used in our experiments as an embedding, and thus does not play any role in the clustering process itself. As a matter of fact, the embedding used was obtained with PCA, $h = 32$ and $250$ Voronoï regions. Note that the label colors match the legend only in the case of the ground truth data. Indeed, the ordering of the labels have no impact on clustering quality.
+For visualization purposes, we projected with UMAP the predicted clusters from our algorithm and other methods to compare them against the ground truth labels to better understand the cluster shapes (see table 2). Note that the projection was not used in our experiments as an embedding, and thus does not play any role in the clustering process itself. As a matter of fact, the embedding used was obtained with PCA, $h = 32$ and $250$ Voronoi regions. Note that the label colors match the legend only in the case of the ground truth data. Indeed, the ordering of the labels have no impact on clustering quality.
 
 ::: {#fig-MNIST layout-ncol=3}
 
@@ -385,11 +385,11 @@ Three representations of the algorithm's predicted cluster centers are displayed
 
 
 
-Spectral Bridges is an original clustering algorithm which presents a novel approach by integrating the strengths of traditional kmeans and spectral clustering frameworks. This algorithm utilizes a simple affinity measure for spectral clustering, which is derived from the minimal margin between pairs of Voronoï regions. 
+Spectral Bridges is an original clustering algorithm which presents a novel approach by integrating the strengths of traditional kmeans and spectral clustering frameworks. This algorithm utilizes a simple affinity measure for spectral clustering, which is derived from the minimal margin between pairs of Voronoi regions. 
 
 The algorithm demonstrates impressive scalability, handling large datasets efficiently through a balanced computational complexity between the k-means clustering and eigendecomposition steps. As a non-parametric method, Spectral Bridges does not rely on strong assumptions about data distribution, enhancing its versatility across various data types. It performs exceptionally well with both synthetic and real-world data and consistently outperforms conventional clustering algorithms such as k-means, DBSCAN, and mixture models. 
 
-The design of Spectral Bridges ensures robustness to noise, a significant advantage in real-world applications. Additionally, the algorithm requires minimal hyperparameters, primarily the number of Voronoï regions, making it straightforward to tune and deploy. 
+The design of Spectral Bridges ensures robustness to noise, a significant advantage in real-world applications. Additionally, the algorithm requires minimal hyperparameters, primarily the number of Voronoi regions, making it straightforward to tune and deploy. 
 
 Furthermore, Spectral Bridges can be kernelized, allowing it to handle data in similarity space directly, which enhances its flexibility and applicability. Overall, Spectral Bridges is a powerful, robust, and scalable clustering algorithm that offers significant improvements over traditional methods, making it an excellent tool for advanced clustering tasks across numerous domains.
 
@@ -417,7 +417,7 @@ B_{kl} &=& \sum_{i \mid t_i=0} \|\boldsymbol x_i - \boldsymbol \mu_k\|^2  + \sum
 \end{aligned}
 $$
 
-The last term may be decomposed in two parts corresponding to the points of the two Voronoï regions which are projected on the segment:
+The last term may be decomposed in two parts corresponding to the points of the two Voronoi regions which are projected on the segment:
 
 $$
 \begin{aligned}
