@@ -306,7 +306,7 @@ For other algorithms, such as DBSCAN,  labels were used to determine the best hy
 
 ## Accuracy
 
-We first evaluated our algorithm's accuracy on the MNIST dataset. Metrics were collected to compare our method with k-means++, EM, and Ward clustering. Metric were estimated by taking the empirical average over $10$ consecutive runs with the same random seed for each method. Since our computational capabilites were too limited, we sampled $20000$ (one third) data points at random. This sample is not fixed and changes for each iteration.
+We first evaluated our algorithm's accuracy on the MNIST dataset. Metrics were collected to compare our method with k-means++, EM, and Ward clustering. Metric were estimated by taking the empirical average over $10$ consecutive runs with the same random seed for each method. Since our computational capabilites were too limited, we sampled 20,000 (one third) data points at random. This sample is not fixed and changes for each iteration.
 
 Let $h$ denote the embedding dimension of the dataset. We tested our method on the raw MNIST dataset without preprocessing ($h = 784$) and after reducing its dimension using PCA to $h \in \{8, 16, 32, 64\}$ (see @fig-mnist-scores).
 
