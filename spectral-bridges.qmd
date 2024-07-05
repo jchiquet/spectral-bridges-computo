@@ -359,7 +359,16 @@ Effects of noise on Spectral Bridges's output.
 
 # Conclusive remarks
 
-Possibility to kernelize
+
+
+Spectral Bridges is an original clustering algorithm which presents a novel approach by integrating the strengths of traditional kmeans and spectral clustering frameworks. This algorithm utilizes a simple affinity measure for spectral clustering, which is derived from the minimal margin between pairs of Voronoï regions. 
+
+The algorithm demonstrates impressive scalability, handling large datasets efficiently through a balanced computational complexity between the k-means clustering and eigendecomposition steps. As a non-parametric method, Spectral Bridges does not rely on strong assumptions about data distribution, enhancing its versatility across various data types. It performs exceptionally well with both synthetic and real-world data and consistently outperforms conventional clustering algorithms such as k-means, DBSCAN, and mixture models. 
+
+The design of Spectral Bridges ensures robustness to noise, a significant advantage in real-world applications. Additionally, the algorithm requires minimal hyperparameters, primarily the number of Voronoï regions, making it straightforward to tune and deploy. 
+
+Furthermore, Spectral Bridges can be kernelized, allowing it to handle data in similarity space directly, which enhances its flexibility and applicability. Overall, Spectral Bridges is a powerful, robust, and scalable clustering algorithm that offers significant improvements over traditional methods, making it an excellent tool for advanced clustering tasks across numerous domains.
+
 
 
 # Appendix  {.appendix}
@@ -417,11 +426,7 @@ $$
 
 ## Code
 
-
-
-The python scripts to reproduce the simulations are available at <https://github.com/flheight/Spectral-Bridges>. 
-
-A R package implementing the algorithm is also available (<https://github.com/cambroise/spectral-bridges>).
+Numerical experiments have been conducted in Python. The python scripts to reproduce the simulations and figures are available at <https://github.com/flheight/Spectral-Bridges>. A R package implementing the algorithm is also available (<https://github.com/cambroise/spectral-bridges>).
 
 # References {.unnumbered}
 
