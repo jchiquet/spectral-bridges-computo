@@ -245,7 +245,13 @@ Illustration of the Spectral bridges algorithm with the Iris dataset (first prin
 # Numerical experiments
 
 
-In this section, we present the results obtained from testing our algorithm on various datasets, both small and large scale, including real-world and well-known synthetic datasets. These experiments assess the accuracy, time and space complexity, ease of use, robustness, and adaptability of our algorithm. We compare **Spectral Bridges** (**SB**) against several state-of-the-art methods, including **k-means++** (**KM**) [@macqueen1967some; @arthur2007kmeanspp], **Expectation-Maximization** (**EM**) [@dempster1977maximum], **Ward Clustering** (**WC**) [@ward1963hierarchical], and **DBSCAN** (**DB**) [@ester1996density]. This comparison establishes baselines across centroid-based clustering algorithms, hierarchical methods, and density-based methods. We evaluate the algorithms on both raw and PCA-processed data with varying dimensionality. For synthetic datasets, we introduce Gaussian and/or uniform noise to evaluate the robustness of our algorithm.
+In this section, we present the results obtained from testing our algorithm on various datasets, both small and large scale, including real-world and well-known synthetic datasets. These experiments assess the accuracy, time and space complexity, ease of use, robustness, and adaptability of our algorithm. We compare **Spectral Bridges** (**SB**) against several state-of-the-art methods, including **k-means++** (**KM**) [@macqueen1967some; @arthur2007kmeanspp], **Expectation-Maximization** (**EM**) [@dempster1977maximum], **Ward Clustering** (**WC**) [@ward1963hierarchical], and **DBSCAN** (**DB**) [@ester1996density]. This comparison establishes baselines across centroid-based clustering algorithms, hierarchical methods, and density-based methods. 
+
+<!--We evaluate the algorithms on both raw and PCA-processed data with varying dimensionality. For synthetic datasets, we introduce Gaussian and/or uniform noise to evaluate the robustness of our algorithm.
+-->
+
+The algorithms are evaluated on both raw and PCA-processed data with varying dimensionality. For synthetic datasets, Gaussian and/or uniform noise is introduced to assess the robustness of the algorithm.
+
 
 ## Real-world Data
 
@@ -277,7 +283,11 @@ Class proportions are presented in ascending order starting from label $0$.
 
 ## Metrics
 
-To evaluate the performance of our clustering algorithm, we use the Adjusted Rand Index (**ARI**) [@halkidi2002cluster] and Normalized Mutual Information (**NMI**) [@cover1991information]. ARI measures the similarity between two clustering results, ranging from $-0.5$ to $1$, with $1$ indicating perfect agreement. NMI ranges from $0$ to $1$, with higher values indicating better clustering quality. In some tests, we also report the variability of scores across multiple runs due to the random initialization in k-means, though k-means++ generally provides stable and reproducible results.
+<!--To evaluate the performance of our clustering algorithm, we use the Adjusted Rand Index (**ARI**) [@halkidi2002cluster] and Normalized Mutual Information (**NMI**) [@cover1991information]. ARI measures the similarity between two clustering results, ranging from $-0.5$ to $1$, with $1$ indicating perfect agreement. NMI ranges from $0$ to $1$, with higher values indicating better clustering quality. In some tests, we also report the variability of scores across multiple runs due to the random initialization in k-means, though k-means++ generally provides stable and reproducible results.
+-->
+
+To evaluate the performance of the clustering algorithm, the Adjusted Rand Index (**ARI**) [@halkidi2002cluster] and Normalized Mutual Information (**NMI**) [@cover1991information] are used. ARI measures the similarity between two clustering results, ranging from $-0.5$ to 1, with 1 indicating perfect agreement. NMI ranges from $0$ to $1$, with higher values indicating better clustering quality. In some tests, the variability of scores across multiple runs is also reported due to the random initialization in k-means, though k-means++ generally provides stable and reproducible results.
+
 
 ## Platform
 
@@ -295,7 +305,7 @@ A larger number of clusters typically suggests that a higher value for the numbe
 By adjusting $m$ in this manner, we aim to balance the need for detailed representation with the risk of overfitting, ensuring that each Voronoi region meaningfully captures the underlying data distribution.
 
 
-For other algorithms, such as DBSCAN, we used labels to determine the best hyperparameter values to compare our method against the "best case scenario", thus putting our algorithm at a voluntary disadvantage.
+For other algorithms, such as DBSCAN,  labels were used to determine the best hyperparameter values to compare our method against the "best case scenario", thus putting  the Spectral Bridges algorithm at a voluntary disadvantage.
 
 ## Accuracy
 
@@ -321,7 +331,11 @@ UMAP projection of predicted clusters against the ground truth labels.
 We also put our algorithm to the test against the same competitors using scikit-learn's UCI Breast Cancer data. Once again, our method performs well although the advantage is not as obvious in this case. However, in none of our tests has it ranked worse than k-means++. The results are displayed as a boxplot generated from $200$ iterations of each algorithm using a different seed, in order to better grasp the variability lying in the seed dependent nature of the k-means++, Expectation Maximization and Spectral Bridges algorithms.
 ![ARI and NMI scores of **k-means++** (blue), **EM** (green), **Ward Clustering** (red), and **Spectral Bridges** (purple) on the UCI Breast Cancer dataset](figures/cancer_summary.pdf)
 
-Since we expect our algorithm to shine at discerning complex and intricate cluster structures, we collected an array four toy datasets illustrated below.
+<!--Since we expect our algorithm to shine at discerning complex and intricate cluster structures, we collected an array four toy datasets illustrated in Figure @fig-ToyDatasets. 
+-->
+
+Since the Spectral Bridges algorithm is expected to excel at discerning complex and intricate cluster structures, an array of four toy datasets was collected, as illustrated in Figure @fig-ToyDatasets.
+
 
 ::: {#fig-ToyDatasets layout-ncol=4}
 
@@ -333,18 +347,25 @@ Since we expect our algorithm to shine at discerning complex and intricate clust
 
 ![Smile](figures/smile.pdf)
 
-Visualization of the four toy datasets.
+Four toy datasets.
 :::
 
-We once again benchmark multiple algorithms including ours in the exact same manner as for the UCI Breast Cancer data. Results show our method outperforms all tested algorithms (DBSCAN, k-means++, Expectation Maximization and Ward Clustering) while needing few hyperparameters. In this regard, as discussed previously, DBSCAN's parameters have been set using the labels to illustrate a best case scenario, although, in practice, one can expect worse results. Despite this, Spectral-Bridge still manages to better encompass the clusters' structure.
+<!--We once again benchmark multiple algorithms including ours in the exact same manner as for the UCI Breast Cancer data. Results show our method outperforms all tested algorithms (DBSCAN, k-means++, Expectation Maximization and Ward Clustering) while needing few hyperparameters. In this regard, as discussed previously, DBSCAN's parameters have been set using the labels to illustrate a best case scenario, although, in practice, one can expect worse results. Despite this, Spectral-Bridge still manages to better encompass the clusters' structure.
+-->
+
+Multiple algorithms, including the proposed one, were benchmarked in the exact same manner as for the UCI Breast Cancer data. The results show that the proposed method outperforms all tested algorithms (DBSCAN, k-means++, Expectation Maximization, and Ward Clustering) while requiring few hyperparameters. As previously discussed, DBSCAN's parameters were optimized using the ground truth labels to represent a best-case scenario; however, in practical applications, suboptimal performance is more likely. Despite this optimization, the Spectral-Bridge algorithm still demonstrates superior ability to capture and represent the underlying cluster structures.
+
 
 ![ARI and NMI scores of Spectral Bridges and competitors on standard synthetic toy datasets](figures/synthetic_summary.pdf)
 
 ## Noise robustness
 
-To evaluate the noise robustness of our algorithm, we imagined two setups : introducing Gaussian distributed perturbations and concatenating uniformly distributed points on a predefined rectangular region (whose size is determined by the span of the dataset) to a given dataset. As illustrated belew, in both of theses cases, our tests show our method is quite insensitive to noise in those scenarios.
+<!--To evaluate the noise robustness of our algorithm, we imagined two setups : introducing Gaussian distributed perturbations and concatenating uniformly distributed points on a predefined rectangular region (whose size is determined by the span of the dataset) to a given dataset. As illustrated in Figure @fig-NoiseRobustness, in both of theses cases, the tests show our method is quite insensitive to noise in those scenarios.
+-->
 
-Here are three representations of our algorithm's predicted cluster centers displayed as colored dots, while the each point of the Impossible dataset is shown as a small black dot. In the first graph, the dataset is not modified. In the second, we added $n=250$ uniformly distributed samples and in the last we used Gaussian noise perturbations with $\sigma = 0.1$.
+To evaluate the noise robustness of the algorithm, two experimental setups were devised: one involved introducing Gaussian-distributed perturbations to the data, and the other involved concatenating uniformly distributed points within a predefined rectangular region (determined by the span of the dataset) to the existing dataset. As illustrated in Figure @fig-NoiseRobustness, the tests demonstrate that in both scenarios, the algorithm exhibits a high degree of insensitivity to noise.
+
+
 
 ::: {#fig-NoiseRobustness layout-ncol=3}
 
@@ -354,7 +375,9 @@ Here are three representations of our algorithm's predicted cluster centers disp
 
 ![Gaussian noise](figures/gaussian_noise_impossible.pdf)
 
-Effects of noise on Spectral Bridges's output.
+
+Three representations of the algorithm's predicted cluster centers are displayed as colored dots, with each point of the Impossible dataset shown as a small black dot. In the left graph, the dataset is unmodified. In the center graph, 250 uniformly distributed samples were added. In the right graph, Gaussian noise perturbations with $\sigma = 0.1$ were applied.
+
 :::
 
 # Conclusive remarks
