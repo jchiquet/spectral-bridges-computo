@@ -47,7 +47,10 @@ editor:
 
 In this paper, Spectral Bridges, a novel clustering algorithm, is introduced. This algorithm builds upon the traditional k-means and spectral clustering frameworks by subdividing data into small Voronoï regions, which are subsequently assessed for their connectivity. Drawing inspiration from Support vector machine margin concept, a non-parametric clustering approach is proposed, building  an affinity margin between each pair of Voronoï regions. This approach is characterized by minimal hyperparameters and delineation of intricate, non-convex cluster structures.
 
-The numerical experiments underscore Spectral Bridges as a fast, robust, and versatile tool for sophisticated clustering tasks spanning diverse domains. Its efficacy is observed to extend to large-scale scenarios encompassing both real-world and synthetic datasets.
+The numerical experiments underscore Spectral Bridges as a fast, robust, and versatile tool for sophisticated clustering tasks spanning diverse domains. Its efficacy is observed to extend to large-scale scenarios encompassing both real-world and synthetic datasets. 
+
+The Spectral Bridge algorithm is implemented both in Python (<https://github.com/flheight/Spectral-Bridges>) and R <https://github.com/cambroise/spectral-bridges>).
+
 
 
 # Introduction
@@ -194,7 +197,8 @@ $$
 ## Algorithm
 
 The Spectral Bridges algorithm first identifies local clusters to define Voronoï regions, computes edges with affinity weights between these regions, and ultimately cuts edges between regions with low inter-region density to determine the final clusters (See Algorithm @alg-spectral-bridges and Figure @fig-steps).
-In spectral clustering, the time complexity is usually dominated by the eigendecomposition step, which is \(O(n^3)\). However, in the case of Spectral Bridges, the \(k\)-means algorithm has a time complexity of \(O(n \times m \times p)\). For datasets with large \(n\), this can be more significant than the \(O(m^3)\) time complexity of the Spectral Bridges eigendecomposition.
+
+In spectral clustering, the time complexity is usually dominated by the eigendecomposition step, which is $O(n^3)$. However, in the case of Spectral Bridges, the kmeans algorithm has a time complexity of $O(n \times m \times p)$. For datasets with large $n$, this can be more significant than the $O(m^3)$ time complexity of the Spectral Bridges eigendecomposition.
 
 ```pseudocode
 #| label: alg-spectral-bridges
@@ -406,10 +410,18 @@ Thus $$
 \begin{aligned}
 B_{kl}- I_{kl} &=&  \sum_{i \mid t_i\in ]0,\frac{1}{2}[} t_i^2 \|\boldsymbol \mu_k - \boldsymbol \mu_l\|^2 + \sum_{i \mid t_i\in ]\frac{1}{2},1[} (1-t_i)^2 \|\boldsymbol \mu_k - \boldsymbol \mu_l\|^2,\\
 \frac{B_{kl}- I_{kl}}{\|\boldsymbol \mu_k - \boldsymbol \mu_l\|^2} &=& \sum_{i \mid t_i\in ]0,\frac{1}{2}[} t_i^2  + \sum_{i \mid t_i\in ]\frac{1}{2},1[} (1-t_i)^2, \\
-\frac{B_{kl}- I_{kl}}{(n_k+n_l)\|\boldsymbol \mu_k - \boldsymbol \mu_l\|^2} &=& \frac{\sum_{\boldsymbol{i} \in k} \langle \boldsymbol{x_i} - \boldsymbol{\mu}_k \vert \boldsymbol{\mu}_l - \boldsymbol{\mu}_k \rangle_+^2  \sum_{\boldsymbol{i} \in l} \langle \boldsymbol{x_i} - \boldsymbol{\mu}_l \vert \boldsymbol{\mu}_k - \boldsymbol{\mu}_l\rangle_+^2}{(n_k+n_l)\|\boldsymbol \mu_k - \boldsymbol \mu_l\|^4}.
+\frac{B_{kl}- I_{kl}}{(n_k+n_l)\|\boldsymbol \mu_k - \boldsymbol \mu_l\|^2} &=& \frac{\sum_{\boldsymbol{x_i} \in \mathcal V_k} \langle \boldsymbol{x_i} - \boldsymbol{\mu}_k \vert \boldsymbol{\mu}_l - \boldsymbol{\mu}_k \rangle_+^2  \sum_{\boldsymbol{x_i} \in \mathcal V_l} \langle \boldsymbol{x_i} - \boldsymbol{\mu}_l \vert \boldsymbol{\mu}_k - \boldsymbol{\mu}_l\rangle_+^2}{(n_k+n_l)\|\boldsymbol \mu_k - \boldsymbol \mu_l\|^4}.
 \end{aligned}
 $$
 
+
+## Code
+
+
+
+The python scripts to reproduce the simulations are available at <https://github.com/flheight/Spectral-Bridges>. 
+
+A R package implementing the algorithm is also available (<https://github.com/cambroise/spectral-bridges>).
 
 # References {.unnumbered}
 
