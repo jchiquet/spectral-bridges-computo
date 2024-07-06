@@ -263,7 +263,7 @@ ISSN 2824-7795</p>
       <div>
       <div class="quarto-title-meta-heading">Modified</div>
       <div class="quarto-title-meta-contents">
-        <p class="date-modified">July 5, 2024</p>
+        <p class="date-modified">July 6, 2024</p>
       </div>
     </div>
       
@@ -297,7 +297,7 @@ ISSN 2824-7795</p>
     <div class="abstract-title">Abstract</div>
       <p>In this paper, Spectral Bridges, a novel clustering algorithm, is introduced. This algorithm builds upon the traditional k-means and spectral clustering frameworks by subdividing data into small Voronoi regions, which are subsequently merged according to a connectivity measure. Drawing inspiration from Support Vector Machine’s margin concept, a non-parametric clustering approach is proposed, building an affinity margin between each pair of Voronoi regions. This approach is characterized by minimal hyperparameters and delineation of intricate, non-convex cluster structures.</p>
       <p>The numerical experiments underscore Spectral Bridges as a fast, robust, and versatile tool for sophisticated clustering tasks spanning diverse domains. Its efficacy extends to large-scale scenarios encompassing both real-world and synthetic datasets.</p>
-      <p>The Spectral Bridge algorithm is implemented both in Python (<a href="https://github.com/flheight/Spectral-Bridges" class="uri">https://github.com/flheight/Spectral-Bridges</a>) and R <a href="https://github.com/cambroise/spectral-bridges-Rpackage" class="uri">https://github.com/cambroise/spectral-bridges-Rpackage</a>).</p>
+      <p>The Spectral Bridge algorithm is implemented both in Python (<a href="https://github.com/flheight/spectral-bridges-pypi/tree/main" class="uri">https://github.com/flheight/spectral-bridges-pypi/tree/main</a>) and R <a href="https://github.com/cambroise/spectral-bridges-Rpackage" class="uri">https://github.com/cambroise/spectral-bridges-Rpackage</a>).</p>
     </div>
   </div>
 
@@ -441,7 +441,7 @@ a_{kl}=
 <h2 data-number="3.2" class="anchored" data-anchor-id="algorithm"><span class="header-section-number">3.2</span> Algorithm</h2>
 <p>The Spectral Bridges algorithm first identifies local clusters to define Voronoi regions, computes edges with affinity weights between these regions, and ultimately cuts edges between regions with low inter-region density to determine the final clusters (See Algorithm <a href="#alg-spectral-bridges">Algorithm 1</a> and Figure <a href="#fig-steps" class="quarto-xref">Figure&nbsp;2</a>).</p>
 <p>In spectral clustering, the time complexity is usually dominated by the eigendecomposition step, which is <span class="math inline">O(n^3)</span>. However, in the case of Spectral Bridges, the kmeans algorithm has a time complexity of <span class="math inline">O(n \times m \times p)</span>. For datasets with large <span class="math inline">n</span>, this can be more significant than the <span class="math inline">O(m^3)</span> time complexity of the Spectral Bridges eigendecomposition.</p>
-<div id="alg-spectral-bridges" class="pseudocode-container" data-line-number="true" data-comment-delimiter="//" data-line-number-punc=":" data-no-end="false" data-alg-title="Algorithm" data-pseudocode-index="1" data-indent-size="1.2em">
+<div id="alg-spectral-bridges" class="pseudocode-container" data-pseudocode-index="1" data-alg-title="Algorithm" data-indent-size="1.2em" data-line-number="true" data-no-end="false" data-comment-delimiter="//" data-line-number-punc=":">
 <div class="pseudocode">
 \begin{algorithm} \caption{Spectral Bridges} \begin{algorithmic} \Procedure{SpectralBridges}{$X, k, m$} \Comment{$X$: input dataset, $k$: number of clusters, $m$: number of Voronoi regions} \State \textbf{Step 1: Vector Quantization} \State $centroids, voronoiRegions \gets$ \Call{KMeans}{$X, m$} \Comment{Initial centroids and Voronoi Regions using k-means++} \State \textbf{Step 2: Affinity Computation} \State $A = \{g(a_{kl})\}_{kl} \gets$ \Call{Affinity}{$X, centroids, voronoiRegions$} \State \textbf{Step 3: Spectral Clustering} \Comment{Affect each region to a cluster} \State $labels \gets$ \Call{SpectralClustering}{$A, k$} \State \textbf{Step 4: Propagate} \Comment{Affect each data point to the cluster of its region} \State $clusters \gets$ \Call{Propagate}{$X, labels, voronoiRegions$} \State \Return $clusters$ \Comment{Cluster labels for data points in $X$} \EndProcedure \end{algorithmic} \end{algorithm}
 </div>
@@ -1454,7 +1454,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a>The numerical experiments underscore Spectral Bridges as a fast, robust, and versatile tool for sophisticated clustering tasks spanning diverse domains. Its efficacy extends to large-scale scenarios encompassing both real-world and synthetic datasets. </span>
 <span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a>The Spectral Bridge algorithm is implemented both in Python (<span class="ot">&lt;https://github.com/flheight/Spectral-Bridges&gt;</span>) and R <span class="ot">&lt;https://github.com/cambroise/spectral-bridges-Rpackage&gt;</span>).</span>
+<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a>The Spectral Bridge algorithm is implemented both in Python (<span class="ot">&lt;https://github.com/flheight/spectral-bridges-pypi/tree/main&gt;</span>) and R <span class="ot">&lt;https://github.com/cambroise/spectral-bridges-Rpackage&gt;</span>).</span>
 <span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a></span>
