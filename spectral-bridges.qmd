@@ -456,6 +456,7 @@ $$
 ## Code
 
 Numerical experiments have been conducted in Python. The python scripts to reproduce the simulations and figures are available at <https://github.com/flheight/Spectral-Bridges>.  The Spectral Bridge algorithm is implemented both in 
+
 - Python: <https://pypi.org/project/spectral-bridges/>,
 -  R: <https://github.com/cambroise/spectral-bridges-Rpackage>.
 
