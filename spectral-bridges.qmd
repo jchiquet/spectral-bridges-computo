@@ -290,15 +290,14 @@ Using the symmetrical nature of the numerator, the calculation of the non-transf
 
     \State \textbf{Step 3: Segments Normalization Calculation}
     \State $\text{segments} \gets \{(\text{centroids}[l] - \text{centroids}[k])\}_{kl}$
-    \Comment{Calculate the segments tensor}
+    \Comment{Calculate the $m \times m \times d$ segments tensor}
     \State $\text{norms} \gets \{(\|\text{segments}[k, l]\|^4)\}_{kl}$
-    \Comment{Compute the fourth power of the norms of the segments}
 
     \State \textbf{Step 4: Projection Calculation}
     \Comment{Calculate half of the numerator}
     \For{$i \in \{1, ..., m\}$}
         \State $\text{projections} \gets \max\left(0, \operatorname{dot}(\text{centeredVoronoiRegions}[i], \text{segments}[i].T)\right)$
-        \Comment{Element-wise maximum following a dot product yielding a $n_i \times m$ matrix}
+        \Comment{Element-wise maximum following a dot product between the centered Voronoi region data matrix and the $i$-th row of the semgents tensor, yielding a $n_i \times m$ matrix}
         \State $\text{affinity}[i] \gets \{(\sum_k \text{projections}[k, j]^2)\}_j$
         \Comment{Assign each row of the affinity matrix}
     \EndFor
