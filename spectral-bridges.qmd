@@ -275,7 +275,7 @@ Using the symmetrical nature of the numerator, the calculation of the non-transf
 \begin{algorithm}
 \caption{Affinity Matrix Construction}
 \begin{algorithmic}
-\Procedure{AffinityConstruction}{$\text{voronoiRegions}, \text{centroids}$}
+\Procedure{Affinity}{$\text{voronoiRegions}, \text{centroids}$}
 \Comment{$\text{voronoiRegions}$: array of $m$ Voronoi regions, $\text{centroids}$: the centers of each region}
 
     \State \textbf{Step 1: Data Centering}
