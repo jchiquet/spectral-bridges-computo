@@ -202,7 +202,7 @@ The inclusion of the square root can be understood as redefining the affinity me
 
 The Spectral Bridges algorithm first identifies local clusters to define Voronoi regions, computes edges with affinity weights between these regions, and ultimately cuts edges between regions with low inter-region density to determine the final clusters (See Algorithm @alg-spectral-bridges and Figure @fig-steps).
 
-In spectral clustering, the time complexity is usually dominated by the eigendecomposition step, which is $O(n^3)$. However, in the case of Spectral Bridges, the k-means algorithm has a time complexity of $O(n \times m \times p)$. For datasets with large $n$, this can be more significant than the $O(m^3)$ time complexity of the Spectral Bridges eigendecomposition.
+In spectral clustering, the time complexity is usually dominated by the eigen-decomposition step, which is $O(n^3)$. However, in the case of Spectral Bridges, the k-means algorithm has a time complexity of $O(n \times m \times p)$. For datasets with large $n$, this can be more significant than the $O(m^3)$ time complexity of the Spectral Bridges eigen-decomposition.
 
 ```pseudocode
 #| label: alg-spectral-bridges
@@ -219,21 +219,18 @@ In spectral clustering, the time complexity is usually dominated by the eigendec
 \begin{algorithmic}
 \Procedure{SpectralBridges}{$X, k, m$} \Comment{$X$: input dataset, $k$: number of clusters, $m$: number of Voronoi regions}
     \State \textbf{Step 1: Vector Quantization}
-    \State $centroids, voronoiRegions \gets$ \Call{KMeans}{$X, m$} \Comment{Initial centroids and Voronoi Regions  using k-means++}
+    \State $\text{centroids}, \text{voronoiRegions} \gets$ \Call{KMeans}{$X, m$} \Comment{Initial centroids and Voronoi Regions  using k-means++}
        \State \textbf{Step 2: Affinity Computation}
-       \State $A = \{g(a_{kl})\}_{kl} \gets$ \Call{Affinity}{$X, centroids, voronoiRegions$}
+       \State $A = \{g(a_{kl})\}_{kl} \gets$ \Call{Affinity}{$X, \text{centroids}, \text{voronoiRegions}$}
         \State \textbf{Step 3: Spectral Clustering} \Comment{Affect each region to a cluster}
-        \State $labels \gets$ \Call{SpectralClustering}{$A, k$}
+        \State $\text{labels} \gets$ \Call{SpectralClustering}{$A, k$}
       \State \textbf{Step 4: Propagate} \Comment{Affect each data point to the cluster of its region}
-      \State $clusters \gets$ \Call{Propagate}{$X, labels, voronoiRegions$}
-     \State \Return $clusters$ \Comment{Cluster labels for data points in $X$}
+      \State $\text{clusters} \gets$ \Call{Propagate}{$X, \text{labels}, \text{voronoiRegions}$}
+     \State \Return $\text{clusters}$ \Comment{Cluster labels for data points in $X$}
 \EndProcedure
 \end{algorithmic}
 \end{algorithm}
 ```
-
-
-
 
 ::: {#fig-steps layout-ncol=3}
 ![Vector quantization](figures/spectral-briges-1.pdf)
@@ -245,6 +242,52 @@ In spectral clustering, the time complexity is usually dominated by the eigendec
 Illustration of the Spectral bridges algorithm with the Iris dataset (first principal plane). Vector quantization (Step 1 of Algorithm @alg-spectral-bridges), Affinity computation (Step 2 of Algorithm @alg-spectral-bridges), Spectral clustering and spreading (Step 3-4 of Algorithm @alg-spectral-bridges).
 :::
 
+Taking a closer look at the second step routine for affinity matrix calculation with a $O(m^2d)$ time complexity, most operations can be parallelized leaving a single loop, thus allowing for an efficient matrix construction. 
+Recall: 
+
+$$
+a_{kl} = \frac{\sum_{\boldsymbol{x_i} \in \mathcal V_k} \langle \boldsymbol{x_i} - \boldsymbol{\mu}_k \vert \boldsymbol{\mu}_l - \boldsymbol{\mu}_k \rangle_+^2  \sum_{\boldsymbol{x_i} \in \mathcal V_l} \langle \boldsymbol{x_i} - \boldsymbol{\mu}_l \vert \boldsymbol{\mu}_k - \boldsymbol{\mu}_l\rangle_+^2}{(n_k+n_l)\|\boldsymbol \mu_k - \boldsymbol \mu_l\|^4}
+$$
+
+Using the symmetrical nature of the numerator, the calculation of the affinity matrix can be subdivided into five steps highlighted by @alg-affinity-construction. Compared to a naive implementation, the following method is approximately 200 times faster on a small dataset comprised of $n = 3594$, $d = 2$ points, and a value of $m = 250$.
+
+```pseudocode
+#| label: alg-affinity-construction
+#| html-indent-size: "1.2em"
+#| html-comment-delimiter: "//"
+#| html-line-number: true
+#| html-line-number-punc: ":"
+#| html-no-end: false
+#| pdf-placement: "htb!"
+#| pdf-line-number: true
+
+\begin{algorithm}
+\caption{Affinity matrix construction}
+\begin{algorithmic}
+\Procedure{AffinityConstruction}{$\text{voronoiRegions}, \text{centroids}$} \Comment{$\text{voronoiRegions}$: list of $m$ Voronoi regions, $\text{centroids}$: the centers of each Voronoi region}
+    \State \textbf{Step 1: Data Centering}
+    \For{$i \in \{1, ..., m\}$}
+        \State $\text{centeredVoronoiRegions}[i] \gets \text{voronoiRegions}[i] - \text{centroids}[i]$ \Comment{Centering each Voronoi region by their center}
+    \EndFor
+    \State \textbf{Step 2: Cardinal Calculation}
+    \State $\text{counts} \gets \{(n_k + n_l)\}_{kl}$ \Comment{Calculate the number of combined points in each pair of Voronoi regions}
+    \State \textbf{Step 3: Segments Normalization Calculation}
+    \State $\text{segments} \gets \{(\text{centroids}[l] - \text{centroids}[k])\}_{kl}$ \Comment{Calculate the segments tensor}
+    \State $\text{norms} \gets \{(\|\text{segments}[k, l]\|^4)\}_{kl}$
+    \State \textbf{Step 4: Projection Calculation} \Comment{Calculate half of the numerator}
+    \For{$i \in \{1, ..., m\}$}
+        \State $\text{projections} \gets \max\left(0, \operatorname{dot}(\text{centeredVoronoiRegions}[i], \text{segments}[i].T)\right)$ \Comment{Elementwise maximum following a dot product yielding a $n_i \times m$ matrix}
+        \State $\text{affinity}[i] \gets \sum_j \operatorname{power}(\text{projections}[j], 2)$ \Comment{Assign each row of the matrix, summing elementwise squared projections along rows of each $\text{projections}[i]$ matrix}
+    \EndFor
+    \State \textbf{Step 5: Final Affinity Matrix Calculation}
+    \State $\text{affinity} \gets (\text{affinity} + \text{affinity}.T) / (\text{counts} * \text{norms})$ \Comment{Symmetrize and normalize the affinity matrix with elementwise multiplication and division}
+    \State \Return $\text{affinity}$ \Comment{Return the affinity matrix}
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+```
+
+\newpage
 
 # Numerical experiments
 
@@ -392,7 +435,7 @@ Three representations of the algorithm's predicted cluster centers are displayed
 
 Spectral Bridges is an original clustering algorithm which presents a novel approach by integrating the strengths of traditional kmeans and spectral clustering frameworks. This algorithm utilizes a simple affinity measure for spectral clustering, which is derived from the minimal margin between pairs of Voronoi regions. 
 
-The algorithm demonstrates impressive scalability, handling large datasets efficiently through a balanced computational complexity between the k-means clustering and eigendecomposition steps. As a non-parametric method, Spectral Bridges does not rely on strong assumptions about data distribution, enhancing its versatility across various data types. It performs exceptionally well with both synthetic and real-world data and consistently outperforms conventional clustering algorithms such as k-means, DBSCAN, and mixture models. 
+The algorithm demonstrates impressive scalability, handling large datasets efficiently through a balanced computational complexity between the k-means clustering and eigen-decomposition steps. As a non-parametric method, Spectral Bridges does not rely on strong assumptions about data distribution, enhancing its versatility across various data types. It performs exceptionally well with both synthetic and real-world data and consistently outperforms conventional clustering algorithms such as k-means, DBSCAN, and mixture models. 
 
 The design of Spectral Bridges ensures robustness to noise, a significant advantage in real-world applications. Additionally, the algorithm requires minimal hyperparameters, primarily the number of Voronoi regions, making it straightforward to tune and deploy. 
 
