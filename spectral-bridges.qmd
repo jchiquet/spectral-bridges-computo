@@ -217,16 +217,27 @@ In spectral clustering, the time complexity is usually dominated by the eigen-de
 \begin{algorithm}
 \caption{Spectral Bridges}
 \begin{algorithmic}
-\Procedure{SpectralBridges}{$X, k, m$} \Comment{$X$: input dataset, $k$: number of clusters, $m$: number of Voronoi regions}
+\Procedure{SpectralBridges}{$X, k, m$}
+\Comment{$X$: input dataset, $k$: number of clusters, $m$: number of Voronoi regions}
+
     \State \textbf{Step 1: Vector Quantization}
-    \State $\text{centroids}, \text{voronoiRegions} \gets$ \Call{KMeans}{$X, m$} \Comment{Initial centroids and Voronoi Regions  using k-means++}
-       \State \textbf{Step 2: Affinity Computation}
-       \State $A = \{g(a_{kl})\}_{kl} \gets$ \Call{Affinity}{$X, \text{centroids}, \text{voronoiRegions}$}
-        \State \textbf{Step 3: Spectral Clustering} \Comment{Affect each region to a cluster}
-        \State $\text{labels} \gets$ \Call{SpectralClustering}{$A, k$}
-      \State \textbf{Step 4: Propagate} \Comment{Affect each data point to the cluster of its region}
-      \State $\text{clusters} \gets$ \Call{Propagate}{$X, \text{labels}, \text{voronoiRegions}$}
-     \State \Return $\text{clusters}$ \Comment{Cluster labels for data points in $X$}
+    \State $\text{centroids}, \text{voronoiRegions} \gets$ \Call{KMeans}{$X, m$}
+    \Comment{Initial centroids and Voronoi regions using k-means++}
+
+    \State \textbf{Step 2: Affinity Computation}
+    \State $A = \{g(a_{kl})\}_{kl} \gets$ \Call{Affinity}{$X, \text{centroids}, \text{voronoiRegions}$}
+    \Comment{Compute affinity matrix $A$}
+
+    \State \textbf{Step 3: Spectral Clustering}
+    \Comment{Assign each region to a cluster}
+    \State $\text{labels} \gets$ \Call{SpectralClustering}{$A, k$}
+
+    \State \textbf{Step 4: Propagate}
+    \Comment{Assign each data point to the cluster of its region}
+    \State $\text{clusters} \gets$ \Call{Propagate}{$X, \text{labels}, \text{voronoiRegions}$}
+
+    \State \Return $\text{clusters}$
+    \Comment{Return cluster labels for data points in $X$}
 \EndProcedure
 \end{algorithmic}
 \end{algorithm}
@@ -249,7 +260,7 @@ $$
 a_{kl} = \frac{\sum_{\boldsymbol{x_i} \in \mathcal V_k} \langle \boldsymbol{x_i} - \boldsymbol{\mu}_k \vert \boldsymbol{\mu}_l - \boldsymbol{\mu}_k \rangle_+^2  \sum_{\boldsymbol{x_i} \in \mathcal V_l} \langle \boldsymbol{x_i} - \boldsymbol{\mu}_l \vert \boldsymbol{\mu}_k - \boldsymbol{\mu}_l\rangle_+^2}{(n_k+n_l)\|\boldsymbol \mu_k - \boldsymbol \mu_l\|^4}
 $$
 
-Using the symmetrical nature of the numerator, the calculation of the affinity matrix can be subdivided into five steps highlighted by @alg-affinity-construction. Compared to a naive implementation, the following method is approximately 200 times faster on a small dataset comprised of $n = 3594$, $d = 2$ points, and a value of $m = 250$.
+Using the symmetrical nature of the numerator, the calculation of the non-transformed affinity matrix can be subdivided into five steps highlighted by @alg-affinity-construction. After computing this first affinity matrix, the non-linear transformation $g$ can then be applied. Compared to a naive implementation, the following method is approximately 200 times faster on a small dataset comprised of $n = 3594$, $d = 2$ points, and a value of $m = 250$.
 
 ```pseudocode
 #| label: alg-affinity-construction
@@ -262,32 +273,46 @@ Using the symmetrical nature of the numerator, the calculation of the affinity m
 #| pdf-line-number: true
 
 \begin{algorithm}
-\caption{Affinity matrix construction}
+\caption{Affinity Matrix Construction}
 \begin{algorithmic}
-\Procedure{AffinityConstruction}{$\text{voronoiRegions}, \text{centroids}$} \Comment{$\text{voronoiRegions}$: list of $m$ Voronoi regions, $\text{centroids}$: the centers of each Voronoi region}
+\Procedure{AffinityConstruction}{$\text{voronoiRegions}, \text{centroids}$}
+\Comment{$\text{voronoiRegions}$: array of $m$ Voronoi regions, $\text{centroids}$: the centers of each Voronoi region}
+
     \State \textbf{Step 1: Data Centering}
     \For{$i \in \{1, ..., m\}$}
-        \State $\text{centeredVoronoiRegions}[i] \gets \text{voronoiRegions}[i] - \text{centroids}[i]$ \Comment{Centering each Voronoi region by their center}
+        \State $\text{centeredVoronoiRegions}[i] \gets \text{voronoiRegions}[i] - \text{centroids}[i]$
+        \Comment{Center each Voronoi region by its center}
     \EndFor
+
     \State \textbf{Step 2: Cardinal Calculation}
-    \State $\text{counts} \gets \{(n_k + n_l)\}_{kl}$ \Comment{Calculate the number of combined points in each pair of Voronoi regions}
+    \State $\text{counts} \gets \{(n_k + n_l)\}_{kl}$
+    \Comment{Calculate the number of combined points in each pair of Voronoi regions}
+
     \State \textbf{Step 3: Segments Normalization Calculation}
-    \State $\text{segments} \gets \{(\text{centroids}[l] - \text{centroids}[k])\}_{kl}$ \Comment{Calculate the segments tensor}
+    \State $\text{segments} \gets \{(\text{centroids}[l] - \text{centroids}[k])\}_{kl}$
+    \Comment{Calculate the segments tensor}
     \State $\text{norms} \gets \{(\|\text{segments}[k, l]\|^4)\}_{kl}$
-    \State \textbf{Step 4: Projection Calculation} \Comment{Calculate half of the numerator}
+    \Comment{Compute the fourth power of the norms of the segments}
+
+    \State \textbf{Step 4: Projection Calculation}
+    \Comment{Calculate half of the numerator}
     \For{$i \in \{1, ..., m\}$}
-        \State $\text{projections} \gets \max\left(0, \operatorname{dot}(\text{centeredVoronoiRegions}[i], \text{segments}[i].T)\right)$ \Comment{Elementwise maximum following a dot product yielding a $n_i \times m$ matrix}
-        \State $\text{affinity}[i] \gets \sum_j \operatorname{power}(\text{projections}[j], 2)$ \Comment{Assign each row of the matrix, summing elementwise squared projections along rows of each $\text{projections}[i]$ matrix}
+        \State $\text{projections} \gets \max\left(0, \operatorname{dot}(\text{centeredVoronoiRegions}[i], \text{segments}[i].T)\right)$
+        \Comment{Element-wise maximum following a dot product yielding a $n_i \times m$ matrix}
+        \State $\text{affinity}[i] \gets \{(\sum_k \text{projections}[k, j]^2)\}_j$
+        \Comment{Assign each row of the affinity matrix}
     \EndFor
+
     \State \textbf{Step 5: Final Affinity Matrix Calculation}
-    \State $\text{affinity} \gets (\text{affinity} + \text{affinity}.T) / (\text{counts} * \text{norms})$ \Comment{Symmetrize and normalize the affinity matrix with elementwise multiplication and division}
-    \State \Return $\text{affinity}$ \Comment{Return the affinity matrix}
+    \State $\text{affinity} \gets (\text{affinity} + \text{affinity}.T) / (\text{counts} * \text{norms})$
+    \Comment{Symmetrize and normalize the affinity matrix with element-wise multiplication and division}
+
+    \State \Return $g(\text{affinity})$
+    \Comment{Return the affinity matrix}
 \EndProcedure
 \end{algorithmic}
 \end{algorithm}
 ```
-
-\newpage
 
 # Numerical experiments
 
