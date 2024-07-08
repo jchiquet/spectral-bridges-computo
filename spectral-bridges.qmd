@@ -49,7 +49,7 @@ In this paper, Spectral Bridges, a novel clustering algorithm, is introduced. Th
 
 The numerical experiments underscore Spectral Bridges as a fast, robust, and versatile tool for sophisticated clustering tasks spanning diverse domains. Its efficacy extends to large-scale scenarios encompassing both real-world and synthetic datasets. 
 
-The Spectral Bridge algorithm is implemented both in Python (<https://pypi.org/project/spectral-bridges/>) and R <https://github.com/cambroise/spectral-bridges-Rpackage>).
+The Spectral Bridge algorithm is implemented both in Python (<https://pypi.org/project/spectral-bridges>) and R <https://github.com/cambroise/spectral-bridges-Rpackage>).
 
 
 # Introduction
@@ -448,7 +448,7 @@ $$
 
 Numerical experiments have been conducted in Python. The python scripts to reproduce the simulations and figures are available at <https://github.com/flheight/Spectral-Bridges>.  The Spectral Bridge algorithm is implemented both in 
 
-- Python: <https://pypi.org/project/spectral-bridges/>,
+- Python: <https://pypi.org/project/spectral-bridges>,
 - R: <https://github.com/cambroise/spectral-bridges-Rpackage>.
 
 
