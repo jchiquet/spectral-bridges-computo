@@ -361,6 +361,8 @@ Multiple algorithms, including the proposed one, were benchmarked in the exact s
 
 ![ARI and NMI scores of Spectral Bridges and competitors on standard synthetic toy datasets.](figures/synthetic_summary.pdf){#fig-m-vs-score}
 
+\newpage
+
 ## Noise robustness
 
 To evaluate the noise robustness of the algorithm, two experimental setups were devised: one involved introducing Gaussian-distributed perturbations to the data, and the other involved concatenating uniformly distributed points within a predefined rectangular region (determined by the span of the dataset) to the existing dataset. As illustrated in @fig-NoiseRobustness, the tests demonstrate that in both scenarios, the algorithm exhibits a high degree of insensitivity to noise.
