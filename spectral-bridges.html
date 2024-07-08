@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.5.52">
+<meta name="generator" content="quarto-1.5.45">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -263,7 +263,7 @@ ISSN 2824-7795</p>
       <div>
       <div class="quarto-title-meta-heading">Modified</div>
       <div class="quarto-title-meta-contents">
-        <p class="date-modified">July 7, 2024</p>
+        <p class="date-modified">July 8, 2024</p>
       </div>
     </div>
       
@@ -442,7 +442,7 @@ a_{kl}=
 <h2 data-number="3.2" class="anchored" data-anchor-id="algorithm"><span class="header-section-number">3.2</span> Algorithm</h2>
 <p>The Spectral Bridges algorithm first identifies local clusters to define Voronoi regions, computes edges with affinity weights between these regions, and ultimately cuts edges between regions with low inter-region density to determine the final clusters (See Algorithm <a href="#alg-spectral-bridges">Algorithm 1</a> and Figure <a href="#fig-steps" class="quarto-xref">Figure&nbsp;2</a>).</p>
 <p>In spectral clustering, the time complexity is usually dominated by the eigen-decomposition step, which is <span class="math inline">O(n^3)</span>. However, in the case of Spectral Bridges, the k-means algorithm has a time complexity of <span class="math inline">O(n \times m \times p)</span>. For datasets with large <span class="math inline">n</span>, this can be more significant than the <span class="math inline">O(m^3)</span> time complexity of the Spectral Bridges eigen-decomposition.</p>
-<div id="alg-spectral-bridges" class="pseudocode-container" data-pseudocode-index="1" data-no-end="false" data-line-number-punc=":" data-alg-title="Algorithm" data-indent-size="1.2em" data-comment-delimiter="//" data-line-number="true">
+<div id="alg-spectral-bridges" class="pseudocode-container" data-comment-delimiter="//" data-alg-title="Algorithm" data-indent-size="1.2em" data-line-number-punc=":" data-no-end="false" data-line-number="true" data-pseudocode-index="1">
 <div class="pseudocode">
 \begin{algorithm} \caption{Spectral Bridges} \begin{algorithmic} \Procedure{SpectralBridges}{$X, k, m$} \Comment{$X$: input dataset, $k$: number of clusters, $m$: number of Voronoi regions} \State \textbf{Step 1: Vector Quantization} \State $\text{centroids}, \text{voronoiRegions} \gets$ \Call{KMeans}{$X, m$} \Comment{Initial centroids and Voronoi regions using k-means++} \State \textbf{Step 2: Affinity Computation} \State $A = \{g(a_{kl})\}_{kl} \gets$ \Call{Affinity}{$X, \text{centroids}, \text{voronoiRegions}$} \Comment{Compute affinity matrix $A$} \State \textbf{Step 3: Spectral Clustering} \Comment{Assign each region to a cluster} \State $\text{labels} \gets$ \Call{SpectralClustering}{$A, k$} \State \textbf{Step 4: Propagate} \Comment{Assign each data point to the cluster of its region} \State $\text{clusters} \gets$ \Call{Propagate}{$X, \text{labels}, \text{voronoiRegions}$} \State \Return $\text{clusters}$ \Comment{Return cluster labels for data points in $X$} \EndProcedure \end{algorithmic} \end{algorithm}
 </div>
@@ -487,7 +487,7 @@ Figure&nbsp;2: Illustration of the Spectral bridges algorithm with the Iris data
 a_{kl} = \frac{\sum_{\boldsymbol{x_i} \in \mathcal V_k} \langle \boldsymbol{x_i} - \boldsymbol{\mu}_k \vert \boldsymbol{\mu}_l - \boldsymbol{\mu}_k \rangle_+^2  \sum_{\boldsymbol{x_i} \in \mathcal V_l} \langle \boldsymbol{x_i} - \boldsymbol{\mu}_l \vert \boldsymbol{\mu}_k - \boldsymbol{\mu}_l\rangle_+^2}{(n_k+n_l)\|\boldsymbol \mu_k - \boldsymbol \mu_l\|^4}
 </span></p>
 <p>Using the symmetrical nature of the numerator, the calculation of the non-transformed affinity matrix can be subdivided into five steps highlighted by <a href="#alg-affinity-construction">Algorithm 2</a>. After computing this first affinity matrix, the non-linear transformation <span class="math inline">g</span> can then be applied. Note all operations have to be understood element-wise except for a dot product. Compared to a naive implementation in Python, the following method is approximately 200 times faster on a small dataset comprised of <span class="math inline">n = 3594</span>, <span class="math inline">d = 2</span> points, and a value of <span class="math inline">m = 250</span>.</p>
-<div id="alg-affinity-construction" class="pseudocode-container" data-pseudocode-index="2" data-no-end="false" data-line-number-punc=":" data-alg-title="Algorithm" data-indent-size="1.2em" data-comment-delimiter="//" data-line-number="true">
+<div id="alg-affinity-construction" class="pseudocode-container" data-comment-delimiter="//" data-alg-title="Algorithm" data-indent-size="1.2em" data-line-number-punc=":" data-no-end="false" data-line-number="true" data-pseudocode-index="2">
 <div class="pseudocode">
 \begin{algorithm} \caption{Affinity Matrix Construction} \begin{algorithmic} \Procedure{Affinity}{$\text{voronoiRegions}, \text{centroids}$} \Comment{$\text{voronoiRegions}$: array of $m$ Voronoi regions, $\text{centroids}$: the centers of each region} \State \textbf{Step 1: Data Centering} \For{$i \in \{1, ..., m\}$} \State $\text{centeredVoronoiRegions}[i] \gets \text{voronoiRegions}[i] - \text{centroids}[i]$ \Comment{Center each region} \EndFor \State \textbf{Step 2: Cardinal Calculation} \State $\text{counts} \gets \{(n_k + n_l)\}_{kl}$ \Comment{Count points in each pair of regions} \State \textbf{Step 3: Segments Normalization Calculation} \State $\text{segments} \gets \{(\text{centroids}[l] - \text{centroids}[k])\}_{kl}$ \Comment{Compute the $m \times m \times d$ segments tensor} \State $\text{norms} \gets \{(\|\text{segments}[k, l]\|^4)\}_{kl}$ \State \textbf{Step 4: Half Numerator Calculation} \For{$i \in \{1, ..., m\}$} \State $\text{projections} \gets \max\left(0, \operatorname{dot}(\text{centeredVoronoiRegions}[i], \text{segments}[i].T)\right)$ \Comment{Dot product between the $i$-th centered region data matrix and its corresponding row of segments, yielding a $n_i \times m$ matrix} \State $\text{affinity}[i] \gets \{(\sum_k \text{projections}[k, j]^2)\}_j$ \Comment{Assign each row of the affinity matrix} \EndFor \State \textbf{Step 5: Final Affinity Matrix Calculation} \State $\text{affinity} \gets (\text{affinity} + \text{affinity}.T) / (\text{counts} * \text{norms})$ \Comment{Symmetrize and normalize the affinity matrix} \State \Return $g(\text{affinity})$ \Comment{Return the affinity matrix} \EndProcedure \end{algorithmic} \end{algorithm}
 </div>
@@ -888,17 +888,16 @@ B_{kl}- I_{kl} &amp;=&amp;  \sum_{i \mid t_i\in ]0,\frac{1}{2}[} t_i^2 \|\boldsy
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sessionInfo</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
-<pre><code>R version 4.4.1 (2024-06-14 ucrt)
-Platform: x86_64-w64-mingw32/x64
-Running under: Windows 11 x64 (build 22631)
+<pre><code>R version 4.3.2 (2023-10-31)
+Platform: x86_64-apple-darwin20 (64-bit)
+Running under: macOS Sonoma 14.3.1
 
 Matrix products: default
-
+BLAS:   /Library/Frameworks/R.framework/Versions/4.3-x86_64/Resources/lib/libRblas.0.dylib 
+LAPACK: /Library/Frameworks/R.framework/Versions/4.3-x86_64/Resources/lib/libRlapack.dylib;  LAPACK version 3.11.0
 
 locale:
-[1] LC_COLLATE=French_France.utf8  LC_CTYPE=French_France.utf8   
-[3] LC_MONETARY=French_France.utf8 LC_NUMERIC=C                  
-[5] LC_TIME=French_France.utf8    
+[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
 
 time zone: Europe/Paris
 tzcode source: internal
@@ -907,10 +906,10 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 loaded via a namespace (and not attached):
- [1] htmlwidgets_1.6.4 compiler_4.4.1    fastmap_1.2.0     cli_3.6.3        
- [5] tools_4.4.1       htmltools_0.5.8.1 yaml_2.3.8        rmarkdown_2.27   
- [9] knitr_1.47        jsonlite_1.8.8    xfun_0.45         digest_0.6.36    
-[13] rlang_1.1.4       evaluate_0.24.0  </code></pre>
+ [1] htmlwidgets_1.6.4 compiler_4.3.2    fastmap_1.1.1     cli_3.6.2        
+ [5] tools_4.3.2       htmltools_0.5.7   rstudioapi_0.15.0 yaml_2.3.8       
+ [9] rmarkdown_2.26    knitr_1.45        jsonlite_1.8.8    xfun_0.42        
+[13] digest_0.6.34     rlang_1.1.3       evaluate_0.23    </code></pre>
 </div>
 </div>
 <!-- -->
@@ -1909,7 +1908,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb3-501"><a href="#cb3-501" aria-hidden="true" tabindex="-1"></a>Numerical experiments have been conducted in Python. The python scripts to reproduce the simulations and figures are available at <span class="ot">&lt;https://github.com/flheight/Spectral-Bridges&gt;</span>.  The Spectral Bridge algorithm is implemented both in </span>
 <span id="cb3-502"><a href="#cb3-502" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-503"><a href="#cb3-503" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Python: <span class="ot">&lt;https://pypi.org/project/spectral-bridges/&gt;</span>,</span>
-<span id="cb3-504"><a href="#cb3-504" aria-hidden="true" tabindex="-1"></a><span class="ss">-  </span>R: <span class="ot">&lt;https://github.com/cambroise/spectral-bridges-Rpackage&gt;</span>.</span>
+<span id="cb3-504"><a href="#cb3-504" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>R: <span class="ot">&lt;https://github.com/cambroise/spectral-bridges-Rpackage&gt;</span>.</span>
 <span id="cb3-505"><a href="#cb3-505" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-506"><a href="#cb3-506" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-507"><a href="#cb3-507" aria-hidden="true" tabindex="-1"></a></span>
