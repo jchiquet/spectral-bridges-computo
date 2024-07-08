@@ -454,99 +454,50 @@ Numerical experiments have been conducted in Python. The python scripts to repro
 
 ### Affinity matrix computation
 
-Taking a closer look at the second step of Algorithm @alg-spectral-bridges for affinity matrix calculation with a $O(m^2d)$ time complexity, most operations can be parallelized leaving a single loop, thus allowing for an efficient matrix construction. 
+Taking a closer look at the second step of @alg-spectral-bridges, that is the affinity matrix calculation with a $O(m^2d)$ time complexity, most operations can be parallelized leaving a single loop, bundling together $m^2$ dot products into only $m$ matrix multiplications, thus allowing for an efficient construction in both high and low level programming languages. Though the complexity of the algorithm remains unchanged, libraries such as Basic Linear Algebra Subprograms can render the calculations orders of magnitude faster. Moreover, the symmetrical nature of the bridge affinity can be used to effectively halve the computation time.
 
-Indeed, we have
-$$
-a_{kl} = \frac{\sum_{\boldsymbol{x_i} \in \mathcal V_k} \langle \boldsymbol{x_i} - \boldsymbol{\mu}_k \vert \boldsymbol{\mu}_l - \boldsymbol{\mu}_k \rangle_+^2  \sum_{\boldsymbol{x_i} \in \mathcal V_l} \langle \boldsymbol{x_i} - \boldsymbol{\mu}_l \vert \boldsymbol{\mu}_k - \boldsymbol{\mu}_l\rangle_+^2}{(n_k+n_l)\|\boldsymbol \mu_k - \boldsymbol \mu_l\|^4}.
-$$
-
-Using the symmetrical nature of the numerator, the calculation of the non-transformed affinity matrix can be subdivided into five steps highlighted by @alg-affinity-construction. After computing this first affinity matrix, the non-linear transformation $g$ can then be applied. Note all operations have to be understood element-wise except for a dot product. Compared to a naive implementation in Python, the following method is approximately 200 times faster on a small dataset comprised of $n = 3594$, $d = 2$ points, and a value of $m = 250$.
-
-```pseudocode
-#| label: alg-affinity-construction
-#| html-indent-size: "1.2em"
-#| html-comment-delimiter: "//"
-#| html-line-number: true
-#| html-line-number-punc: ":"
-#| html-no-end: false
-#| pdf-placement: "htb!"
-#| pdf-line-number: true
-
-\begin{algorithm}
-\caption{Affinity Matrix Construction}
-\begin{algorithmic}
-\Procedure{Affinity}{$\text{voronoiRegions}, \text{centroids}$}
-\Comment{$\text{voronoiRegions}$: array of $m$ Voronoï regions, $\text{centroids}$: the centers of each region}
-
-    \State \textbf{Step 1: Data Centering}
-    \For{$i \in \{1, ..., m\}$}
-        \State $\text{centeredVoronoiRegions}[i] \gets \text{voronoiRegions}[i] - \text{centroids}[i]$
-        \Comment{Center each region}
-    \EndFor
-
-    \State \textbf{Step 2: Cardinal Calculation}
-    \State $\text{counts} \gets \{(n_k + n_l)\}_{kl}$
-    \Comment{Count points in each pair of regions}
-
-    \State \textbf{Step 3: Segments Normalization Calculation}
-    \State $\text{segments} \gets \{(\text{centroids}[l] - \text{centroids}[k])\}_{kl}$
-    \Comment{Compute the $m \times m \times d$ segments tensor}
-    \State $\text{norms} \gets \{(\|\text{segments}[k, l]\|^4)\}_{kl}$
-
-    \State \textbf{Step 4: Half Numerator Calculation}
-    \For{$i \in \{1, ..., m\}$}
-        \State $\text{projections} \gets \max\left(0, \operatorname{dot}(\text{centeredVoronoiRegions}[i], \text{segments}[i].T)\right)$
-        \Comment{Dot product between the $i$-th centered region data matrix and its corresponding row of segments, yielding a $n_i \times m$ matrix}
-        \State $\text{affinity}[i] \gets \{(\sum_k \text{projections}[k, j]^2)\}_j$
-        \Comment{Assign each row of the affinity matrix}
-    \EndFor
-
-    \State \textbf{Step 5: Final Affinity Matrix Calculation}
-    \State $\text{affinity} \gets (\text{affinity} + \text{affinity}.T) / (\text{counts} * \text{norms})$
-    \Comment{Symmetrize and normalize the affinity matrix}
-
-    \State \Return $g(\text{affinity})$
-    \Comment{Return the affinity matrix}
-\EndProcedure
-\end{algorithmic}
-\end{algorithm}
-```
-
+The calculation of the affinity matrix is highlighted by the Python code @lst-code-affinity. Though it could be even more optimized, the following code snippet is approximately 200 times faster than a naive implementation on a small dataset comprised of $n = 3594$, $d = 2$ points, and a value of $m = 250$.
 
 Notice that the Python code is significantly faster than the R code.
 
 ```{python}
-#| lst-label: code-affinity
+#| lst-label: lst-code-affinity
 #| lst-cap: "Python code for affinity matrix computation"
 #| echo: true
 #| eval: false
-#| 
+
+
+# Initialize the affinity matrix
 affinity = np.empty((self.n_nodes, self.n_nodes))
 
+# Center each Voronoi region around its centroid
 X_centered = [
-  X[kmeans.labels_ == i] - kmeans.cluster_centers_[i]
-  for i in range(self.n_nodes)
-  ]
-  
+    X[kmeans.labels_ == i] - kmeans.cluster_centers_[i] for i in range(self.n_nodes)
+]
+
+# Count the total number of points in each pair of regions
 counts = np.array([X_centered[i].shape[0] for i in range(self.n_nodes)])
 counts = counts[np.newaxis, :] + counts[:, np.newaxis]
-  
+
+# Compute the segments between each pair of centroids and their squared Euclidean norm
 segments = (
-    kmeans.cluster_centers_[np.newaxis, :]
-    - kmeans.cluster_centers_[:, np.newaxis]
-    )
+    kmeans.cluster_centers_[np.newaxis, :] - kmeans.cluster_centers_[:, np.newaxis]
+)
 dists = np.einsum("ijk,ijk->ij", segments, segments)
-np.fill_diagonal(dists, 1)
-    
+np.fill_diagonal(dists, 1)  # Avoid dividing by zero
+
+# Assign each row of the affinity matrix
 for i in range(self.n_nodes):
-      projs = np.maximum(np.dot(X_centered[i], segments[i].T), 0)
-      affinity[i] = np.einsum("ij,ij->j", projs, projs)
-      
+    projs = np.maximum(np.dot(X_centered[i], segments[i].T), 0)
+    affinity[i] = np.einsum("ij,ij->j", projs, projs)
+
+# Symmetrize the matrix and normalize, as well as taking the element-wise square root
 affinity = np.sqrt(affinity + affinity.T) / (np.sqrt(counts) * dists)
-affinity -= 0.5 * affinity.max()
+affinity -= 0.5 * affinity.max()  # For numerical stability
+
+# Apply the exponential transformation
 q10, q90 = np.quantile(affinity, [0.1, 0.9])
-      
+
 gamma = np.log(self.M) / (q90 - q10)
 affinity = np.exp(gamma * affinity)
 ```
