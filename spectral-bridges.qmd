@@ -256,6 +256,7 @@ In spectral clustering, the time complexity is usually dominated by the eigen-de
 Illustration of the Spectral bridges algorithm with the Iris dataset (first principal plane). Vector quantization (Step 1 of Algorithm @alg-spectral-bridges), Affinity computation (Step 2 of Algorithm @alg-spectral-bridges), Spectral clustering and spreading (Step 3-4 of Algorithm @alg-spectral-bridges).
 :::
 
+\newpage
 
 # Numerical experiments
 
@@ -264,13 +265,14 @@ In this section, the results obtained from testing the Spectral Bridges algorith
 
 The algorithms are evaluated on both raw and PCA-processed data with varying dimensionality. For synthetic datasets, Gaussian and/or uniform noise is introduced to assess the robustness of the algorithm.
 
+## Datasets
 
-## Real-world Data
+### Real-world data
 
 - **MNIST**: A large dataset containing 60,000 handwritten digit images in ten balanced classes, commonly used for image processing benchmarks. Each image consists of $28 \times 28 = 784$ pixels.
 - **UCI ML Breast Cancer Wisconsin**: A dataset featuring computed attributes from digitized images of fine needle aspirates (FNA) of breast masses, used to predict whether a tumor is malignant or benign.
 
-## Synthetic Data
+### Synthetic data
 
 - **Impossible**: A synthetic dataset designed to challenge clustering algorithms with complex patterns.
 - **Moons**: A two-dimensional dataset with two interleaving half circles.
