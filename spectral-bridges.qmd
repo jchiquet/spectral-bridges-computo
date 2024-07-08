@@ -108,7 +108,7 @@ The proposed algorithm uses k-means centroids for vector quantization defining V
 
 ## Bridge affinity {#sec-bridge-affinity}
 
-The basic idea involves calculating the difference in inertia achieved by projecting onto a segment connecting two centroids, rather than using the two centroids separately (See Figure @fig-balls-bridge). If the difference is small, it suggests a low density between the classes. Conversely, if this diffrence is large, it indicates that the two classes may reside within the same densely populated region.
+The basic idea involves calculating the difference in inertia achieved by projecting onto a segment connecting two centroids, rather than using the two centroids separately (see @fig-balls-bridge). If the difference is small, it suggests a low density between the classes. Conversely, if this diffrence is large, it indicates that the two classes may reside within the same densely populated region.
 
 ::: {#fig-balls-bridge layout-ncol=2}
 ![](figures/balls.pdf){width=50%}
@@ -203,7 +203,7 @@ The inclusion of the square root can be understood as redefining the affinity me
 
 ## Algorithm
 
-The Spectral Bridges algorithm first identifies local clusters to define Voronoï regions, computes edges with affinity weights between these regions, and ultimately cuts edges between regions with low inter-region density to determine the final clusters (See Algorithm @alg-spectral-bridges and Figure @fig-steps).
+The Spectral Bridges algorithm first identifies local clusters to define Voronoï regions, computes edges with affinity weights between these regions, and ultimately cuts edges between regions with low inter-region density to determine the final clusters (See @alg-spectral-bridges and @fig-steps).
 
 In spectral clustering, the time complexity is usually dominated by the eigen-decomposition step, which is $O(n^3)$. However, in the case of Spectral Bridges, the k-means algorithm has a time complexity of $O(n \times m \times p)$. For datasets with large $n$, this can be more significant than the $O(m^3)$ time complexity of the Spectral Bridges eigen-decomposition.
 
@@ -339,7 +339,7 @@ The Spectral Bridges algorithm was also put to the test against the same competi
 
 ![ARI and NMI scores of **k-means++** (blue), **EM** (green), **Ward Clustering** (red), and **Spectral Bridges** (purple) on the UCI Breast Cancer dataset.](figures/cancer_summary.pdf){#fig-cancer-scores}
 
-Since the Spectral Bridges algorithm is expected to excel at discerning complex and intricate cluster structures, an array of four toy datasets was collected, as illustrated in Figure @fig-toy-datasets.
+Since the Spectral Bridges algorithm is expected to excel at discerning complex and intricate cluster structures, an array of four toy datasets was collected, as illustrated in @fig-toy-datasets.
 
 ::: {#fig-toy-datasets layout-ncol=4}
 
@@ -361,7 +361,7 @@ Multiple algorithms, including the proposed one, were benchmarked in the exact s
 
 ## Noise robustness
 
-To evaluate the noise robustness of the algorithm, two experimental setups were devised: one involved introducing Gaussian-distributed perturbations to the data, and the other involved concatenating uniformly distributed points within a predefined rectangular region (determined by the span of the dataset) to the existing dataset. As illustrated in Figure @fig-NoiseRobustness, the tests demonstrate that in both scenarios, the algorithm exhibits a high degree of insensitivity to noise.
+To evaluate the noise robustness of the algorithm, two experimental setups were devised: one involved introducing Gaussian-distributed perturbations to the data, and the other involved concatenating uniformly distributed points within a predefined rectangular region (determined by the span of the dataset) to the existing dataset. As illustrated in @fig-NoiseRobustness, the tests demonstrate that in both scenarios, the algorithm exhibits a high degree of insensitivity to noise.
 
 ::: {#fig-NoiseRobustness layout-ncol=3}
 
@@ -501,8 +501,6 @@ q10, q90 = np.quantile(affinity, [0.1, 0.9])
 gamma = np.log(self.M) / (q90 - q10)
 affinity = np.exp(gamma * affinity)
 ```
-
-
   
 # References {.unnumbered}
 

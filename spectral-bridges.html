@@ -374,7 +374,7 @@ Ainsi le terme de pénalité utilisé pour les carte de Kohonen pourrais être u
 <p>The proposed algorithm uses k-means centroids for vector quantization defining Voronoï region, and a strategy is proposed to link these regions, with an “affinity” gauged in terms of minimal margin between pairs of classes. These affinities are considered as weight of edges defining a completely connected graph whose vertices are the regions. Spectral clustering on the region provide a partition of the input space. The sole parameters of the algorithm are the number of Voronoï region and the number of final cluster.</p>
 <section id="sec-bridge-affinity" class="level2" data-number="3.1">
 <h2 data-number="3.1" class="anchored" data-anchor-id="sec-bridge-affinity"><span class="header-section-number">3.1</span> Bridge affinity</h2>
-<p>The basic idea involves calculating the difference in inertia achieved by projecting onto a segment connecting two centroids, rather than using the two centroids separately (See Figure <a href="#fig-balls-bridge" class="quarto-xref">Figure&nbsp;1</a>). If the difference is small, it suggests a low density between the classes. Conversely, if this diffrence is large, it indicates that the two classes may reside within the same densely populated region.</p>
+<p>The basic idea involves calculating the difference in inertia achieved by projecting onto a segment connecting two centroids, rather than using the two centroids separately (see <a href="#fig-balls-bridge" class="quarto-xref">Figure&nbsp;1</a>). If the difference is small, it suggests a low density between the classes. Conversely, if this diffrence is large, it indicates that the two classes may reside within the same densely populated region.</p>
 <div id="fig-balls-bridge" class="quarto-layout-panel">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-balls-bridge-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
@@ -440,9 +440,9 @@ a_{kl}=
 </section>
 <section id="algorithm" class="level2" data-number="3.2">
 <h2 data-number="3.2" class="anchored" data-anchor-id="algorithm"><span class="header-section-number">3.2</span> Algorithm</h2>
-<p>The Spectral Bridges algorithm first identifies local clusters to define Voronoï regions, computes edges with affinity weights between these regions, and ultimately cuts edges between regions with low inter-region density to determine the final clusters (See Algorithm <a href="#alg-spectral-bridges">Algorithm 1</a> and Figure <a href="#fig-steps" class="quarto-xref">Figure&nbsp;2</a>).</p>
+<p>The Spectral Bridges algorithm first identifies local clusters to define Voronoï regions, computes edges with affinity weights between these regions, and ultimately cuts edges between regions with low inter-region density to determine the final clusters (See <a href="#alg-spectral-bridges">Algorithm 1</a> and <a href="#fig-steps" class="quarto-xref">Figure&nbsp;2</a>).</p>
 <p>In spectral clustering, the time complexity is usually dominated by the eigen-decomposition step, which is <span class="math inline">O(n^3)</span>. However, in the case of Spectral Bridges, the k-means algorithm has a time complexity of <span class="math inline">O(n \times m \times p)</span>. For datasets with large <span class="math inline">n</span>, this can be more significant than the <span class="math inline">O(m^3)</span> time complexity of the Spectral Bridges eigen-decomposition.</p>
-<div id="alg-spectral-bridges" class="pseudocode-container" data-line-number-punc=":" data-alg-title="Algorithm" data-pseudocode-index="1" data-no-end="false" data-line-number="true" data-comment-delimiter="//" data-indent-size="1.2em">
+<div id="alg-spectral-bridges" class="pseudocode-container" data-indent-size="1.2em" data-alg-title="Algorithm" data-no-end="false" data-pseudocode-index="1" data-comment-delimiter="//" data-line-number-punc=":" data-line-number="true">
 <div class="pseudocode">
 \begin{algorithm} \caption{Spectral Bridges} \begin{algorithmic} \Procedure{SpectralBridges}{$X, k, m$} \Comment{$X$: input dataset, $k$: number of clusters, $m$: number of Voronoï regions} \State \textbf{Step 1: Vector Quantization} \State $\text{centroids}, \text{voronoiRegions} \gets$ \Call{KMeans}{$X, m$} \Comment{Initial centroids and Voronoi regions using k-means++} \State \textbf{Step 2: Affinity Computation} \State $A = \{g(a_{kl})\}_{kl} \gets$ \Call{Affinity}{$X, \text{centroids}, \text{voronoiRegions}$} \Comment{Compute affinity matrix $A$} \State \textbf{Step 3: Spectral Clustering} \Comment{Assign each region to a cluster} \State $\text{labels} \gets$ \Call{SpectralClustering}{$A, k$} \State \textbf{Step 4: Propagate} \Comment{Assign each data point to the cluster of its region} \State $\text{clusters} \gets$ \Call{Propagate}{$X, \text{labels}, \text{voronoiRegions}$} \State \Return $\text{clusters}$ \Comment{Return cluster labels for data points in $X$} \EndProcedure \end{algorithmic} \end{algorithm}
 </div>
@@ -647,7 +647,7 @@ Figure&nbsp;5: ARI and NMI scores of <strong>k-means++</strong> (blue), <strong>
 </figcaption>
 </figure>
 </div>
-<p>Since the Spectral Bridges algorithm is expected to excel at discerning complex and intricate cluster structures, an array of four toy datasets was collected, as illustrated in Figure <a href="#fig-toy-datasets" class="quarto-xref">Figure&nbsp;6</a>.</p>
+<p>Since the Spectral Bridges algorithm is expected to excel at discerning complex and intricate cluster structures, an array of four toy datasets was collected, as illustrated in <a href="#fig-toy-datasets" class="quarto-xref">Figure&nbsp;6</a>.</p>
 <div id="fig-toy-datasets" class="quarto-layout-panel">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-toy-datasets-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
@@ -701,7 +701,7 @@ Figure&nbsp;6: Four toy datasets.
 </section>
 <section id="noise-robustness" class="level2" data-number="4.7">
 <h2 data-number="4.7" class="anchored" data-anchor-id="noise-robustness"><span class="header-section-number">4.7</span> Noise robustness</h2>
-<p>To evaluate the noise robustness of the algorithm, two experimental setups were devised: one involved introducing Gaussian-distributed perturbations to the data, and the other involved concatenating uniformly distributed points within a predefined rectangular region (determined by the span of the dataset) to the existing dataset. As illustrated in Figure <a href="#fig-NoiseRobustness" class="quarto-xref">Figure&nbsp;7</a>, the tests demonstrate that in both scenarios, the algorithm exhibits a high degree of insensitivity to noise.</p>
+<p>To evaluate the noise robustness of the algorithm, two experimental setups were devised: one involved introducing Gaussian-distributed perturbations to the data, and the other involved concatenating uniformly distributed points within a predefined rectangular region (determined by the span of the dataset) to the existing dataset. As illustrated in <a href="#fig-NoiseRobustness" class="quarto-xref">Figure&nbsp;7</a>, the tests demonstrate that in both scenarios, the algorithm exhibits a high degree of insensitivity to noise.</p>
 <div id="fig-NoiseRobustness" class="quarto-layout-panel">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-NoiseRobustness-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
@@ -1560,7 +1560,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb3-108"><a href="#cb3-108" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-109"><a href="#cb3-109" aria-hidden="true" tabindex="-1"></a><span class="fu">## Bridge affinity {#sec-bridge-affinity}</span></span>
 <span id="cb3-110"><a href="#cb3-110" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-111"><a href="#cb3-111" aria-hidden="true" tabindex="-1"></a>The basic idea involves calculating the difference in inertia achieved by projecting onto a segment connecting two centroids, rather than using the two centroids separately (See Figure @fig-balls-bridge). If the difference is small, it suggests a low density between the classes. Conversely, if this diffrence is large, it indicates that the two classes may reside within the same densely populated region.</span>
+<span id="cb3-111"><a href="#cb3-111" aria-hidden="true" tabindex="-1"></a>The basic idea involves calculating the difference in inertia achieved by projecting onto a segment connecting two centroids, rather than using the two centroids separately (see @fig-balls-bridge). If the difference is small, it suggests a low density between the classes. Conversely, if this diffrence is large, it indicates that the two classes may reside within the same densely populated region.</span>
 <span id="cb3-112"><a href="#cb3-112" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-113"><a href="#cb3-113" aria-hidden="true" tabindex="-1"></a>::: {#fig-balls-bridge layout-ncol=2}</span>
 <span id="cb3-114"><a href="#cb3-114" aria-hidden="true" tabindex="-1"></a><span class="al">![](figures/balls.pdf)</span>{width=50%}</span>
@@ -1655,7 +1655,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb3-203"><a href="#cb3-203" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-204"><a href="#cb3-204" aria-hidden="true" tabindex="-1"></a><span class="fu">## Algorithm</span></span>
 <span id="cb3-205"><a href="#cb3-205" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-206"><a href="#cb3-206" aria-hidden="true" tabindex="-1"></a>The Spectral Bridges algorithm first identifies local clusters to define Voronoï regions, computes edges with affinity weights between these regions, and ultimately cuts edges between regions with low inter-region density to determine the final clusters (See Algorithm @alg-spectral-bridges and Figure @fig-steps).</span>
+<span id="cb3-206"><a href="#cb3-206" aria-hidden="true" tabindex="-1"></a>The Spectral Bridges algorithm first identifies local clusters to define Voronoï regions, computes edges with affinity weights between these regions, and ultimately cuts edges between regions with low inter-region density to determine the final clusters (See @alg-spectral-bridges and @fig-steps).</span>
 <span id="cb3-207"><a href="#cb3-207" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-208"><a href="#cb3-208" aria-hidden="true" tabindex="-1"></a>In spectral clustering, the time complexity is usually dominated by the eigen-decomposition step, which is $O(n^3)$. However, in the case of Spectral Bridges, the k-means algorithm has a time complexity of $O(n \times m \times p)$. For datasets with large $n$, this can be more significant than the $O(m^3)$ time complexity of the Spectral Bridges eigen-decomposition.</span>
 <span id="cb3-209"><a href="#cb3-209" aria-hidden="true" tabindex="-1"></a></span>
@@ -1791,7 +1791,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb3-339"><a href="#cb3-339" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-340"><a href="#cb3-340" aria-hidden="true" tabindex="-1"></a><span class="al">![ARI and NMI scores of **k-means++** (blue), **EM** (green), **Ward Clustering** (red), and **Spectral Bridges** (purple) on the UCI Breast Cancer dataset.](figures/cancer_summary.pdf)</span>{#fig-cancer-scores}</span>
 <span id="cb3-341"><a href="#cb3-341" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-342"><a href="#cb3-342" aria-hidden="true" tabindex="-1"></a>Since the Spectral Bridges algorithm is expected to excel at discerning complex and intricate cluster structures, an array of four toy datasets was collected, as illustrated in Figure @fig-toy-datasets.</span>
+<span id="cb3-342"><a href="#cb3-342" aria-hidden="true" tabindex="-1"></a>Since the Spectral Bridges algorithm is expected to excel at discerning complex and intricate cluster structures, an array of four toy datasets was collected, as illustrated in @fig-toy-datasets.</span>
 <span id="cb3-343"><a href="#cb3-343" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-344"><a href="#cb3-344" aria-hidden="true" tabindex="-1"></a>::: {#fig-toy-datasets layout-ncol=4}</span>
 <span id="cb3-345"><a href="#cb3-345" aria-hidden="true" tabindex="-1"></a></span>
@@ -1813,7 +1813,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb3-361"><a href="#cb3-361" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-362"><a href="#cb3-362" aria-hidden="true" tabindex="-1"></a><span class="fu">## Noise robustness</span></span>
 <span id="cb3-363"><a href="#cb3-363" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-364"><a href="#cb3-364" aria-hidden="true" tabindex="-1"></a>To evaluate the noise robustness of the algorithm, two experimental setups were devised: one involved introducing Gaussian-distributed perturbations to the data, and the other involved concatenating uniformly distributed points within a predefined rectangular region (determined by the span of the dataset) to the existing dataset. As illustrated in Figure @fig-NoiseRobustness, the tests demonstrate that in both scenarios, the algorithm exhibits a high degree of insensitivity to noise.</span>
+<span id="cb3-364"><a href="#cb3-364" aria-hidden="true" tabindex="-1"></a>To evaluate the noise robustness of the algorithm, two experimental setups were devised: one involved introducing Gaussian-distributed perturbations to the data, and the other involved concatenating uniformly distributed points within a predefined rectangular region (determined by the span of the dataset) to the existing dataset. As illustrated in @fig-NoiseRobustness, the tests demonstrate that in both scenarios, the algorithm exhibits a high degree of insensitivity to noise.</span>
 <span id="cb3-365"><a href="#cb3-365" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-366"><a href="#cb3-366" aria-hidden="true" tabindex="-1"></a>::: {#fig-NoiseRobustness layout-ncol=3}</span>
 <span id="cb3-367"><a href="#cb3-367" aria-hidden="true" tabindex="-1"></a></span>
@@ -1953,19 +1953,17 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb3-503"><a href="#cb3-503" aria-hidden="true" tabindex="-1"></a>gamma <span class="op">=</span> np.log(<span class="va">self</span>.M) <span class="op">/</span> (q90 <span class="op">-</span> q10)</span>
 <span id="cb3-504"><a href="#cb3-504" aria-hidden="true" tabindex="-1"></a>affinity <span class="op">=</span> np.exp(gamma <span class="op">*</span> affinity)</span>
 <span id="cb3-505"><a href="#cb3-505" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb3-506"><a href="#cb3-506" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-507"><a href="#cb3-507" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-508"><a href="#cb3-508" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb3-509"><a href="#cb3-509" aria-hidden="true" tabindex="-1"></a><span class="fu"># References {.unnumbered}</span></span>
-<span id="cb3-510"><a href="#cb3-510" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-511"><a href="#cb3-511" aria-hidden="true" tabindex="-1"></a>::: {#refs}</span>
-<span id="cb3-512"><a href="#cb3-512" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb3-506"><a href="#cb3-506" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-507"><a href="#cb3-507" aria-hidden="true" tabindex="-1"></a><span class="fu"># References {.unnumbered}</span></span>
+<span id="cb3-508"><a href="#cb3-508" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-509"><a href="#cb3-509" aria-hidden="true" tabindex="-1"></a>::: {#refs}</span>
+<span id="cb3-510"><a href="#cb3-510" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb3-511"><a href="#cb3-511" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-512"><a href="#cb3-512" aria-hidden="true" tabindex="-1"></a><span class="fu"># Session information {.appendix .unnumbered}</span></span>
 <span id="cb3-513"><a href="#cb3-513" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-514"><a href="#cb3-514" aria-hidden="true" tabindex="-1"></a><span class="fu"># Session information {.appendix .unnumbered}</span></span>
-<span id="cb3-515"><a href="#cb3-515" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-516"><a href="#cb3-516" aria-hidden="true" tabindex="-1"></a><span class="in">```{r session-info}</span></span>
-<span id="cb3-517"><a href="#cb3-517" aria-hidden="true" tabindex="-1"></a><span class="in">sessionInfo()</span></span>
-<span id="cb3-518"><a href="#cb3-518" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb3-514"><a href="#cb3-514" aria-hidden="true" tabindex="-1"></a><span class="in">```{r session-info}</span></span>
+<span id="cb3-515"><a href="#cb3-515" aria-hidden="true" tabindex="-1"></a><span class="in">sessionInfo()</span></span>
+<span id="cb3-516"><a href="#cb3-516" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 </code><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></pre></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
