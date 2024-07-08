@@ -714,7 +714,29 @@ voronoi_df <- do.call(rbind, lapply(1:length(tiles), function(i) {
 }))
 
 
+affinity.old <- affinity
+affinity[affinity < 0.1] <- 0
 
+transform <- "exp"
+M <- 1e3
+if (transform == "exp") {
+  gamma <- log(M) / diff(quantile(affinity.old, c(0.1, 0.9)))
+  affinity.old <- exp(gamma * (affinity.old - 0.5 * max(affinity.old)))
+}
+
+# Normalized Laplacian matrix
+D_inv_sqrt <- 1 / sqrt(rowSums(affinity.old))
+L <- diag(n_nodes) - t(affinity.old * D_inv_sqrt) * D_inv_sqrt
+eigen.res <- eigen(-L, symmetric = TRUE)
+
+# Determining the number of clusters
+n_classes <- 3  # set to 3 or use a method to determine this dynamically
+
+eigvecs <- eigen.res$vectors[, 1:n_classes]
+eigvecs <- eigvecs / sqrt(rowSums(eigvecs ^ 2))
+labels <- kmeans(eigvecs, nstart = 20, centers = n_classes)$cluster
+
+clusters<-y
 
 # Add cluster labels to the Voronoi data frame
 

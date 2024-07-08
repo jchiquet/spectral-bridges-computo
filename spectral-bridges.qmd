@@ -56,7 +56,10 @@ The Spectral Bridge algorithm is implemented both in Python (<https://pypi.org/p
 
 Clustering is a fundamental technique for exploratory data analysis, organizing a set of objects into distinct homogeneous groups known as clusters. It is extensively utilized across various fields, such as biology for gene expression analysis [@Eisen1998], social sciences for community detection in social networks [@latouche2011], and psychology for identifying behavioral patterns. Clustering is often employed alongside supervised learning as a pre-processing step, helping to structure and simplify data, thus enhancing the performance and interpretability of subsequent predictive models [@Verhaak2010]. Additionally, clustering can be integrated into supervised learning algorithms, such as mixture of experts [@jacobs1991adaptive], as part of a multi-objective strategy.
 
-There are numerous approaches to clustering, each defined by how similarity between objects is measured, either through a similarity measure, a distance metric, or a statistical model.
+There are various approaches to clustering, and the quality of the results is largely determined by how the similarity between objects is defined, either through a similarity measure or a distance metric. Clustering techniques originate from diverse fields of research, such as genetics, psychometry, statistics, and computer science. Some methods are entirely heuristic, while others aim to optimize specific criteria and can be related to statistical models. This diversity reflects the multidisciplinary nature of clustering, incorporating insights and methodologies from multiple scientific disciplines.
+
+
+
 
 Density-based methods identify regions within the data with a high concentration of points, corresponding to the modes of the joint density. A notable non-parametric example of this approach is DBSCAN [@ester1996density]. In contrast, model-based clustering, such as Gaussian mixture models, represents a parametric approach to density-based methods. Model-based clustering assumes that the data is generated from a mixture of underlying probability distributions, typically Gaussian distributions. Each cluster is viewed as a component of this mixture model, and the Expectation-Maximization (EM) algorithm is often used to estimate the parameters. This approach provides a probabilistic framework for clustering, allowing for the incorporation of prior knowledge and the ability to handle more complex cluster shapes and distributions [@mclachlan2000finite].
 
@@ -74,7 +77,7 @@ The paper begins with a section dedicated to presenting the context and related 
 
 Spectral clustering is a graph-based approach that computes the eigen-vectors of the graph's Laplacian matrix. This technique transforms the data into a lower-dimensional space, making the clusters more discernible. A standard algorithm like k-means is then applied to these transformed features to identify the clusters [@von2007tutorial]. Spectral clustering enables capturing complex data structures and discerning clusters based on the connectivity of data points in a transformed space, effectively treating it as a relaxed graph cut problem.
 
-Classical spectral clustering involves two phases: construction of the affinity matrix and eigen-decomposition. Constructing the affinity matrix requires $O(n^2d)$ time  and $O(n)$ memory, while eigen-decomposition demands $O(n^3)$ time and $O(n^2)$ memory, where $n$ is the data size and $d$ is the dimension. As $n$ increases, the computational load escalates significantly [@von2007tutorial].
+Classical spectral clustering involves two phases: construction of the affinity matrix and eigen-decomposition. Constructing the affinity matrix requires $O(n^2d)$ time  and $O(n^2)$ memory, while eigen-decomposition demands $O(n^3)$ time and $O(n^2)$ memory, where $n$ is the data size and $d$ is the dimension. As $n$ increases, the computational load escalates significantly [@von2007tutorial].
 
 To mitigate this computational burden, one common approach is to sparsify the affinity matrix and use sparse eigen-solvers, reducing memory costs but still requiring computation of all original matrix entries [@von2007tutorial]. Another strategy is sub-matrix construction. The Nyström method randomly selects $m$ representatives from the dataset to form an $n\times m$ affinity sub-matrix [@chen2010parallel]. Cai et al. extended this with the landmark-based spectral clustering method, which uses k-means to determine $m$ cluster centers as representatives [@cai2014large]. Ultra-scalable spectral clustering (U-SPEC) employs a hybrid representative selection strategy and a fast approximation method for constructing a sparse affinity sub-matrix [@huang2019ultra]. 
 
@@ -253,64 +256,6 @@ In spectral clustering, the time complexity is usually dominated by the eigen-de
 Illustration of the Spectral bridges algorithm with the Iris dataset (first principal plane). Vector quantization (Step 1 of Algorithm @alg-spectral-bridges), Affinity computation (Step 2 of Algorithm @alg-spectral-bridges), Spectral clustering and spreading (Step 3-4 of Algorithm @alg-spectral-bridges).
 :::
 
-Taking a closer look at the second step routine for affinity matrix calculation with a $O(m^2d)$ time complexity, most operations can be parallelized leaving a single loop, thus allowing for an efficient matrix construction. 
-Recall: 
-
-$$
-a_{kl} = \frac{\sum_{\boldsymbol{x_i} \in \mathcal V_k} \langle \boldsymbol{x_i} - \boldsymbol{\mu}_k \vert \boldsymbol{\mu}_l - \boldsymbol{\mu}_k \rangle_+^2  \sum_{\boldsymbol{x_i} \in \mathcal V_l} \langle \boldsymbol{x_i} - \boldsymbol{\mu}_l \vert \boldsymbol{\mu}_k - \boldsymbol{\mu}_l\rangle_+^2}{(n_k+n_l)\|\boldsymbol \mu_k - \boldsymbol \mu_l\|^4}
-$$
-
-Using the symmetrical nature of the numerator, the calculation of the non-transformed affinity matrix can be subdivided into five steps highlighted by @alg-affinity-construction. After computing this first affinity matrix, the non-linear transformation $g$ can then be applied. Note all operations have to be understood element-wise except for a dot product. Compared to a naive implementation in Python, the following method is approximately 200 times faster on a small dataset comprised of $n = 3594$, $d = 2$ points, and a value of $m = 250$.
-
-```pseudocode
-#| label: alg-affinity-construction
-#| html-indent-size: "1.2em"
-#| html-comment-delimiter: "//"
-#| html-line-number: true
-#| html-line-number-punc: ":"
-#| html-no-end: false
-#| pdf-placement: "htb!"
-#| pdf-line-number: true
-
-\begin{algorithm}
-\caption{Affinity Matrix Construction}
-\begin{algorithmic}
-\Procedure{Affinity}{$\text{voronoiRegions}, \text{centroids}$}
-\Comment{$\text{voronoiRegions}$: array of $m$ Voronoi regions, $\text{centroids}$: the centers of each region}
-
-    \State \textbf{Step 1: Data Centering}
-    \For{$i \in \{1, ..., m\}$}
-        \State $\text{centeredVoronoiRegions}[i] \gets \text{voronoiRegions}[i] - \text{centroids}[i]$
-        \Comment{Center each region}
-    \EndFor
-
-    \State \textbf{Step 2: Cardinal Calculation}
-    \State $\text{counts} \gets \{(n_k + n_l)\}_{kl}$
-    \Comment{Count points in each pair of regions}
-
-    \State \textbf{Step 3: Segments Normalization Calculation}
-    \State $\text{segments} \gets \{(\text{centroids}[l] - \text{centroids}[k])\}_{kl}$
-    \Comment{Compute the $m \times m \times d$ segments tensor}
-    \State $\text{norms} \gets \{(\|\text{segments}[k, l]\|^4)\}_{kl}$
-
-    \State \textbf{Step 4: Half Numerator Calculation}
-    \For{$i \in \{1, ..., m\}$}
-        \State $\text{projections} \gets \max\left(0, \operatorname{dot}(\text{centeredVoronoiRegions}[i], \text{segments}[i].T)\right)$
-        \Comment{Dot product between the $i$-th centered region data matrix and its corresponding row of segments, yielding a $n_i \times m$ matrix}
-        \State $\text{affinity}[i] \gets \{(\sum_k \text{projections}[k, j]^2)\}_j$
-        \Comment{Assign each row of the affinity matrix}
-    \EndFor
-
-    \State \textbf{Step 5: Final Affinity Matrix Calculation}
-    \State $\text{affinity} \gets (\text{affinity} + \text{affinity}.T) / (\text{counts} * \text{norms})$
-    \Comment{Symmetrize and normalize the affinity matrix}
-
-    \State \Return $g(\text{affinity})$
-    \Comment{Return the affinity matrix}
-\EndProcedure
-\end{algorithmic}
-\end{algorithm}
-```
 
 # Numerical experiments
 
@@ -496,7 +441,10 @@ B_{kl}- I_{kl} &=&  \sum_{i \mid t_i\in ]0,\frac{1}{2}[} t_i^2 \|\boldsymbol \mu
 $$
 
 
+
 ## Code
+
+### Implementation 
 
 Numerical experiments have been conducted in Python. The python scripts to reproduce the simulations and figures are available at <https://github.com/flheight/Spectral-Bridges>.  The Spectral Bridge algorithm is implemented both in 
 
@@ -504,7 +452,107 @@ Numerical experiments have been conducted in Python. The python scripts to repro
 - R: <https://github.com/cambroise/spectral-bridges-Rpackage>.
 
 
+### Affinity matrix computation
 
+Taking a closer look at the second step of Algorithm @alg-spectral-bridges for affinity matrix calculation with a $O(m^2d)$ time complexity, most operations can be parallelized leaving a single loop, thus allowing for an efficient matrix construction. 
+
+Indeed, we have
+$$
+a_{kl} = \frac{\sum_{\boldsymbol{x_i} \in \mathcal V_k} \langle \boldsymbol{x_i} - \boldsymbol{\mu}_k \vert \boldsymbol{\mu}_l - \boldsymbol{\mu}_k \rangle_+^2  \sum_{\boldsymbol{x_i} \in \mathcal V_l} \langle \boldsymbol{x_i} - \boldsymbol{\mu}_l \vert \boldsymbol{\mu}_k - \boldsymbol{\mu}_l\rangle_+^2}{(n_k+n_l)\|\boldsymbol \mu_k - \boldsymbol \mu_l\|^4}.
+$$
+
+Using the symmetrical nature of the numerator, the calculation of the non-transformed affinity matrix can be subdivided into five steps highlighted by @alg-affinity-construction. After computing this first affinity matrix, the non-linear transformation $g$ can then be applied. Note all operations have to be understood element-wise except for a dot product. Compared to a naive implementation in Python, the following method is approximately 200 times faster on a small dataset comprised of $n = 3594$, $d = 2$ points, and a value of $m = 250$.
+
+```pseudocode
+#| label: alg-affinity-construction
+#| html-indent-size: "1.2em"
+#| html-comment-delimiter: "//"
+#| html-line-number: true
+#| html-line-number-punc: ":"
+#| html-no-end: false
+#| pdf-placement: "htb!"
+#| pdf-line-number: true
+
+\begin{algorithm}
+\caption{Affinity Matrix Construction}
+\begin{algorithmic}
+\Procedure{Affinity}{$\text{voronoiRegions}, \text{centroids}$}
+\Comment{$\text{voronoiRegions}$: array of $m$ Voronoi regions, $\text{centroids}$: the centers of each region}
+
+    \State \textbf{Step 1: Data Centering}
+    \For{$i \in \{1, ..., m\}$}
+        \State $\text{centeredVoronoiRegions}[i] \gets \text{voronoiRegions}[i] - \text{centroids}[i]$
+        \Comment{Center each region}
+    \EndFor
+
+    \State \textbf{Step 2: Cardinal Calculation}
+    \State $\text{counts} \gets \{(n_k + n_l)\}_{kl}$
+    \Comment{Count points in each pair of regions}
+
+    \State \textbf{Step 3: Segments Normalization Calculation}
+    \State $\text{segments} \gets \{(\text{centroids}[l] - \text{centroids}[k])\}_{kl}$
+    \Comment{Compute the $m \times m \times d$ segments tensor}
+    \State $\text{norms} \gets \{(\|\text{segments}[k, l]\|^4)\}_{kl}$
+
+    \State \textbf{Step 4: Half Numerator Calculation}
+    \For{$i \in \{1, ..., m\}$}
+        \State $\text{projections} \gets \max\left(0, \operatorname{dot}(\text{centeredVoronoiRegions}[i], \text{segments}[i].T)\right)$
+        \Comment{Dot product between the $i$-th centered region data matrix and its corresponding row of segments, yielding a $n_i \times m$ matrix}
+        \State $\text{affinity}[i] \gets \{(\sum_k \text{projections}[k, j]^2)\}_j$
+        \Comment{Assign each row of the affinity matrix}
+    \EndFor
+
+    \State \textbf{Step 5: Final Affinity Matrix Calculation}
+    \State $\text{affinity} \gets (\text{affinity} + \text{affinity}.T) / (\text{counts} * \text{norms})$
+    \Comment{Symmetrize and normalize the affinity matrix}
+
+    \State \Return $g(\text{affinity})$
+    \Comment{Return the affinity matrix}
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+```
+
+
+Notice that the Python code is significantly faster than the R code.
+
+```{python}
+#| lst-label: code-affinity
+#| lst-cap: "Python code for affinity matrix computation"
+#| echo: true
+#| eval: false
+#| 
+affinity = np.empty((self.n_nodes, self.n_nodes))
+
+X_centered = [
+  X[kmeans.labels_ == i] - kmeans.cluster_centers_[i]
+  for i in range(self.n_nodes)
+  ]
+  
+counts = np.array([X_centered[i].shape[0] for i in range(self.n_nodes)])
+counts = counts[np.newaxis, :] + counts[:, np.newaxis]
+  
+segments = (
+    kmeans.cluster_centers_[np.newaxis, :]
+    - kmeans.cluster_centers_[:, np.newaxis]
+    )
+dists = np.einsum("ijk,ijk->ij", segments, segments)
+np.fill_diagonal(dists, 1)
+    
+for i in range(self.n_nodes):
+      projs = np.maximum(np.dot(X_centered[i], segments[i].T), 0)
+      affinity[i] = np.einsum("ij,ij->j", projs, projs)
+      
+affinity = np.sqrt(affinity + affinity.T) / (np.sqrt(counts) * dists)
+affinity -= 0.5 * affinity.max()
+q10, q90 = np.quantile(affinity, [0.1, 0.9])
+      
+gamma = np.log(self.M) / (q90 - q10)
+affinity = np.exp(gamma * affinity)
+```
+
+
+  
 # References {.unnumbered}
 
 ::: {#refs}
