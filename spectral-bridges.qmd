@@ -372,7 +372,7 @@ Four toy datasets.
 Multiple algorithms, including the proposed one, were benchmarked in the exact same manner as for the UCI Breast Cancer data. The results show that the proposed method outperforms all tested algorithms (DBSCAN, k-means++, Expectation Maximization, and Ward Clustering) while requiring few hyperparameters. As previously discussed, DBSCAN's parameters were optimized using the ground truth labels to represent a best-case scenario; however, in practical applications, suboptimal performance is more likely. Despite this optimization, the Spectral-Bridge algorithm still demonstrates superior ability to capture and represent the underlying cluster structures.
 
 
-![ARI and NMI scores of Spectral Bridges and competitors on standard synthetic toy datasets.](figures/synthetic_summary.pdf){#fig-m-vs-score}
+![ARI and NMI scores of Spectral Bridges and competitors on standard synthetic toy datasets.](figures/synthetic_summary.pdf){#fig-synthetic-scores}
 
 \newpage
 
@@ -397,7 +397,7 @@ Three representations of the algorithm's predicted cluster centers are displayed
 
 To better understand and measure the significance of choosing the right values for the hyperparameters of the proposed algorithm, that it to say the number of Voronoï regions $m$, Spectral Bridges was run on the PCA $h = 32$ embedded MNIST dataset with varying values of $m \in \{10, 120, 230, 340, 450, 560, 670, 780, 890, 1000 \}$. The case $m = 10$ is equivalent to the k-means++ algorithm. ARI and NMI scores are recorded over 20 consecutive iterations and subsequently plotted. As shown by @fig-m-vs-score, the accuracy seems to be consistently increasing with values of $m$, although the largest observed gap occurs between values of $m = 10$ and $m = 120$, indicating a tremendous improvement over the classical k-means++ framework even for empirically suboptimal hyperparameter values. 
 
-![ARI and NMI scores of Spectral Bridges with varying values of $m$.](figures/nodes_vs_score.pdf)
+![ARI and NMI scores of Spectral Bridges with varying values of $m$.](figures/nodes_vs_score.pdf){#fig-m-vs-score}
 
 # Conclusive remarks
 
