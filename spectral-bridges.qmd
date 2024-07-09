@@ -205,7 +205,7 @@ The inclusion of the square root can be understood as redefining the affinity me
 
 The Spectral Bridges algorithm first identifies local clusters to define Voronoï regions, computes edges with affinity weights between these regions, and ultimately cuts edges between regions with low inter-region density to determine the final clusters (See @alg-spectral-bridges and @fig-steps).
 
-In spectral clustering, the time complexity is usually dominated by the eigen-decomposition step, which is $O(n^3)$. However, in the case of Spectral Bridges, the k-means algorithm has a time complexity of $O(n \times m \times p)$. For datasets with large $n$, this can be more significant than the $O(m^3)$ time complexity of the Spectral Bridges eigen-decomposition.
+In spectral clustering, the time complexity is usually dominated by the eigen-decomposition step, which is $O(n^3)$. However, in the case of Spectral Bridges, the k-means algorithm has a time complexity of $O(n \times m \times p)$. For datasets with large $n$, this can be more significant than the $O(m^3)$ time complexity of the Spectral Bridges eigen-decomposition. As for the affinity matrix construction, there are $m^2$ coefficients to be calculated. Each $a_{kl}$ coefficient requires the computation of $n_k + n_l$ dot products as well as the norm $\| \boldsymbol \mu_k-\boldsymbol \mu_l \|$, the latter often being negligeable. Assuming that the Voronoï regions are roughly balanced in cardinality, we have $n_k \approx \frac{n}{m}$, therefore the time complexity of the affinity matrix if $O(n \times m \times d + m^2d)$, but it is rarely the bottleneck. 
 
 ```pseudocode
 #| label: alg-spectral-bridges
@@ -316,9 +316,22 @@ By adjusting $m$ in this manner, we aim to balance the need for detailed represe
 
 For other algorithms, such as DBSCAN,  labels were used to determine the best hyperparameter values to compare our method against the "best case scenario", thus putting  the Spectral Bridges algorithm at a voluntary disadvantage.
 
+## Time complexity
+
+To assess the algorithm's time complexity, the average execution times over 50 runs were computed for varying numbers of Voronoï regions $m$ as well as dataset sizes. With a constant number of clusters $K = 5$ and an embedding dimension of $d = 10$, the results (see @fig-time-complexity) highlight Spectral Bridges algorihtm's efficacy. As discussed previously, though the time complexity of the affinity matrix is greater than $O(m^2d)$, we observe a linear relationship between $m$ and the execution time because the matrix construction is highly optimized and the time taken is almost negligeable compared to that of the initial k-means++ centroids initalization.
+
+::: {#fig-time-complexity layout-ncol=2}
+
+![Dataset size](figures/size_vs_time.pdf)
+
+![Voronoï regions number](figures/nodes_vs_time.pdf)
+
+Average time taken per model fit.
+:::
+
 ## Accuracy
 
-The algorithm's accuracy was first evaluated on the MNIST dataset. Metrics were collected to compare our method with k-means++, EM, and Ward clustering. Metric were estimated by taking the empirical average over $10$ consecutive runs with the same random seed for each method. Since our computational capabilites were too limited, a sample of 20,000 (one third) data points was chosen at random for each iteration.
+The algorithm's accuracy was first evaluated on the MNIST dataset. Metrics were collected to compare our method with k-means++, EM, and Ward clustering. Metric were estimated by taking the empirical average over 10 consecutive runs with the same random seed for each method. Since our computational capabilites were too limited, a sample of 20,000 (one third) data points was chosen at random for each iteration.
 
 Let $h$ denote the embedding dimension of the dataset. Spectral Bridges was tested both on the raw MNIST dataset without preprocessing ($h = 784$) and after reducing its dimension using PCA to $h \in \{8, 16, 32, 64\}$ (see @fig-mnist-scores).
 
