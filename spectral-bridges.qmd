@@ -51,15 +51,11 @@ The numerical experiments underscore Spectral Bridges as a fast, robust, and ver
 
 The Spectral Bridge algorithm is implemented both in Python (<https://pypi.org/project/spectral-bridges>) and R <https://github.com/cambroise/spectral-bridges-Rpackage>).
 
-
 # Introduction
 
 Clustering is a fundamental technique for exploratory data analysis, organizing a set of objects into distinct homogeneous groups known as clusters. It is extensively utilized across various fields, such as biology for gene expression analysis [@Eisen1998], social sciences for community detection in social networks [@latouche2011], and psychology for identifying behavioral patterns. Clustering is often employed alongside supervised learning as a pre-processing step, helping to structure and simplify data, thus enhancing the performance and interpretability of subsequent predictive models [@Verhaak2010]. Additionally, clustering can be integrated into supervised learning algorithms, such as mixture of experts [@jacobs1991adaptive], as part of a multi-objective strategy.
 
 There are various approaches to clustering, and the quality of the results is largely determined by how the similarity between objects is defined, either through a similarity measure or a distance metric. Clustering techniques originate from diverse fields of research, such as genetics, psychometry, statistics, and computer science. Some methods are entirely heuristic, while others aim to optimize specific criteria and can be related to statistical models. This diversity reflects the multidisciplinary nature of clustering, incorporating insights and methodologies from multiple scientific disciplines.
-
-
-
 
 Density-based methods identify regions within the data with a high concentration of points, corresponding to the modes of the joint density. A notable non-parametric example of this approach is DBSCAN [@ester1996density]. In contrast, model-based clustering, such as Gaussian mixture models, represents a parametric approach to density-based methods. Model-based clustering assumes that the data is generated from a mixture of underlying probability distributions, typically Gaussian distributions. Each cluster is viewed as a component of this mixture model, and the Expectation-Maximization (EM) algorithm is often used to estimate the parameters. This approach provides a probabilistic framework for clustering, allowing for the incorporation of prior knowledge and the ability to handle more complex cluster shapes and distributions [@mclachlan2000finite].
 
@@ -74,7 +70,6 @@ The paper begins with a section dedicated to presenting the context and related 
 
 # Related Work
 
-
 Spectral clustering is a graph-based approach that computes the eigen-vectors of the graph's Laplacian matrix. This technique transforms the data into a lower-dimensional space, making the clusters more discernible. A standard algorithm like k-means is then applied to these transformed features to identify the clusters [@von2007tutorial]. Spectral clustering enables capturing complex data structures and discerning clusters based on the connectivity of data points in a transformed space, effectively treating it as a relaxed graph cut problem.
 
 Classical spectral clustering involves two phases: construction of the affinity matrix and eigen-decomposition. Constructing the affinity matrix requires $O(n^2d)$ time  and $O(n^2)$ memory, while eigen-decomposition demands $O(n^3)$ time and $O(n^2)$ memory, where $n$ is the data size and $d$ is the dimension. As $n$ increases, the computational load escalates significantly [@von2007tutorial].
@@ -87,8 +82,6 @@ The issue of characterizing the affinity between two clusters to create an edge 
 
 Notice that the  clustering robustness of many Spectral clustering algorithms heavily relies on the proper selection of kernel parameter, which is difficult to find without prior knowledge [@ng2001spectral].
 
-
-
 <!--
 The approach using k-means to determine $m$ clusters and then creating a graph from these clusters is similar to certain penalized versions of Kohonen self-organizing maps, where the graph nodes are the centers of the $m$ clusters and the edge weights are related to the distance between the centroids.
 
@@ -100,7 +93,6 @@ $$
 
 Ainsi le terme de pénalité utilisé pour les carte de Kohonen pourrais être utilisé par caractériser la similiarté entre deux
 -->
-
 
 # Spectral bridges
 
@@ -260,7 +252,6 @@ Illustration of the Spectral bridges algorithm with the Iris dataset (first prin
 
 # Numerical experiments
 
-
 In this section, the results obtained from testing the Spectral Bridges algorithm on various datasets, both small and large scale, including real-world and well-known synthetic datasets, are presented. These experiments assess the accuracy, time and space complexity, ease of use, robustness, and adaptability of our algorithm. We compare Spectral Bridges (SB) against several state-of-the-art methods, including k-means++ (KM) [@macqueen1967some; @arthur2007kmeanspp], Expectation-Maximization (EM) [@dempster1977maximum], Ward Clustering (WC) [@ward1963hierarchical], and DBSCAN (DB) [@ester1996density]. This comparison establishes baselines across centroid-based clustering algorithms, hierarchical methods, and density-based methods. 
 
 The algorithms are evaluated on both raw and PCA-processed data with varying dimensionality. For synthetic datasets, Gaussian and/or uniform noise is introduced to assess the robustness of the algorithm.
@@ -299,7 +290,6 @@ Class proportions are presented in ascending order starting from label $0$.
 
 To evaluate the performance of the clustering algorithm, the Adjusted Rand Index (ARI) [@halkidi2002cluster] and Normalized Mutual Information (NMI) [@cover1991information] are used. ARI measures the similarity between two clustering results, ranging from -0.5 to 1, with 1 indicating perfect agreement. NMI ranges from 0 to 1, with higher values indicating better clustering quality. In some tests, the variability of scores across multiple runs is also reported due to the random initialization in k-means, though k-means++ generally provides stable and reproducible results.
 
-
 ## Platform
 
 All experiments were conducted on an Archlinux machine with Linux 6.9.3 Kernel, 8GB of RAM, and an AMD Ryzen 3 7320U processor.
@@ -312,7 +302,6 @@ A larger number of clusters typically suggests that a higher value for the numbe
 A good yet not very precise way of setting the number of Voronoï regions $m$ is to observe the Within Cluster Sum of Squares (WCSS) or inertia in a way akin to the elbow method. Since $m$ should be set to a value strictly greater than $K$, we plot the WCSS for varying values of $m$, and find a value such that the WCSS-$m$ relationship becomes quasi-linear.
 
 By adjusting $m$ in this manner, we aim to balance the need for detailed representation with the risk of overfitting, ensuring that each Voronoï region meaningfully captures the underlying data distribution. The sensitivity or lack thereof is illustrated later on by @fig-m-vs-score.
-
 
 For other algorithms, such as DBSCAN,  labels were used to determine the best hyperparameter values to compare our method against the "best case scenario", thus putting  the Spectral Bridges algorithm at a voluntary disadvantage.
 
@@ -388,7 +377,6 @@ To evaluate the noise robustness of the algorithm, two experimental setups were 
 
 ![Gaussian noise](figures/gaussian_noise_impossible.pdf)
 
-
 Three representations of the algorithm's predicted cluster centers are displayed as colored dots, with each point of the Impossible dataset shown as a small black dot. In the left graph, the dataset is unmodified. In the center graph, 250 uniformly distributed samples were added. In the right graph, Gaussian noise perturbations with $\sigma = 0.1$ were applied.
 
 :::
@@ -461,8 +449,6 @@ B_{kl}- I_{kl} &=&  \sum_{i \mid t_i\in ]0,\frac{1}{2}[} t_i^2 \|\boldsymbol \mu
 \end{aligned}
 $$
 
-
-
 ## Code
 
 ### Implementation 
@@ -471,7 +457,6 @@ Numerical experiments have been conducted in Python. The python scripts to repro
 
 - Python: <https://pypi.org/project/spectral-bridges>,
 - R: <https://github.com/cambroise/spectral-bridges-Rpackage>.
-
 
 ### Affinity matrix computation
 
