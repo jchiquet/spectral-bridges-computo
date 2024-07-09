@@ -27,7 +27,7 @@ citation:
   type: article-journal
   container-title: "Computo"
   doi: "10.xxxx/xxx-xxx"
-  url: "https://github.com/computorg/computo-quarto-extension"
+  url: "https://github.com/cambroise/spectral-bridges-computo"
   issn: "2824-7795"
 bibliography: references.bib
 google-scholar: true
@@ -55,11 +55,14 @@ The Spectral Bridge algorithm is implemented both in Python (<https://pypi.org/p
 
 Clustering is a fundamental technique for exploratory data analysis, organizing a set of objects into distinct homogeneous groups known as clusters. It is extensively utilized across various fields, such as biology for gene expression analysis [@Eisen1998], social sciences for community detection in social networks [@latouche2011], and psychology for identifying behavioral patterns. Clustering is often employed alongside supervised learning as a pre-processing step, helping to structure and simplify data, thus enhancing the performance and interpretability of subsequent predictive models [@Verhaak2010]. Additionally, clustering can be integrated into supervised learning algorithms, such as mixture of experts [@jacobs1991adaptive], as part of a multi-objective strategy.
 
-There are various approaches to clustering, and the quality of the results is largely determined by how the similarity between objects is defined, either through a similarity measure or a distance metric. Clustering techniques originate from diverse fields of research, such as genetics, psychometry, statistics, and computer science. Some methods are entirely heuristic, while others aim to optimize specific criteria and can be related to statistical models. This diversity reflects the multidisciplinary nature of clustering, incorporating insights and methodologies from multiple scientific disciplines.
+There are various approaches to clustering, and the quality of the results is largely determined by how the similarity between objects is defined, either through a similarity measure or a distance metric. Clustering techniques originate from diverse fields of research, such as genetics, psychometry, statistics, and computer science. Some methods are entirely heuristic, while others aim to optimize specific criteria and can be related to statistical models. 
+
+<!--This diversity reflects the multidisciplinary nature of clustering, incorporating insights and methodologies from multiple scientific disciplines.
+-->
 
 Density-based methods identify regions within the data with a high concentration of points, corresponding to the modes of the joint density. A notable non-parametric example of this approach is DBSCAN [@ester1996density]. In contrast, model-based clustering, such as Gaussian mixture models, represents a parametric approach to density-based methods. Model-based clustering assumes that the data is generated from a mixture of underlying probability distributions, typically Gaussian distributions. Each cluster is viewed as a component of this mixture model, and the Expectation-Maximization (EM) algorithm is often used to estimate the parameters. This approach provides a probabilistic framework for clustering, allowing for the incorporation of prior knowledge and the ability to handle more complex cluster shapes and distributions [@mclachlan2000finite].
 
-Geometric approaches, such as k-means [@macqueen1967some], are distance-based methods that aim to partition data by optimizing a criterion reflecting group homogeneity. The k-means++ algorithm [@arthur2007kmeanspp] enhances this approach by providing fast, convenient, and interpretable results. However, a key limitation of these methods is the assumption of linear boundaries between clusters, implying that clusters are convex. To address non-convex clusters, the kernel trick can be applied, allowing for a more flexible k-means algorithm. This approach is comparable to spectral clustering in handling complex cluster boundaries [@dhillon2004kernel]. The k-means algorithm can also be interpreted within the framework of model-based clustering under specific assumptions [@govaert2003clustering], revealing that it is essentially a special case of the more general Gaussian mixture models, where clusters are assumed to be spherical Gaussian distributions with equal variance.
+Geometric approaches, such as k-means [@macqueen1967some], are distance-based methods that aim to partition data by optimizing a criterion reflecting group homogeneity. The k-means++ algorithm [@arthur2007kmeanspp] enhances this approach by providing faster and more reliable results. However, a key limitation of these methods is the assumption of linear boundaries between clusters, implying that clusters are convex. To address non-convex clusters, the kernel trick can be applied, allowing for a more flexible k-means algorithm. This approach is comparable to spectral clustering in handling complex cluster boundaries [@dhillon2004kernel]. The k-means algorithm can also be interpreted within the framework of model-based clustering under specific assumptions [@govaert2003clustering], revealing that it is essentially a special case of the more general Gaussian mixture models, where clusters are assumed to be spherical Gaussian distributions with equal variance.
 
 Graph-based methods represent data as a graph, with vertices symbolizing data points and edges weighted to indicate the affinity between these points. Spectral clustering can be seen as a relaxed version of the graph cut algorithm [@shi2000normalized]. However, traditional spectral clustering faces significant limitations due to its high time and space complexity, greatly hindering its applicability to large-scale problems [@von2007tutorial].
 
@@ -94,7 +97,7 @@ $$
 Ainsi le terme de pénalité utilisé pour les carte de Kohonen pourrais être utilisé par caractériser la similiarté entre deux
 -->
 
-# Spectral bridges
+# Spectral Bridges
 
 The proposed algorithm uses k-means centroids for vector quantization defining Voronoï region, and a strategy is proposed to link these regions, with an "affinity" gauged in terms of minimal margin between pairs of classes. These affinities are considered as weight of edges defining a completely connected graph whose vertices are the regions. Spectral clustering on the region provide a partition of the input space. The sole parameters of the algorithm are the number of Voronoï region and the number of final cluster. 
 
@@ -110,9 +113,9 @@ The basic idea involves calculating the difference in inertia achieved by projec
 Balls (left) versus Bridge (right). The inertia of each structure is the sum of the squared distances represented by grey lines.
 :::
 
-Let us consider a sample $X=(\boldsymbol x_i)_{i \in \{1,\cdots,n\}}$ of vectors $\boldsymbol x_i \in \mathbb R^p$ and a set of $m$ coding vectors $(\boldsymbol \mu_k)_{k \in \{1,\cdots,m\}}$ defining a partition $P=\{\mathcal{V}_1,\cdots,\mathcal{V}_m \}$ of $\mathbb R^p$ into $m$ Voronoï regions:
+Let us consider a sample $X=(\boldsymbol x_i)_{i \in \{1,\cdots,n\}}$ of vectors $\boldsymbol x_i \in \mathbb R^d$ and a set of $m$ coding vectors $(\boldsymbol \mu_k)_{k \in \{1,\cdots,m\}}$ defining a partition $P=\{\mathcal{V}_1,\cdots,\mathcal{V}_m \}$ of $\mathbb R^d$ into $m$ Voronoï regions:
 $$
-\mathcal{V}_k = \left\{ \mathbf{x} \in \mathbb{R}^n \mid \|\mathbf{x} - \boldsymbol{\mu}_k\| \leq \|\mathbf{x} - \boldsymbol{\mu}_j\| \text{ for all } j \neq k \right\}.
+\mathcal{V}_k = \left\{ \mathbf{x} \in \mathbb{R}^d \mid \|\mathbf{x} - \boldsymbol{\mu}_k\| \leq \|\mathbf{x} - \boldsymbol{\mu}_j\| \text{ for all } j \neq k \right\}.
 $$
 
 In the following a ball denotes the subset of $X$ in a Voronoï region.  The inertia of two balls $\mathcal{V}_k$ and $\mathcal{V}_l$ is 
@@ -189,7 +192,7 @@ $$
 \gamma = \frac{log(𝑀)}{\sqrt{q_{90}} - \sqrt{q_{10}}}
 $$
 
-where $q_{10}$ and $q_{90}$ are respectively the 10th and 90th percentiles of the original affinity matrix and $M > 0$. Thus, since the transformation is order-preserving, the 90th percentile of the newly constructed matrix is $M$ times greater than the 10th percentile. By default, $M$ is arbitrarily set to a large value of $10^4$.
+where $q_{10}$ and $q_{90}$ are respectively the 10th and 90th percentiles of the original affinity matrix and $M > 1$. Thus, since the transformation is order-preserving, the 90th percentile of the newly constructed matrix is $M$ times greater than the 10th percentile. By default, $M$ is arbitrarily set to a large value of $10^4$.
 
 The inclusion of the square root can be understood as redefining the affinity measure. Instead of considering the variance and the squared Euclidean norm, we interpret the affinity as the ratio between the standard deviation and the length of the segment connecting two centroids. This reinterpretation greatly enhances numerical stability, contributing to more reliable clustering results.
 
@@ -245,7 +248,7 @@ In spectral clustering, the time complexity is usually dominated by the eigen-de
 
 ![Spectral clustering](figures/spectral-briges-3-4.pdf)
 
-Illustration of the Spectral bridges algorithm with the Iris dataset (first principal plane). Vector quantization (Step 1 of Algorithm @alg-spectral-bridges), Affinity computation (Step 2 of Algorithm @alg-spectral-bridges), Spectral clustering and spreading (Step 3-4 of Algorithm @alg-spectral-bridges).
+Illustration of the Spectral bridges algorithm with the Iris dataset (first principal plane). Vector quantization (Step 1 of  @alg-spectral-bridges), Affinity computation (Step 2 of  @alg-spectral-bridges), Spectral clustering and spreading (Step 3-4 of  @alg-spectral-bridges).
 :::
 
 \newpage
@@ -266,7 +269,7 @@ The algorithms are evaluated on both raw and PCA-processed data with varying dim
 ### Synthetic data
 
 - **Impossible**: A synthetic dataset designed to challenge clustering algorithms with complex patterns.
-- **Moons**: A two-dimensional dataset with two interleaving half circles.
+- **Moons**: A two-dimensional dataset with two interleaving half-circles.
 - **Circles**: A synthetic dataset of points arranged in two non-linearly separable circles.
 - **Smile**: A synthetic dataset with points arranged in the shape of a smiling face, used to test the separation of non-linearly separable data.
 
@@ -455,7 +458,7 @@ $$
 
 Numerical experiments have been conducted in Python. The python scripts to reproduce the simulations and figures are available at <https://github.com/flheight/Spectral-Bridges>.  The Spectral Bridge algorithm is implemented both in 
 
-- Python: <https://pypi.org/project/spectral-bridges>,
+- Python: <https://pypi.org/project/spectral-bridges>, and
 - R: <https://github.com/cambroise/spectral-bridges-Rpackage>.
 
 ### Affinity matrix computation
