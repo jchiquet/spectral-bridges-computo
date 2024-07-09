@@ -205,7 +205,7 @@ The inclusion of the square root can be understood as redefining the affinity me
 
 The Spectral Bridges algorithm first identifies local clusters to define Voronoï regions, computes edges with affinity weights between these regions, and ultimately cuts edges between regions with low inter-region density to determine the final clusters (See @alg-spectral-bridges and @fig-steps).
 
-In spectral clustering, the time complexity is usually dominated by the eigen-decomposition step, which is $O(n^3)$. However, in the case of Spectral Bridges, the k-means algorithm has a time complexity of $O(n \times m \times p)$. For datasets with large $n$, this can be more significant than the $O(m^3)$ time complexity of the Spectral Bridges eigen-decomposition. As for the affinity matrix construction, there are $m^2$ coefficients to be calculated. Each $a_{kl}$ coefficient requires the computation of $n_k + n_l$ dot products as well as the norm $\| \boldsymbol \mu_k-\boldsymbol \mu_l \|$, the latter often being negligeable. Assuming that the Voronoï regions are roughly balanced in cardinality, we have $n_k \approx \frac{n}{m}$, therefore the time complexity of the affinity matrix if $O(n \times m \times d + m^2d)$, but it is rarely the bottleneck. 
+In spectral clustering, the time complexity is usually dominated by the eigen-decomposition step, which is $O(n^3)$. However, in the case of Spectral Bridges, the k-means algorithm has a time complexity of $O(n \times m \times p)$. For datasets with large $n$, this can be more significant than the $O(m^3)$ time complexity of the Spectral Bridges eigen-decomposition. As for the affinity matrix construction, there are $m^2$ coefficients to be calculated. Each $a_{kl}$ coefficient requires the computation of $n_k + n_l$ dot products as well as the norm $\| \boldsymbol \mu_k-\boldsymbol \mu_l \|$, the latter often being negligeable. Assuming that the Voronoï regions are roughly balanced in cardinality, we have $n_k \approx \frac{n}{m}$, therefore the time complexity of the affinity matrix if $O(n \times m \times d + m^2d)$, but this is rarely the bottleneck. 
 
 ```pseudocode
 #| label: alg-spectral-bridges
@@ -378,9 +378,9 @@ Multiple algorithms, including the proposed one, were benchmarked in the exact s
 
 ## Noise robustness
 
-To evaluate the noise robustness of the algorithm, two experimental setups were devised: one involved introducing Gaussian-distributed perturbations to the data, and the other involved concatenating uniformly distributed points within a predefined rectangular region (determined by the span of the dataset) to the existing dataset. As illustrated in @fig-NoiseRobustness, the tests demonstrate that in both scenarios, the algorithm exhibits a high degree of insensitivity to noise.
+To evaluate the noise robustness of the algorithm, two experimental setups were devised: one involved introducing Gaussian-distributed perturbations to the data, and the other involved concatenating uniformly distributed points within a predefined rectangular region (determined by the span of the dataset) to the existing dataset. As illustrated in @fig-noise-robustness, the tests demonstrate that in both scenarios, the algorithm exhibits a high degree of insensitivity to noise.
 
-::: {#fig-NoiseRobustness layout-ncol=3}
+::: {#fig-noise-robustness layout-ncol=3}
 
 ![Clean](figures/clean_impossible.pdf)
 
@@ -475,7 +475,7 @@ Numerical experiments have been conducted in Python. The python scripts to repro
 
 ### Affinity matrix computation
 
-Taking a closer look at the second step of @alg-spectral-bridges, that is the affinity matrix calculation with a $O(m^2d)$ time complexity, most operations can be parallelized leaving a single loop, bundling together $m^2$ dot products into only $m$ matrix multiplications, thus allowing for an efficient construction in both high and low level programming languages. Though the complexity of the algorithm remains unchanged, libraries such as Basic Linear Algebra Subprograms can render the calculations orders of magnitude faster. Moreover, the symmetrical nature of the bridge affinity can be used to effectively halve the computation time.
+Taking a closer look at the second step of @alg-spectral-bridges, that is the affinity matrix calculation with a $O(n \times m \times d + m^2d)$ time complexity, most operations can be parallelized leaving a single loop, bundling together $m^2$ dot products into only $m$ matrix multiplications, thus allowing for an efficient construction in both high and low level programming languages. Though the complexity of the algorithm remains unchanged, libraries such as Basic Linear Algebra Subprograms can render the calculations orders of magnitude faster. Moreover, the symmetrical nature of the bridge affinity can be used to effectively halve the computation time.
 
 The calculation of the affinity matrix is highlighted by the Python code @lst-code-affinity. Though it could be even more optimized, the following code snippet is approximately 200 times faster than a naive implementation on a small dataset comprised of $n = 3594$, $d = 2$ points, and a value of $m = 250$.
 
