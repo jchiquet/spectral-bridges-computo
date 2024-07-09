@@ -322,9 +322,9 @@ To assess the algorithm's time complexity, the average execution times over 50 r
 
 ::: {#fig-time-complexity layout-ncol=2}
 
-![Dataset size](figures/size_vs_time.pdf)
+![Varying $n$, fixed $m = 10$](figures/size_vs_time.pdf)
 
-![Voronoï regions number](figures/nodes_vs_time.pdf)
+![Varying $m$, fixed $n = 5000$](figures/nodes_vs_time.pdf)
 
 Average time taken per model fit.
 :::
