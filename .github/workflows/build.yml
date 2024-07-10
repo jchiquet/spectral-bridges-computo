@@ -16,13 +16,17 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
+      - name: System dependecies
+        run: |
+          sudo apt-get install -y libcurl4-openssl-dev
+
       - name: Set up quarto
         uses: quarto-dev/quarto-actions/setup@v2
         with:
           version: pre-release
           tinytex: true
 
-      - name: register tinytex globally for diagram.lua
+      - name: register tinytex globally
         run: |
           mkdir -p ~/.local/bin
           ~/.TinyTeX/bin/x86_64-linux/tlmgr update --self
