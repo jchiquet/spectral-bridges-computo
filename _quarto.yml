@@ -1,16 +1,7 @@
 project:
-  title: "computo-quarto-extension"
-  render: 
-    - computo-quarto-extension.qmd
-  resources: 
-    - environment.yml
-    - .nojekyll
+  title: "spectral-bridges"
+  render:
+    - "spectral-bridges.qmd"
 
-execute: 
-  cache: true
-  freeze: auto
 
-format:
-  computo-html: 
-    output-file: index.html
-  computo-pdf: default  
+
