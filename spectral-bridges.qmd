@@ -43,6 +43,12 @@ editor:
     wrap: 72
 ---
 
+
+```{r library-install, echo=FALSE,warning=FALSE}
+library(reticulate)
+```
+
+
 # Abstract
 
 In this paper, Spectral Bridges, a novel clustering algorithm, is introduced. This algorithm builds upon the traditional k-means and spectral clustering frameworks by subdividing data into small Voronoï regions, which are subsequently merged according to a connectivity measure. Drawing inspiration from Support Vector Machine's margin concept, a non-parametric clustering approach is proposed, building an affinity margin between each pair of Voronoï regions. This approach is characterized by minimal hyperparameters and delineation of intricate, non-convex cluster structures.
