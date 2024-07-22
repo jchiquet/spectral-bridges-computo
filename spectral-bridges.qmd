@@ -469,7 +469,7 @@ The calculation of the affinity matrix is highlighted by the Python code @lst-co
 
 Notice that the Python code is significantly faster than the R code.
 
-```{python}
+```{python, python.reticulate = FALSE}
 #| lst-label: lst-code-affinity
 #| lst-cap: "Python code for affinity matrix computation"
 #| echo: true
