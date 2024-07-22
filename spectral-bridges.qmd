@@ -44,7 +44,7 @@ editor:
 ---
 
 
-```{r library-install, echo=FALSE,warning=FALSE}
+```{r library-install, echo=FALSE,warning=FALSE,python.reticulate=FALSE}
 library(reticulate)
 ```
 
