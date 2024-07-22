@@ -45,6 +45,7 @@ editor:
 
 
 ```{r library-install, echo=FALSE,warning=FALSE,python.reticulate=FALSE}
+install.pacakges(reticulate)
 library(reticulate)
 ```
 
