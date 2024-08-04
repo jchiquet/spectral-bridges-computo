@@ -90,7 +90,7 @@ Other approaches use the properties of the small initial clusters for the affini
 
 The issue of characterizing the affinity between two clusters to create an edge weight is central to the efficiency of a spectral clustering algorithm operating from a submatrix.
 
-Notice that the  clustering robustness of many Spectral clustering algorithms heavily relies on the proper selection of kernel parameter, which is difficult to find without prior knowledge [@ng2001spectral].
+Notice that the clustering robustness of many Spectral clustering algorithms heavily relies on the proper selection of kernel parameter, which is difficult to find without prior knowledge [@ng2001spectral].
 
 <!--
 The approach using k-means to determine $m$ clusters and then creating a graph from these clusters is similar to certain penalized versions of Kohonen self-organizing maps, where the graph nodes are the centers of the $m$ clusters and the edge weights are related to the distance between the centroids.
@@ -110,7 +110,7 @@ The proposed algorithm uses k-means centroids for vector quantization defining V
 
 ## Bridge affinity {#sec-bridge-affinity}
 
-The basic idea involves calculating the difference in inertia achieved by projecting onto a segment connecting two centroids, rather than using the two centroids separately (see @fig-balls-bridge). If the difference is small, it suggests a low density between the classes. Conversely, if this diffrence is large, it indicates that the two classes may reside within the same densely populated region.
+The basic idea involves calculating the difference in inertia achieved by projecting onto a segment connecting two centroids, rather than using the two centroids separately (see @fig-balls-bridge). If the difference is small, it suggests a low density between the classes. Conversely, if this difference is large, it indicates that the two classes may reside within the same densely populated region.
 
 ::: {#fig-balls-bridge layout-ncol=2}
 ![](figures/balls.pdf){width=50%}
@@ -125,9 +125,9 @@ $$
 \mathcal{V}_k = \left\{ \mathbf{x} \in \mathbb{R}^d \mid \|\mathbf{x} - \boldsymbol{\mu}_k\| \leq \|\mathbf{x} - \boldsymbol{\mu}_j\| \text{ for all } j \neq k \right\}.
 $$
 
-In the following a ball denotes the subset of $X$ in a Voronoï region.  The inertia of two balls $\mathcal{V}_k$ and $\mathcal{V}_l$ is 
+In the following a ball denotes the subset of $X$ in a Voronoï region. The inertia of two balls $\mathcal{V}_k$ and $\mathcal{V}_l$ is 
 $$
-I_{kl} = \sum_{\boldsymbol x_i\in \mathcal{V}_k} \|\boldsymbol x_i - \boldsymbol \mu_k\|^2  + \sum_{\boldsymbol x_i\in \mathcal{V}_l} \|\boldsymbol x_i - \boldsymbol \mu_l\|^2.
+I_{kl} = \sum_{\boldsymbol x_i\in \mathcal{V}_k} \|\boldsymbol x_i - \boldsymbol \mu_k\|^2 + \sum_{\boldsymbol x_i\in \mathcal{V}_l} \|\boldsymbol x_i - \boldsymbol \mu_l\|^2.
 $$ 
 We define a bridge as a structure defined by a segment connecting two centroids $\boldsymbol \mu_k$ and $\boldsymbol \mu_l$. The inertia of a bridge between $\mathcal{V}_k$ and $\mathcal{V}_l$ is defined as 
 $$
@@ -136,28 +136,28 @@ $$ where
 $$
 \boldsymbol p_{kl}(\boldsymbol x_i) = \boldsymbol \mu_{k} + t_i(\boldsymbol \mu_{l} - \boldsymbol \mu_{k}),
 $$ with $$
-t_i  = \min\left(1, \max\left(0, \frac{\langle \boldsymbol x_i - \boldsymbol \mu_k | \boldsymbol \mu_l - \boldsymbol \mu_k\rangle}{\|  \boldsymbol \mu_l - \boldsymbol \mu_k \|^2}\right)\right). 
+t_i = \min\left(1, \max\left(0, \frac{\langle \boldsymbol x_i - \boldsymbol \mu_k | \boldsymbol \mu_l - \boldsymbol \mu_k\rangle}{\| \boldsymbol \mu_l - \boldsymbol \mu_k \|^2}\right)\right). 
 $$ 
 
-Considering two centroïds, the normalized average of the difference betweenn Bridge and balls inertia  (See [Appendix](#gain)) constitutes the basis of our affinity measure between two regions:
+Considering two centroïds, the normalized average of the difference betweenn Bridge and balls inertia (see [Appendix](#gain)) constitutes the basis of our affinity measure between two regions:
 $$
 \begin{aligned}
-\frac{B_{kl}- I_{kl}}{(n_k+n_l)\|\boldsymbol \mu_k - \boldsymbol \mu_l\|^2} &=& \frac{\sum_{\boldsymbol{x_i} \in \mathcal V_k} \langle \boldsymbol{x_i} - \boldsymbol{\mu}_k \vert \boldsymbol{\mu}_l - \boldsymbol{\mu}_k \rangle_+^2  \sum_{\boldsymbol{x_i} \in \mathcal V_l} \langle \boldsymbol{x_i} - \boldsymbol{\mu}_l \vert \boldsymbol{\mu}_k - \boldsymbol{\mu}_l\rangle_+^2}{(n_k+n_l)\|\boldsymbol \mu_k - \boldsymbol \mu_l\|^4},\\
-&=&  \frac{\sum_{\boldsymbol{x_i} \in \mathcal V_k \cup \mathcal V_l} \alpha_i^2}{n_k+n_l},
+\frac{B_{kl}- I_{kl}}{(n_k+n_l)\|\boldsymbol \mu_k - \boldsymbol \mu_l\|^2} &=& \frac{\sum_{\boldsymbol{x_i} \in \mathcal V_k} \langle \boldsymbol{x_i} - \boldsymbol{\mu}_k \vert \boldsymbol{\mu}_l - \boldsymbol{\mu}_k \rangle_+^2 \sum_{\boldsymbol{x_i} \in \mathcal V_l} \langle \boldsymbol{x_i} - \boldsymbol{\mu}_l \vert \boldsymbol{\mu}_k - \boldsymbol{\mu}_l\rangle_+^2}{(n_k+n_l)\|\boldsymbol \mu_k - \boldsymbol \mu_l\|^4},\\
+&=& \frac{\sum_{\boldsymbol{x_i} \in \mathcal V_k \cup \mathcal V_l} \alpha_i^2}{n_k+n_l},
 \end{aligned}
 $$
 where 
 $$
 \alpha_i=
 \begin{cases}
-t_i, &  \text{ if } t_i\in[0,1/2],\\
+t_i, & \text{ if } t_i\in[0,1/2],\\
 1-t_i, & \text{ if } t_i\in]1/2,1].
 \end{cases}
 $$ 
 
 The basic intuition behind this affinity is that $t_i$ represents the
 relative position of the projection of $\boldsymbol x_i$ on the segment
-$[\boldsymbol \mu_k,\boldsymbol \mu_l]$. $\alpha_i$  represents the relative position on the segment, 
+$[\boldsymbol \mu_k,\boldsymbol \mu_l]$. $\alpha_i$ represents the relative position on the segment, 
 with the centroid of the class to which $\boldsymbol x_i$ belongs as the reference point.
 
 The boundary that separates the two clusters defined by centroids
@@ -205,7 +205,7 @@ The inclusion of the square root can be understood as redefining the affinity me
 
 ## Algorithm
 
-The Spectral Bridges algorithm first identifies local clusters to define Voronoï regions, computes edges with affinity weights between these regions, and ultimately cuts edges between regions with low inter-region density to determine the final clusters (See @alg-spectral-bridges and @fig-steps).
+The Spectral Bridges algorithm first identifies local clusters to define Voronoï regions, computes edges with affinity weights between these regions, and ultimately cuts edges between regions with low inter-region density to determine the final clusters (see @alg-spectral-bridges and @fig-steps).
 
 In spectral clustering, the time complexity is usually dominated by the eigen-decomposition step, which is $O(n^3)$. However, in the case of Spectral Bridges, the k-means algorithm has a time complexity of $O(n \times m \times d)$. For datasets with large $n$, this can be more significant than the $O(m^3)$ time complexity of the Spectral Bridges eigen-decomposition. As for the affinity matrix construction, there are $m^2$ coefficients to be calculated. Each $a_{kl}$ coefficient requires the computation of $n_k + n_l$ dot products as well as the norm $\| \boldsymbol \mu_k-\boldsymbol \mu_l \|$, the latter often being negligeable. Assuming that the Voronoï regions are roughly balanced in cardinality, we have $n_k \approx \frac{n}{m}$. Since $m$ should always be less than $n$, therefore $\frac{n}{m} > 1$ and the time complexity of the affinity matrix is $O(\frac{n}{m} \times m^2 \times d) = O(n \times m \times d)$ given the acceptable range of values for $m$. Nonetheless, this is rarely the bottleneck. 
 
@@ -313,7 +313,7 @@ A good yet not very precise way of setting the number of Voronoï regions $m$ is
 
 By adjusting $m$ in this manner, we aim to balance the need for detailed representation with the risk of overfitting, ensuring that each Voronoï region meaningfully captures the underlying data distribution. The sensitivity or lack thereof is illustrated later on by @fig-m-vs-score.
 
-For other algorithms, such as DBSCAN,  labels were used to determine the best hyperparameter values to compare our method against the "best case scenario", thus putting  the Spectral Bridges algorithm at a voluntary disadvantage.
+For other algorithms, such as DBSCAN, labels were used to determine the best hyperparameter values to compare our method against the "best case scenario", thus putting  the Spectral Bridges algorithm at a voluntary disadvantage.
 
 ## Time complexity
 
@@ -407,7 +407,7 @@ The design of Spectral Bridges ensures robustness to noise, a significant advant
 
 Furthermore, Spectral Bridges can be kernelized, allowing it to handle data in similarity space directly, which enhances its flexibility and applicability. Overall, Spectral Bridges is a powerful, robust, and scalable clustering algorithm that offers significant improvements over traditional methods, making it an excellent tool for advanced clustering tasks across numerous domains.
 
-# Appendix  {.appendix}
+# Appendix {.appendix}
 
 ## Derivation of the bridge affinity {#gain}
 
@@ -418,10 +418,10 @@ $$ where
 $$
 \boldsymbol p_{kl}(\boldsymbol x_i) = \boldsymbol \mu_{k} + t_i(\boldsymbol \mu_{l} - \boldsymbol \mu_{k}),
 $$ with $$
-t_i  = \min\left(1, \max\left(0, \frac{\langle \boldsymbol x_i - \boldsymbol \mu_k | \boldsymbol \mu_l - \boldsymbol \mu_k\rangle}{\|  \boldsymbol \mu_l - \boldsymbol \mu_k \|^2}\right)\right). 
+t_i = \min\left(1, \max\left(0, \frac{\langle \boldsymbol x_i - \boldsymbol \mu_k | \boldsymbol \mu_l - \boldsymbol \mu_k\rangle}{\|  \boldsymbol \mu_l - \boldsymbol \mu_k \|^2}\right)\right). 
 $$ 
 
-$B_{kl}$, the bridge inertia between centroids $k$ and $l$,  can be expressed as the sum of three terms, which represents the projection onto each centroïds and onto the segment:
+$B_{kl}$, the bridge inertia between centroids $k$ and $l$, can be expressed as the sum of three terms, which represents the projection onto each centroïds and onto the segment:
 
 $$
 \begin{aligned}
