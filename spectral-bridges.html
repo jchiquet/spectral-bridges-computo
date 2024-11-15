@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.5.52">
+<meta name="generator" content="quarto-1.6.34">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -88,10 +88,10 @@ div.csl-indent {
 <script src="spectral-bridges_files/libs/quarto-html/tippy.umd.min.js"></script>
 <script src="spectral-bridges_files/libs/quarto-html/anchor.min.js"></script>
 <link href="spectral-bridges_files/libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="spectral-bridges_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="spectral-bridges_files/libs/quarto-html/quarto-syntax-highlighting-269cce51a89c29763059256e2b0ec029.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="spectral-bridges_files/libs/bootstrap/bootstrap.min.js"></script>
 <link href="spectral-bridges_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="spectral-bridges_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<link href="spectral-bridges_files/libs/bootstrap/bootstrap-6c62f0fc9707561a9c4508123b2975ea.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script src="spectral-bridges_files/libs/quarto-contrib/pseudocode-2.4.1/pseudocode.min.js"></script>
 <link href="spectral-bridges_files/libs/quarto-contrib/pseudocode-2.4.1/pseudocode.min.css" rel="stylesheet">
 <style>
@@ -354,7 +354,7 @@ ISSN 2824-7795</p>
 <p>Density-based methods identify regions within the data with a high concentration of points, corresponding to the modes of the joint density. A notable non-parametric example of this approach is DBSCAN <span class="citation" data-cites="ester1996density">(<a href="#ref-ester1996density" role="doc-biblioref">Ester et al. 1996</a>)</span>. In contrast, model-based clustering, such as Gaussian mixture models, represents a parametric approach to density-based methods. Model-based clustering assumes that the data is generated from a mixture of underlying probability distributions, typically Gaussian distributions. Each cluster is viewed as a component of this mixture model, and the Expectation-Maximization (EM) algorithm is often used to estimate the parameters. This approach provides a probabilistic framework for clustering, allowing for the incorporation of prior knowledge and the ability to handle more complex cluster shapes and distributions <span class="citation" data-cites="mclachlan2000finite">(<a href="#ref-mclachlan2000finite" role="doc-biblioref">McLachlan and Peel 2000</a>)</span>.</p>
 <p>Geometric approaches, such as k-means <span class="citation" data-cites="macqueen1967some">(<a href="#ref-macqueen1967some" role="doc-biblioref">MacQueen et al. 1967</a>)</span>, are distance-based methods that aim to partition data by optimizing a criterion reflecting group homogeneity. The k-means++ algorithm <span class="citation" data-cites="arthur2007kmeanspp">(<a href="#ref-arthur2007kmeanspp" role="doc-biblioref">Arthur and Vassilvitskii 2006</a>)</span> enhances this approach by providing faster and more reliable results. However, a key limitation of these methods is the assumption of linear boundaries between clusters, implying that clusters are convex. To address non-convex clusters, the kernel trick can be applied, allowing for a more flexible k-means algorithm. This approach is comparable to spectral clustering in handling complex cluster boundaries <span class="citation" data-cites="dhillon2004kernel">(<a href="#ref-dhillon2004kernel" role="doc-biblioref">Dhillon, Guan, and Kulis 2004</a>)</span>. The k-means algorithm can also be interpreted within the framework of model-based clustering under specific assumptions <span class="citation" data-cites="govaert2003clustering">(<a href="#ref-govaert2003clustering" role="doc-biblioref">Govaert and Nadif 2003</a>)</span>, revealing that it is essentially a special case of the more general Gaussian mixture models, where clusters are assumed to be spherical Gaussian distributions with equal variance.</p>
 <p>Graph-based methods represent data as a graph, with vertices symbolizing data points and edges weighted to indicate the affinity between these points. Spectral clustering can be seen as a relaxed version of the graph cut algorithm <span class="citation" data-cites="shi2000normalized">(<a href="#ref-shi2000normalized" role="doc-biblioref">Shi and Malik 2000</a>)</span>. However, traditional spectral clustering faces significant limitations due to its high time and space complexity, greatly hindering its applicability to large-scale problems <span class="citation" data-cites="von2007tutorial">(<a href="#ref-von2007tutorial" role="doc-biblioref">Von Luxburg 2007</a>)</span>.</p>
-<p>The method we propose aims to find non-convex clusters in large datasets, without relying on a parametric model, by using spectral clustering based on an affinity that characterizes the local density of the data. The algorithm described in this paper draws from numerous clustering approaches. The initial intuition is to detect high-density areas. To this end, vector quantization is used to divide the space into a Voronoï tessellation. An original geometric criterion is then employed to detect pairs of Voronoï regions that are either distant from each other or separated by a low-density boundary. Finally, this affinity measure is considered as the weight of an edge in a complete graph connecting the centroids of the tessellation, and a spectral clustering algorithm is used to find a partition of this graph. The only parameters of the algorithm are the number of Voronoï Cells and the number of clusters.</p>
+<p>The method we propose aims to find non-convex clusters in large datasets, without relying on a parametric model, by using spectral clustering based on an affinity that characterizes the local density of the data. The algorithm described in this paper draws from numerous clustering approaches. The initial intuition is to detect high-density areas. To this end, vector quantization is used to divide the space into a Voronoï tessellation. An original geometric criterion is then employed to detect pairs of Voronoï regions that are either distant from each other or separated by a low-density boundary. Finally, this affinity measure is considered as the weight of an edge in a complete graph connecting the centroids of the tessellation, and a spectral clustering algorithm is used to find a partition of this graph. The two main parameters of the algorithm are the number of Voronoï Cells and the number of clusters.</p>
 <p>The paper begins with a section dedicated to presenting the context and related algorithms, followed by a detailed description of the proposed algorithm. Experiments and comparisons with reference algorithms are then conducted on both real and synthetic data.</p>
 </section>
 <section id="related-work" class="level1" data-number="2">
@@ -505,7 +505,7 @@ a_{p, kl} =
 <h2 data-number="3.2" class="anchored" data-anchor-id="algorithm"><span class="header-section-number">3.2</span> Algorithm</h2>
 <p>The Spectral Bridges algorithm first identifies local clusters to define Voronoï regions, computes edges with affinity weights between these regions, and ultimately cuts edges between regions with low inter-region density to determine the final clusters (see <a href="#alg-spectral-bridges" class="quarto-xref">Algorithm 1</a> and <a href="#fig-steps" class="quarto-xref">Figure&nbsp;3</a>).</p>
 <p>In spectral clustering, the time complexity is usually dominated by the eigen-decomposition step, which is <span class="math inline">O(n^3)</span>. However, in the case of Spectral Bridges, the k-means algorithm has a time complexity of <span class="math inline">O(n \times m \times d)</span>. For datasets with large <span class="math inline">n</span>, this can be more significant than the <span class="math inline">O(m^3)</span> time complexity of the Spectral Bridges eigen-decomposition. As for the affinity matrix construction, there are <span class="math inline">m^2</span> coefficients to be calculated. Each <span class="math inline">a_{kl}</span> coefficient requires the computation of <span class="math inline">n_k + n_l</span> dot products as well as the norm <span class="math inline">\| \boldsymbol \mu_k-\boldsymbol \mu_l \|</span>, the latter often being negligeable. Assuming that the Voronoï regions are roughly balanced in cardinality, we have <span class="math inline">n_k \approx \frac{n}{m}</span>. Since <span class="math inline">m</span> should always be less than <span class="math inline">n</span>, therefore <span class="math inline">\frac{n}{m} &gt; 1</span> and the time complexity of the affinity matrix is <span class="math inline">O(\frac{n}{m} \times m^2 \times d) = O(n \times m \times d)</span> given the acceptable range of values for <span class="math inline">m</span>. Nonetheless, this is rarely the bottleneck.</p>
-<div id="alg-spectral-bridges" class="pseudocode-container quarto-float" data-caption-prefix="Algorithm" data-indent-size="1.2em" data-line-number-punc=":" data-comment-delimiter="//" data-line-number="true" data-no-end="false" data-pseudocode-number="1">
+<div id="alg-spectral-bridges" class="pseudocode-container quarto-float" data-caption-prefix="Algorithm" data-no-end="false" data-line-number-punc=":" data-line-number="true" data-pseudocode-number="1" data-indent-size="1.2em" data-comment-delimiter="//">
 <div class="pseudocode">
 \begin{algorithm} \caption{Spectral Bridges} \begin{algorithmic} \Procedure{SpectralBridges}{$X, k, m$} \Comment{$X$: input dataset, $k$: number of clusters, $m$: number of Voronoï regions} \State \textbf{Step 1: Vector Quantization} \State $\text{centroids}, \text{voronoiRegions} \gets$ \Call{KMeans}{$X, m$} \Comment{Initial centroids and Voronoi regions using k-means++} \State \textbf{Step 2: Affinity Computation} \State $A = \{g(a_{kl})\}_{kl} \gets$ \Call{Affinity}{$X, \text{centroids}, \text{voronoiRegions}$} \Comment{Compute affinity matrix $A$} \State \textbf{Step 3: Spectral Clustering} \Comment{Assign each region to a cluster} \State $\text{labels} \gets$ \Call{SpectralClustering}{$A, k$} \State \textbf{Step 4: Propagate} \Comment{Assign each data point to the cluster of its region} \State $\text{clusters} \gets$ \Call{Propagate}{$X, \text{labels}, \text{voronoiRegions}$} \State \Return $\text{clusters}$ \Comment{Return cluster labels for data points in $X$} \EndProcedure \end{algorithmic} \end{algorithm}
 </div>
@@ -1079,17 +1079,16 @@ Listing&nbsp;1: Python code for affinity matrix computation
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sessionInfo</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
-<pre><code>R version 4.4.1 (2024-06-14 ucrt)
-Platform: x86_64-w64-mingw32/x64
-Running under: Windows 11 x64 (build 22631)
+<pre><code>R version 4.4.2 (2024-10-31)
+Platform: x86_64-apple-darwin20
+Running under: macOS Sequoia 15.1
 
 Matrix products: default
-
+BLAS:   /Library/Frameworks/R.framework/Versions/4.4-x86_64/Resources/lib/libRblas.0.dylib 
+LAPACK: /Library/Frameworks/R.framework/Versions/4.4-x86_64/Resources/lib/libRlapack.dylib;  LAPACK version 3.12.0
 
 locale:
-[1] LC_COLLATE=French_France.utf8  LC_CTYPE=French_France.utf8   
-[3] LC_MONETARY=French_France.utf8 LC_NUMERIC=C                  
-[5] LC_TIME=French_France.utf8    
+[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
 
 time zone: Europe/Paris
 tzcode source: internal
@@ -1098,10 +1097,10 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 loaded via a namespace (and not attached):
- [1] htmlwidgets_1.6.4 compiler_4.4.1    fastmap_1.2.0     cli_3.6.3        
- [5] tools_4.4.1       htmltools_0.5.8.1 rstudioapi_0.16.0 yaml_2.3.8       
- [9] rmarkdown_2.27    knitr_1.47        jsonlite_1.8.8    xfun_0.45        
-[13] digest_0.6.36     rlang_1.1.4       evaluate_0.24.0  </code></pre>
+ [1] compiler_4.4.2    fastmap_1.2.0     cli_3.6.3         tools_4.4.2      
+ [5] htmltools_0.5.8.1 yaml_2.3.10       rmarkdown_2.29    knitr_1.49       
+ [9] jsonlite_1.8.9    xfun_0.49         digest_0.6.37     rlang_1.1.4      
+[13] evaluate_1.0.1   </code></pre>
 </div>
 </div>
 <!-- -->
@@ -1203,8 +1202,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   });
   clipboard.on('success', onCopySuccess);
   if (window.document.getElementById('quarto-embedded-source-code-modal')) {
-    // For code content inside modals, clipBoardJS needs to be initialized with a container option
-    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
     const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
       text: getTextToCopy,
       container: window.document.getElementById('quarto-embedded-source-code-modal')
@@ -1371,7 +1368,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       if (window.Quarto?.typesetMath) {
         window.Quarto.typesetMath(note);
       }
-      // TODO in 1.5, we should make sure this works without a callout special case
       if (note.classList.contains("callout")) {
         return note.outerHTML;
       } else {
@@ -1667,7 +1663,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb3-68"><a href="#cb3-68" aria-hidden="true" tabindex="-1"></a>Graph-based methods represent data as a graph, with vertices symbolizing data points and edges weighted to indicate the affinity between these points. Spectral clustering can be seen as a relaxed version of the graph cut algorithm <span class="co">[</span><span class="ot">@shi2000normalized</span><span class="co">]</span>. However, traditional spectral clustering faces significant limitations due to its high time and space complexity, greatly hindering its applicability to large-scale problems <span class="co">[</span><span class="ot">@von2007tutorial</span><span class="co">]</span>.</span>
 <span id="cb3-69"><a href="#cb3-69" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-70"><a href="#cb3-70" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-71"><a href="#cb3-71" aria-hidden="true" tabindex="-1"></a>The method we propose aims to find non-convex clusters in large datasets, without relying on a parametric model, by using spectral clustering based on an affinity that characterizes the local density of the data. The algorithm described in this paper draws from numerous clustering approaches. The initial intuition is to detect high-density areas. To this end, vector quantization is used to divide the space into a Voronoï tessellation. An original geometric criterion is then employed to detect pairs of Voronoï regions that are either distant from each other or separated by a low-density boundary. Finally, this affinity measure is considered as the weight of an edge in a complete graph connecting the centroids of the tessellation, and a spectral clustering algorithm is used to find a partition of this graph. The only parameters of the algorithm are the number of Voronoï Cells and the number of clusters.   </span>
+<span id="cb3-71"><a href="#cb3-71" aria-hidden="true" tabindex="-1"></a>The method we propose aims to find non-convex clusters in large datasets, without relying on a parametric model, by using spectral clustering based on an affinity that characterizes the local density of the data. The algorithm described in this paper draws from numerous clustering approaches. The initial intuition is to detect high-density areas. To this end, vector quantization is used to divide the space into a Voronoï tessellation. An original geometric criterion is then employed to detect pairs of Voronoï regions that are either distant from each other or separated by a low-density boundary. Finally, this affinity measure is considered as the weight of an edge in a complete graph connecting the centroids of the tessellation, and a spectral clustering algorithm is used to find a partition of this graph. The two main parameters of the algorithm are the number of Voronoï Cells and the number of clusters.   </span>
 <span id="cb3-72"><a href="#cb3-72" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-73"><a href="#cb3-73" aria-hidden="true" tabindex="-1"></a>The paper begins with a section dedicated to presenting the context and related algorithms, followed by a detailed description of the proposed algorithm. Experiments and comparisons with reference algorithms are then conducted on both real and synthetic data.</span>
 <span id="cb3-74"><a href="#cb3-74" aria-hidden="true" tabindex="-1"></a></span>
