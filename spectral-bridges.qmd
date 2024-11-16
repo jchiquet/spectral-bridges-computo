@@ -199,7 +199,7 @@ $$
 
 The inclusion of the square root redefines the variance affinity measure. Rather than using the squared Euclidean norm, the affinity is interpreted as a quadratic mean, representing the ratio of the standard deviation to the length of the segment connecting two centroids. 
 
-This concept can be generalized by introducing the $p$-bridge affinity for any $p \neq 0$ using the Minkovski mean:
+This concept can be generalized by introducing the $p$-bridge affinity for any $p > 0$ using the Minkowski mean:
 $$
 a_{p, kl} =
 \begin{cases}
