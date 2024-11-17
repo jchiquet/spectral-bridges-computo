@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.6.34">
+<meta name="generator" content="quarto-1.6.36">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -88,10 +88,10 @@ div.csl-indent {
 <script src="spectral-bridges_files/libs/quarto-html/tippy.umd.min.js"></script>
 <script src="spectral-bridges_files/libs/quarto-html/anchor.min.js"></script>
 <link href="spectral-bridges_files/libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="spectral-bridges_files/libs/quarto-html/quarto-syntax-highlighting-269cce51a89c29763059256e2b0ec029.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="spectral-bridges_files/libs/quarto-html/quarto-syntax-highlighting-722b7ecd703fa194e825a0d619ad685e.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="spectral-bridges_files/libs/bootstrap/bootstrap.min.js"></script>
 <link href="spectral-bridges_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="spectral-bridges_files/libs/bootstrap/bootstrap-6c62f0fc9707561a9c4508123b2975ea.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="spectral-bridges_files/libs/bootstrap/bootstrap-d00b43ac4267d6f0f4293763b3c14d6b.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script src="spectral-bridges_files/libs/quarto-contrib/pseudocode-2.4.1/pseudocode.min.js"></script>
 <link href="spectral-bridges_files/libs/quarto-contrib/pseudocode-2.4.1/pseudocode.min.css" rel="stylesheet">
 <style>
@@ -266,7 +266,7 @@ ISSN 2824-7795</p>
       <div>
       <div class="quarto-title-meta-heading">Modified</div>
       <div class="quarto-title-meta-contents">
-        <p class="date-modified">November 15, 2024</p>
+        <p class="date-modified">November 17, 2024</p>
       </div>
     </div>
       
@@ -425,9 +425,17 @@ t_i, &amp; \text{ if } t_i\in[0,1/2],\\
 \end{cases}
 </span></p>
 <p>The basic intuition behind this affinity is that <span class="math inline">t_i</span> represents the relative position of the projection of <span class="math inline">\boldsymbol x_i</span> on the segment <span class="math inline">[\boldsymbol \mu_k,\boldsymbol \mu_l]</span>. <span class="math inline">\alpha_i</span> represents the relative position on the segment, with the centroid of the class to which <span class="math inline">\boldsymbol x_i</span> belongs as the reference point.</p>
-<p>The boundary that separates the two clusters defined by centroids <span class="math inline">\boldsymbol \mu_k</span> and <span class="math inline">\boldsymbol \mu_l</span> is a hyperplane. This hyperplane is orthogonal to the line segment connecting the centroids and intersects this segment at its midpoint.</p>
+<p>This quantity can also be understood in relation to a local form of PCA. Unlike the standard PCA inertia criterion, this approach is directional and limited to the union of two Voronoï cells.</p>
+<p>Let <span class="math inline">\bar{X}_k</span> denote the matrix representing the region <span class="math inline">\mathcal{V}_k</span>, centered at its barycenter <span class="math inline">\boldsymbol{\mu}_k</span>. The projection operator onto the <span class="math inline">\boldsymbol{\mu}_k</span>-centered segment <span class="math inline">[\boldsymbol{0}, \boldsymbol{\mu}_l - \boldsymbol{\mu}_k]</span> is given by: <span class="math display">
+\pi_{kl}(\cdot) = \boldsymbol{p}_{kl}(\cdot) - \boldsymbol{\mu}_k
+</span></p>
+<p>It then follows that: <span class="math display">
+\frac{\sum_{\boldsymbol{x_i} \in \mathcal{V}_k \cup \mathcal{V}_l} \alpha_i^2}{n_k + n_l} = \frac{\| \pi_{kl}(\bar{X}_k) \|_F^2 + \| \pi_{lk}(\bar{X}_l) \|_F^2}{n_k + n_l}
+</span> where <span class="math inline">\| \cdot \|_F</span> is the Frobenius norm.</p>
+<p>This formulation is particularly useful for numerical implementation.</p>
+<p>Moreover, the boundary that separates the two clusters defined by centroids <span class="math inline">\boldsymbol \mu_k</span> and <span class="math inline">\boldsymbol \mu_l</span> is a hyperplane <span class="math inline">\mathcal{P}_{kl}</span>. This hyperplane is orthogonal to the line segment connecting the centroids and intersects this segment at its midpoint.</p>
 <p>If we consider all points <span class="math inline">\boldsymbol x_i \in \mathcal V_k \cup \mathcal V_l</span> which are not projected on centroids but somewhere on the segment, the distance from a point to the hyperplane is <span class="math display">
-\|\boldsymbol p_{kl}(\boldsymbol x_i) - \boldsymbol \mu_{kl}\| = (1/2-\alpha_i) \| \boldsymbol \mu_k-\boldsymbol \mu_l \|.
+d(\boldsymbol x_i, \mathcal{P}_{kl}) = (1/2-\alpha_i) \| \boldsymbol \mu_k-\boldsymbol \mu_l \|.
 </span></p>
 <p>This distance is similar to the concept of margin in Support Vector Machine <span class="citation" data-cites="Cortes1995">(<a href="#ref-Cortes1995" role="doc-biblioref">Cortes and Vapnik 1995</a>)</span>. When the <span class="math inline">\alpha_i</span> values are small (close to zero since <span class="math inline">\alpha_i\in [0,1/2]</span>), the margins to the hyperplane are large, indicating a low density between the classes. Conversely, if the margins are small, it suggests that the two classes may reside within the same densely populated region. Consequently, the sum of the <span class="math inline">\alpha_i</span> or <span class="math inline">\alpha_i^2</span> increases with the density of the region between the classes (See Figure <a href="#fig-interpretation" class="quarto-xref">Figure&nbsp;2</a>).</p>
 <div id="fig-interpretation" class="quarto-layout-panel">
@@ -483,15 +491,15 @@ a_{kl} =
 \sqrt{\frac{\sum_{\boldsymbol{x_i} \in \mathcal{V}_k \cup \mathcal{V}_l} \alpha_i^2}{n_k + n_l}}, &amp; \text{otherwise}.
 \end{cases}
 </span></p>
-<p>The inclusion of the square root redefines the variance affinity measure. Rather than using the squared Euclidean norm, the affinity is interpreted as the ratio of the standard deviation to the length of the segment connecting two centroids.</p>
-<p>This concept can be generalized by introducing the <span class="math inline">p</span>-bridge affinity for any <span class="math inline">p \geq 1</span>: <span class="math display">
+<p>The inclusion of the square root redefines the variance affinity measure. Rather than using the squared Euclidean norm, the affinity is interpreted as a quadratic mean, representing the ratio of the standard deviation to the length of the segment connecting two centroids.</p>
+<p>This concept can be generalized by introducing the <span class="math inline">p</span>-bridge affinity for any <span class="math inline">p &gt; 0</span> using the Minkowski mean: <span class="math display">
 a_{p, kl} =
 \begin{cases}
 0, &amp; \text{if } k = l, \\
 \left(\frac{\sum_{\boldsymbol{x_i} \in \mathcal{V}_k \cup \mathcal{V}_l} \alpha_i^p}{n_k + n_l}\right)^{1/p}, &amp; \text{otherwise}.
 \end{cases}
 </span></p>
-<p>Both definitions are equivalent when <span class="math inline">p = 2</span>. For <span class="math inline">p = 1</span>, the affinity aligns directly with the SVM model previously discussed.</p>
+<p>Both definitions are equivalent when <span class="math inline">p = 2</span>. For <span class="math inline">p = 1</span>, the affinity aligns directly with the SVM model previously discussed. Note that this yields a bounded metric in <span class="math inline">[0, 1/2]</span>.</p>
 <p>To allow points with large margin to dominate and make the algorithm more robust to noise and outliers we consider the following exponential transformation: <span id="eq-scaling"><span class="math display">
 \tilde{a}_{kl} = g(a_{kl})=\exp(\gamma a_{kl}).
 \tag{1}</span></span></p>
@@ -499,13 +507,13 @@ a_{p, kl} =
 \gamma = \frac{log(𝑀)}{q_{90} - q_{10}}
 </span></p>
 <p>where <span class="math inline">q_{10}</span> and <span class="math inline">q_{90}</span> are respectively the 10th and 90th percentiles of the original affinity matrix and <span class="math inline">M &gt; 1</span>. Thus, since the transformation is order-preserving, the 90th percentile of the newly constructed matrix is <span class="math inline">M</span> times greater than the 10th percentile. By default, <span class="math inline">M</span> is arbitrarily set to a large value of <span class="math inline">10^4</span>.</p>
-<p>This regularization is crucial: with a bounded affinity metric, exponentiation enhances the separation between low and high-density regions, controlled by a scaling parameter, as in traditional spectral clustering. Redefining the metric with a square root (or power <span class="math inline">1/p</span> for the generalized affinity) helps mitigate a converse issue, where machine error can cause numerical instability when solving the Laplacian eigenproblem, especially if values become too large. Since the range of affinity values can become too wide when the initial ratio between the largest and smallest non-zero unscaled bridge affinities is high. This transformation reduces the maximum values in the affinity matrix while preserving the metric’s interpretability and distance-like properties; importantly, this adjustment is not intended for outlier detection.</p>
+<p>This regularization is crucial: with a bounded affinity metric, exponentiation enhances the separation between low and high-density regions, controlled by a scaling parameter, as in traditional spectral clustering. Redefining the metric with a square root (or power <span class="math inline">1/p</span> for the generalized affinity) helps mitigate a converse issue. Omitting this step would entail <span class="math inline">a_{kl} \leq 2^{-p}</span>. Machine error could cause numerical instability when solving the Laplacian eigenproblem, especially if values become too small or too large, since the range of affinity values can become wide when the initial ratio between the largest and smallest non-zero unscaled bridge affinities is high. This transformation reduces the maximum values in the affinity matrix while preserving the metric’s interpretability and distance-like properties; importantly, this adjustment is not intended for outlier detection.</p>
 </section>
 <section id="algorithm" class="level2" data-number="3.2">
 <h2 data-number="3.2" class="anchored" data-anchor-id="algorithm"><span class="header-section-number">3.2</span> Algorithm</h2>
 <p>The Spectral Bridges algorithm first identifies local clusters to define Voronoï regions, computes edges with affinity weights between these regions, and ultimately cuts edges between regions with low inter-region density to determine the final clusters (see <a href="#alg-spectral-bridges" class="quarto-xref">Algorithm 1</a> and <a href="#fig-steps" class="quarto-xref">Figure&nbsp;3</a>).</p>
 <p>In spectral clustering, the time complexity is usually dominated by the eigen-decomposition step, which is <span class="math inline">O(n^3)</span>. However, in the case of Spectral Bridges, the k-means algorithm has a time complexity of <span class="math inline">O(n \times m \times d)</span>. For datasets with large <span class="math inline">n</span>, this can be more significant than the <span class="math inline">O(m^3)</span> time complexity of the Spectral Bridges eigen-decomposition. As for the affinity matrix construction, there are <span class="math inline">m^2</span> coefficients to be calculated. Each <span class="math inline">a_{kl}</span> coefficient requires the computation of <span class="math inline">n_k + n_l</span> dot products as well as the norm <span class="math inline">\| \boldsymbol \mu_k-\boldsymbol \mu_l \|</span>, the latter often being negligeable. Assuming that the Voronoï regions are roughly balanced in cardinality, we have <span class="math inline">n_k \approx \frac{n}{m}</span>. Since <span class="math inline">m</span> should always be less than <span class="math inline">n</span>, therefore <span class="math inline">\frac{n}{m} &gt; 1</span> and the time complexity of the affinity matrix is <span class="math inline">O(\frac{n}{m} \times m^2 \times d) = O(n \times m \times d)</span> given the acceptable range of values for <span class="math inline">m</span>. Nonetheless, this is rarely the bottleneck.</p>
-<div id="alg-spectral-bridges" class="pseudocode-container quarto-float" data-no-end="false" data-caption-prefix="Algorithm" data-indent-size="1.2em" data-comment-delimiter="//" data-line-number-punc=":" data-line-number="true" data-pseudocode-number="1">
+<div id="alg-spectral-bridges" class="pseudocode-container quarto-float" data-pseudocode-number="1" data-comment-delimiter="//" data-indent-size="1.2em" data-line-number="true" data-caption-prefix="Algorithm" data-line-number-punc=":" data-no-end="false">
 <div class="pseudocode">
 \begin{algorithm} \caption{Spectral Bridges} \begin{algorithmic} \Procedure{SpectralBridges}{$X, k, m$} \Comment{$X$: input dataset, $k$: number of clusters, $m$: number of Voronoï regions} \State \textbf{Step 1: Vector Quantization} \State $\text{centroids}, \text{voronoiRegions} \gets$ \Call{KMeans}{$X, m$} \Comment{Initial centroids and Voronoi regions using k-means++} \State \textbf{Step 2: Affinity Computation} \State $A = \{g(a_{kl})\}_{kl} \gets$ \Call{Affinity}{$X, \text{centroids}, \text{voronoiRegions}$} \Comment{Compute affinity matrix $A$} \State \textbf{Step 3: Spectral Clustering} \Comment{Assign each region to a cluster} \State $\text{labels} \gets$ \Call{SpectralClustering}{$A, k$} \State \textbf{Step 4: Propagate} \Comment{Assign each data point to the cluster of its region} \State $\text{clusters} \gets$ \Call{Propagate}{$X, \text{labels}, \text{voronoiRegions}$} \State \Return $\text{clusters}$ \Comment{Return cluster labels for data points in $X$} \EndProcedure \end{algorithmic} \end{algorithm}
 </div>
@@ -552,7 +560,7 @@ Figure&nbsp;3: Illustration of the Spectral Bridges algorithm with the Iris data
 <p>Model selection in non-parametric settings is challenging due to the absence of predefined model parameters. It relies heavily on data-driven approaches. Metrics like the Gap Statistic <span class="citation" data-cites="tibshirani2001estimating">(<a href="#ref-tibshirani2001estimating" role="doc-biblioref">Tibshirani, Walther, and Hastie 2001</a>)</span> and the Laplacian eigengap <span class="citation" data-cites="von2007tutorial">(<a href="#ref-von2007tutorial" role="doc-biblioref">Von Luxburg 2007</a>)</span> are potential tools for hyperparameter selection.</p>
 <p>We propose a method for choosing the scaling parameter (see Equation <a href="#eq-scaling" class="quarto-xref">Equation&nbsp;1</a>) that yields stable results. Selecting both <span class="math inline">m</span>, the number of Voronoï regions, and <span class="math inline">K</span>, the number of clusters, is difficult. We address this by adopting a heuristic: first, choose <span class="math inline">K</span>, then determine <span class="math inline">m</span> using a modified Laplacian eigengap.</p>
 <p>If <span class="math inline">K</span> represents the true number of clusters, the affinity matrix resembles a graph adjacency matrix with <span class="math inline">K</span> connected components. This configuration is characterized by an eigengap at the <span class="math inline">K</span>th eigenvalue. In Self-Tuning Spectral Clustering <span class="citation" data-cites="zelnik2004self">(<a href="#ref-zelnik2004self" role="doc-biblioref">Zelnik-Manor and Perona 2004</a>)</span>, the eigengap <span class="math inline">\lambda_{K+1} - \lambda_K</span> is used to evaluate clustering quality for <span class="math inline">K</span> clusters. Following a similar strategy, and assuming <span class="math inline">K</span> is known, the Laplacian eigengap at the <span class="math inline">K</span>th eigenvalue can select <span class="math inline">m</span>, with the scaling parameter fixed.</p>
-<p>Determining the optimal value of <span class="math inline">m</span> using the eigengap is not straightforward. As the affinity matrix dimension increases, the number of eigenvalues grows, reducing gaps between them. This makes direct comparisons unreliable. To address this, we use the ratio <span class="math inline">R = (\lambda_{K+1} - \lambda_K) / \lambda_{K+1}</span>. This metric is bounded between 0 and 1 and measures the relative difference between consecutive eigenvalues. It facilitates meaningful comparisons across different values of <span class="math inline">m</span>. A value of <span class="math inline">R</span> close to 1 suggests high clustering quality, whereas lower values indicate weaker performance.</p>
+<p>Determining the optimal value of <span class="math inline">m</span> using the eigengap is not straightforward. As the affinity matrix dimension increases, the number of eigenvalues grows, reducing gaps between them. This makes direct comparisons unreliable. To address this, we use the ratio <span class="math inline">\rho = (\lambda_{K+1} - \lambda_K) / \lambda_{K+1}</span>. This metric is bounded between 0 and 1 and measures the relative difference between consecutive eigenvalues. It facilitates meaningful comparisons across different values of <span class="math inline">m</span>. A value of <span class="math inline">R</span> close to 1 suggests high clustering quality, whereas lower values indicate weaker performance.</p>
 <p>Using this metric, we determine a near-optimal value for <span class="math inline">m</span> by maximizing the average <span class="math inline">R</span> across possible values of <span class="math inline">m</span>. Additionally, the metric enhances robustness by running the algorithm with different random seeds and selecting the clustering result with the highest normalized eigengap.</p>
 </section>
 </section>
@@ -1079,16 +1087,17 @@ Listing&nbsp;1: Python code for affinity matrix computation
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sessionInfo</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
-<pre><code>R version 4.4.2 (2024-10-31)
-Platform: x86_64-apple-darwin20
-Running under: macOS Sequoia 15.1
+<pre><code>R version 4.4.1 (2024-06-14 ucrt)
+Platform: x86_64-w64-mingw32/x64
+Running under: Windows 11 x64 (build 22631)
 
 Matrix products: default
-BLAS:   /Library/Frameworks/R.framework/Versions/4.4-x86_64/Resources/lib/libRblas.0.dylib 
-LAPACK: /Library/Frameworks/R.framework/Versions/4.4-x86_64/Resources/lib/libRlapack.dylib;  LAPACK version 3.12.0
+
 
 locale:
-[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+[1] LC_COLLATE=French_France.utf8  LC_CTYPE=French_France.utf8   
+[3] LC_MONETARY=French_France.utf8 LC_NUMERIC=C                  
+[5] LC_TIME=French_France.utf8    
 
 time zone: Europe/Paris
 tzcode source: internal
@@ -1097,10 +1106,10 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 loaded via a namespace (and not attached):
- [1] compiler_4.4.2    fastmap_1.2.0     cli_3.6.3         tools_4.4.2      
- [5] htmltools_0.5.8.1 yaml_2.3.10       rmarkdown_2.29    knitr_1.49       
- [9] jsonlite_1.8.9    xfun_0.49         digest_0.6.37     rlang_1.1.4      
-[13] evaluate_1.0.1   </code></pre>
+ [1] htmlwidgets_1.6.4 compiler_4.4.1    fastmap_1.2.0     cli_3.6.3        
+ [5] tools_4.4.1       htmltools_0.5.8.1 rstudioapi_0.16.0 yaml_2.3.8       
+ [9] rmarkdown_2.27    knitr_1.47        jsonlite_1.8.8    xfun_0.45        
+[13] digest_0.6.36     rlang_1.1.4       evaluate_0.24.0  </code></pre>
 </div>
 </div>
 <!-- -->
@@ -1746,429 +1755,476 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb3-151"><a href="#cb3-151" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-152"><a href="#cb3-152" aria-hidden="true" tabindex="-1"></a>The basic intuition behind this affinity is that $t_i$ represents the</span>
 <span id="cb3-153"><a href="#cb3-153" aria-hidden="true" tabindex="-1"></a>relative position of the projection of $\boldsymbol x_i$ on the segment</span>
-<span id="cb3-154"><a href="#cb3-154" aria-hidden="true" tabindex="-1"></a>$<span class="co">[</span><span class="ot">\boldsymbol \mu_k,\boldsymbol \mu_l</span><span class="co">]</span>$. $\alpha_i$ represents the relative position on the segment, </span>
-<span id="cb3-155"><a href="#cb3-155" aria-hidden="true" tabindex="-1"></a>with the centroid of the class to which $\boldsymbol x_i$ belongs as the reference point.</span>
+<span id="cb3-154"><a href="#cb3-154" aria-hidden="true" tabindex="-1"></a>$<span class="co">[</span><span class="ot">\boldsymbol \mu_k,\boldsymbol \mu_l</span><span class="co">]</span>$. $\alpha_i$ represents the relative position on the segment, with the centroid of the class to which $\boldsymbol x_i$ belongs as the reference point.</span>
+<span id="cb3-155"><a href="#cb3-155" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-156"><a href="#cb3-156" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-157"><a href="#cb3-157" aria-hidden="true" tabindex="-1"></a>The boundary that separates the two clusters defined by centroids</span>
-<span id="cb3-158"><a href="#cb3-158" aria-hidden="true" tabindex="-1"></a>$\boldsymbol \mu_k$ and $\boldsymbol \mu_l$ is a hyperplane. This</span>
-<span id="cb3-159"><a href="#cb3-159" aria-hidden="true" tabindex="-1"></a>hyperplane is orthogonal to the line segment connecting the centroids</span>
-<span id="cb3-160"><a href="#cb3-160" aria-hidden="true" tabindex="-1"></a>and intersects this segment at its midpoint.</span>
-<span id="cb3-161"><a href="#cb3-161" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-162"><a href="#cb3-162" aria-hidden="true" tabindex="-1"></a>If we consider all points $\boldsymbol x_i \in \mathcal V_k \cup \mathcal V_l$ which are not projected on centroids but somewhere on the segment, the distance from</span>
-<span id="cb3-163"><a href="#cb3-163" aria-hidden="true" tabindex="-1"></a>a point to the hyperplane is </span>
-<span id="cb3-164"><a href="#cb3-164" aria-hidden="true" tabindex="-1"></a>$$</span>
-<span id="cb3-165"><a href="#cb3-165" aria-hidden="true" tabindex="-1"></a>\|\boldsymbol p_{kl}(\boldsymbol x_i) - \boldsymbol \mu_{kl}\| = (1/2-\alpha_i) \| \boldsymbol \mu_k-\boldsymbol \mu_l \|.</span>
-<span id="cb3-166"><a href="#cb3-166" aria-hidden="true" tabindex="-1"></a>$$</span>
-<span id="cb3-167"><a href="#cb3-167" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-168"><a href="#cb3-168" aria-hidden="true" tabindex="-1"></a>This distance is similar to the concept of margin in Support Vector Machine <span class="co">[</span><span class="ot">@Cortes1995</span><span class="co">]</span>. When the $\alpha_i$ values are small (close to zero since $\alpha_i\in <span class="co">[</span><span class="ot">0,1/2</span><span class="co">]</span>$), the margins to the hyperplane are large, indicating a low density between the classes. Conversely, if</span>
-<span id="cb3-169"><a href="#cb3-169" aria-hidden="true" tabindex="-1"></a>the margins are small, it suggests that the two classes may reside</span>
-<span id="cb3-170"><a href="#cb3-170" aria-hidden="true" tabindex="-1"></a>within the same densely populated region. Consequently, the sum of the</span>
-<span id="cb3-171"><a href="#cb3-171" aria-hidden="true" tabindex="-1"></a>$\alpha_i$ or $\alpha_i^2$ increases with the density of the region</span>
-<span id="cb3-172"><a href="#cb3-172" aria-hidden="true" tabindex="-1"></a>between the classes (See Figure @fig-interpretation). </span>
-<span id="cb3-173"><a href="#cb3-173" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-174"><a href="#cb3-174" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-175"><a href="#cb3-175" aria-hidden="true" tabindex="-1"></a>::: {#fig-interpretation layout-ncol=2}</span>
-<span id="cb3-176"><a href="#cb3-176" aria-hidden="true" tabindex="-1"></a><span class="al">![Margin with close centroids](figures/svm-interpretation-3.pdf)</span></span>
-<span id="cb3-177"><a href="#cb3-177" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-178"><a href="#cb3-178" aria-hidden="true" tabindex="-1"></a><span class="al">![Density of the $\alpha_i$ for close centroids](figures/histo-alphai-3.pdf)</span></span>
-<span id="cb3-179"><a href="#cb3-179" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-180"><a href="#cb3-180" aria-hidden="true" tabindex="-1"></a><span class="al">![Margin with well separated centroids](figures/svm-interpretation-10.pdf)</span></span>
-<span id="cb3-181"><a href="#cb3-181" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-182"><a href="#cb3-182" aria-hidden="true" tabindex="-1"></a><span class="al">![Density of the $\alpha_i$ for well separated centroids](figures/histo-alphai-10.pdf)</span></span>
-<span id="cb3-183"><a href="#cb3-183" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-184"><a href="#cb3-184" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-185"><a href="#cb3-185" aria-hidden="true" tabindex="-1"></a>Spectral Bridge affinity illustration involving two centroids. The bold black dots mark the centroids of each cluster, while the colored cells represent the final partition of data points. In subfigures (a) and (c), the length of each dotted grey segment is proportional to $1/2 - \alpha_i$, whereas the thin black segments are proportional to $\alpha_i$. Subfigures (b) and (d) depict the distribution of $\alpha_i$, showing the behavior when clusters are either closely positioned (a, b) or well-separated (c, d).</span>
-<span id="cb3-186"><a href="#cb3-186" aria-hidden="true" tabindex="-1"></a>:::</span>
-<span id="cb3-187"><a href="#cb3-187" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-157"><a href="#cb3-157" aria-hidden="true" tabindex="-1"></a>This quantity can also be understood in relation to a local form of PCA. Unlike the standard PCA inertia criterion, this approach is directional and limited to the union of two Voronoï cells. </span>
+<span id="cb3-158"><a href="#cb3-158" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-159"><a href="#cb3-159" aria-hidden="true" tabindex="-1"></a>Let $\bar{X}_k$ denote the matrix representing the region $\mathcal{V}_k$, centered at its barycenter $\boldsymbol{\mu}_k$. The projection operator onto the $\boldsymbol{\mu}_k$-centered segment $<span class="co">[</span><span class="ot">\boldsymbol{0}, \boldsymbol{\mu}_l - \boldsymbol{\mu}_k</span><span class="co">]</span>$ is given by:</span>
+<span id="cb3-160"><a href="#cb3-160" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb3-161"><a href="#cb3-161" aria-hidden="true" tabindex="-1"></a>\pi_{kl}(\cdot) = \boldsymbol{p}_{kl}(\cdot) - \boldsymbol{\mu}_k</span>
+<span id="cb3-162"><a href="#cb3-162" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb3-163"><a href="#cb3-163" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-164"><a href="#cb3-164" aria-hidden="true" tabindex="-1"></a>It then follows that:</span>
+<span id="cb3-165"><a href="#cb3-165" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb3-166"><a href="#cb3-166" aria-hidden="true" tabindex="-1"></a>\frac{\sum_{\boldsymbol{x_i} \in \mathcal{V}_k \cup \mathcal{V}_l} \alpha_i^2}{n_k + n_l} = \frac{\| \pi_{kl}(\bar{X}_k) \|_F^2 + \| \pi_{lk}(\bar{X}_l) \|_F^2}{n_k + n_l}</span>
+<span id="cb3-167"><a href="#cb3-167" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb3-168"><a href="#cb3-168" aria-hidden="true" tabindex="-1"></a>where $\| \cdot \|_F$ is the Frobenius norm.</span>
+<span id="cb3-169"><a href="#cb3-169" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-170"><a href="#cb3-170" aria-hidden="true" tabindex="-1"></a>This formulation is particularly useful for numerical implementation.</span>
+<span id="cb3-171"><a href="#cb3-171" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-172"><a href="#cb3-172" aria-hidden="true" tabindex="-1"></a>Moreover, the boundary that separates the two clusters defined by centroids</span>
+<span id="cb3-173"><a href="#cb3-173" aria-hidden="true" tabindex="-1"></a>$\boldsymbol \mu_k$ and $\boldsymbol \mu_l$ is a hyperplane $\mathcal{P}_{kl}$. This</span>
+<span id="cb3-174"><a href="#cb3-174" aria-hidden="true" tabindex="-1"></a>hyperplane is orthogonal to the line segment connecting the centroids</span>
+<span id="cb3-175"><a href="#cb3-175" aria-hidden="true" tabindex="-1"></a>and intersects this segment at its midpoint.</span>
+<span id="cb3-176"><a href="#cb3-176" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-177"><a href="#cb3-177" aria-hidden="true" tabindex="-1"></a>If we consider all points $\boldsymbol x_i \in \mathcal V_k \cup \mathcal V_l$ which are not projected on centroids but somewhere on the segment, the distance from</span>
+<span id="cb3-178"><a href="#cb3-178" aria-hidden="true" tabindex="-1"></a>a point to the hyperplane is </span>
+<span id="cb3-179"><a href="#cb3-179" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb3-180"><a href="#cb3-180" aria-hidden="true" tabindex="-1"></a>d(\boldsymbol x_i, \mathcal{P}_{kl}) = (1/2-\alpha_i) \| \boldsymbol \mu_k-\boldsymbol \mu_l \|.</span>
+<span id="cb3-181"><a href="#cb3-181" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb3-182"><a href="#cb3-182" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-183"><a href="#cb3-183" aria-hidden="true" tabindex="-1"></a>This distance is similar to the concept of margin in Support Vector Machine <span class="co">[</span><span class="ot">@Cortes1995</span><span class="co">]</span>. When the $\alpha_i$ values are small (close to zero since $\alpha_i\in <span class="co">[</span><span class="ot">0,1/2</span><span class="co">]</span>$), the margins to the hyperplane are large, indicating a low density between the classes. Conversely, if</span>
+<span id="cb3-184"><a href="#cb3-184" aria-hidden="true" tabindex="-1"></a>the margins are small, it suggests that the two classes may reside</span>
+<span id="cb3-185"><a href="#cb3-185" aria-hidden="true" tabindex="-1"></a>within the same densely populated region. Consequently, the sum of the</span>
+<span id="cb3-186"><a href="#cb3-186" aria-hidden="true" tabindex="-1"></a>$\alpha_i$ or $\alpha_i^2$ increases with the density of the region</span>
+<span id="cb3-187"><a href="#cb3-187" aria-hidden="true" tabindex="-1"></a>between the classes (See Figure @fig-interpretation). </span>
 <span id="cb3-188"><a href="#cb3-188" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-189"><a href="#cb3-189" aria-hidden="true" tabindex="-1"></a>Note that the criterion is local and indicates the relative difference in densities between the balls and the bridge, rather than evaluating a global score for the densities of the structures.</span>
-<span id="cb3-190"><a href="#cb3-190" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-191"><a href="#cb3-191" aria-hidden="true" tabindex="-1"></a>Eventually, we define the bridge affinity between centroids $k$ and $l$ as the square root of the variance gain:</span>
-<span id="cb3-192"><a href="#cb3-192" aria-hidden="true" tabindex="-1"></a>$$</span>
-<span id="cb3-193"><a href="#cb3-193" aria-hidden="true" tabindex="-1"></a>a_{kl} =</span>
-<span id="cb3-194"><a href="#cb3-194" aria-hidden="true" tabindex="-1"></a>\begin{cases}</span>
-<span id="cb3-195"><a href="#cb3-195" aria-hidden="true" tabindex="-1"></a>0, &amp; \text{if } k = l, <span class="sc">\\</span></span>
-<span id="cb3-196"><a href="#cb3-196" aria-hidden="true" tabindex="-1"></a>\sqrt{\frac{\sum_{\boldsymbol{x_i} \in \mathcal{V}_k \cup \mathcal{V}_l} \alpha_i^2}{n_k + n_l}}, &amp; \text{otherwise}.</span>
-<span id="cb3-197"><a href="#cb3-197" aria-hidden="true" tabindex="-1"></a>\end{cases}</span>
-<span id="cb3-198"><a href="#cb3-198" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb3-189"><a href="#cb3-189" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-190"><a href="#cb3-190" aria-hidden="true" tabindex="-1"></a>::: {#fig-interpretation layout-ncol=2}</span>
+<span id="cb3-191"><a href="#cb3-191" aria-hidden="true" tabindex="-1"></a><span class="al">![Margin with close centroids](figures/svm-interpretation-3.pdf)</span></span>
+<span id="cb3-192"><a href="#cb3-192" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-193"><a href="#cb3-193" aria-hidden="true" tabindex="-1"></a><span class="al">![Density of the $\alpha_i$ for close centroids](figures/histo-alphai-3.pdf)</span></span>
+<span id="cb3-194"><a href="#cb3-194" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-195"><a href="#cb3-195" aria-hidden="true" tabindex="-1"></a><span class="al">![Margin with well separated centroids](figures/svm-interpretation-10.pdf)</span></span>
+<span id="cb3-196"><a href="#cb3-196" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-197"><a href="#cb3-197" aria-hidden="true" tabindex="-1"></a><span class="al">![Density of the $\alpha_i$ for well separated centroids](figures/histo-alphai-10.pdf)</span></span>
+<span id="cb3-198"><a href="#cb3-198" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-199"><a href="#cb3-199" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-200"><a href="#cb3-200" aria-hidden="true" tabindex="-1"></a>The inclusion of the square root redefines the variance affinity measure. Rather than using the squared Euclidean norm, the affinity is interpreted as the ratio of the standard deviation to the length of the segment connecting two centroids. </span>
-<span id="cb3-201"><a href="#cb3-201" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-202"><a href="#cb3-202" aria-hidden="true" tabindex="-1"></a>This concept can be generalized by introducing the $p$-bridge affinity for any $p \geq 1$:</span>
-<span id="cb3-203"><a href="#cb3-203" aria-hidden="true" tabindex="-1"></a>$$</span>
-<span id="cb3-204"><a href="#cb3-204" aria-hidden="true" tabindex="-1"></a>a_{p, kl} =</span>
-<span id="cb3-205"><a href="#cb3-205" aria-hidden="true" tabindex="-1"></a>\begin{cases}</span>
-<span id="cb3-206"><a href="#cb3-206" aria-hidden="true" tabindex="-1"></a>0, &amp; \text{if } k = l, <span class="sc">\\</span></span>
-<span id="cb3-207"><a href="#cb3-207" aria-hidden="true" tabindex="-1"></a>\left(\frac{\sum_{\boldsymbol{x_i} \in \mathcal{V}_k \cup \mathcal{V}_l} \alpha_i^p}{n_k + n_l}\right)^{1/p}, &amp; \text{otherwise}.</span>
-<span id="cb3-208"><a href="#cb3-208" aria-hidden="true" tabindex="-1"></a>\end{cases}</span>
-<span id="cb3-209"><a href="#cb3-209" aria-hidden="true" tabindex="-1"></a>$$</span>
-<span id="cb3-210"><a href="#cb3-210" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-211"><a href="#cb3-211" aria-hidden="true" tabindex="-1"></a>Both definitions are equivalent when $p = 2$. For $p = 1$, the affinity aligns directly with the SVM model previously discussed.</span>
-<span id="cb3-212"><a href="#cb3-212" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-213"><a href="#cb3-213" aria-hidden="true" tabindex="-1"></a>To allow points with large margin to dominate and make the algorithm more robust to noise and outliers we consider the following exponential transformation:</span>
-<span id="cb3-214"><a href="#cb3-214" aria-hidden="true" tabindex="-1"></a>$$</span>
-<span id="cb3-215"><a href="#cb3-215" aria-hidden="true" tabindex="-1"></a>\tilde{a}_{kl} = g(a_{kl})=\exp(\gamma a_{kl}).</span>
-<span id="cb3-216"><a href="#cb3-216" aria-hidden="true" tabindex="-1"></a>$${#eq-scaling}</span>
-<span id="cb3-217"><a href="#cb3-217" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-218"><a href="#cb3-218" aria-hidden="true" tabindex="-1"></a>where $\gamma$ is a scaling factor. This factor is set to ensure a large enough separation between the final coefficients. This factor is determined by the equation:</span>
-<span id="cb3-219"><a href="#cb3-219" aria-hidden="true" tabindex="-1"></a>$$</span>
-<span id="cb3-220"><a href="#cb3-220" aria-hidden="true" tabindex="-1"></a>\gamma = \frac{log(𝑀)}{q_{90} - q_{10}}</span>
-<span id="cb3-221"><a href="#cb3-221" aria-hidden="true" tabindex="-1"></a>$$</span>
-<span id="cb3-222"><a href="#cb3-222" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-223"><a href="#cb3-223" aria-hidden="true" tabindex="-1"></a>where $q_{10}$ and $q_{90}$ are respectively the 10th and 90th percentiles of the original affinity matrix and $M &gt; 1$. Thus, since the transformation is order-preserving, the 90th percentile of the newly constructed matrix is $M$ times greater than the 10th percentile. By default, $M$ is arbitrarily set to a large value of $10^4$.</span>
-<span id="cb3-224"><a href="#cb3-224" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-225"><a href="#cb3-225" aria-hidden="true" tabindex="-1"></a>This regularization is crucial: with a bounded affinity metric, exponentiation enhances the separation between low and high-density regions, controlled by a scaling parameter, as in traditional spectral clustering. Redefining the metric with a square root (or power $1/p$ for the generalized affinity) helps mitigate a converse issue, where machine error can cause numerical instability when solving the Laplacian eigenproblem, especially if values become too large. Since the range of affinity values can become too wide when the initial ratio between the largest and smallest non-zero unscaled bridge affinities is high. This transformation reduces the maximum values in the affinity matrix while preserving the metric's interpretability and distance-like properties; importantly, this adjustment is not intended for outlier detection.</span>
-<span id="cb3-226"><a href="#cb3-226" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-227"><a href="#cb3-227" aria-hidden="true" tabindex="-1"></a><span class="fu">## Algorithm</span></span>
-<span id="cb3-228"><a href="#cb3-228" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-229"><a href="#cb3-229" aria-hidden="true" tabindex="-1"></a>The Spectral Bridges algorithm first identifies local clusters to define Voronoï regions, computes edges with affinity weights between these regions, and ultimately cuts edges between regions with low inter-region density to determine the final clusters (see @alg-spectral-bridges and @fig-steps).</span>
-<span id="cb3-230"><a href="#cb3-230" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-231"><a href="#cb3-231" aria-hidden="true" tabindex="-1"></a>In spectral clustering, the time complexity is usually dominated by the eigen-decomposition step, which is $O(n^3)$. However, in the case of Spectral Bridges, the k-means algorithm has a time complexity of $O(n \times m \times d)$. For datasets with large $n$, this can be more significant than the $O(m^3)$ time complexity of the Spectral Bridges eigen-decomposition. As for the affinity matrix construction, there are $m^2$ coefficients to be calculated. Each $a_{kl}$ coefficient requires the computation of $n_k + n_l$ dot products as well as the norm $\| \boldsymbol \mu_k-\boldsymbol \mu_l \|$, the latter often being negligeable. Assuming that the Voronoï regions are roughly balanced in cardinality, we have $n_k \approx \frac{n}{m}$. Since $m$ should always be less than $n$, therefore $\frac{n}{m} &gt; 1$ and the time complexity of the affinity matrix is $O(\frac{n}{m} \times m^2 \times d) = O(n \times m \times d)$ given the acceptable range of values for $m$. Nonetheless, this is rarely the bottleneck. </span>
+<span id="cb3-200"><a href="#cb3-200" aria-hidden="true" tabindex="-1"></a>Spectral Bridge affinity illustration involving two centroids. The bold black dots mark the centroids of each cluster, while the colored cells represent the final partition of data points. In subfigures (a) and (c), the length of each dotted grey segment is proportional to $1/2 - \alpha_i$, whereas the thin black segments are proportional to $\alpha_i$. Subfigures (b) and (d) depict the distribution of $\alpha_i$, showing the behavior when clusters are either closely positioned (a, b) or well-separated (c, d).</span>
+<span id="cb3-201"><a href="#cb3-201" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb3-202"><a href="#cb3-202" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-203"><a href="#cb3-203" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-204"><a href="#cb3-204" aria-hidden="true" tabindex="-1"></a>Note that the criterion is local and indicates the relative difference in densities between the balls and the bridge, rather than evaluating a global score for the densities of the structures.</span>
+<span id="cb3-205"><a href="#cb3-205" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-206"><a href="#cb3-206" aria-hidden="true" tabindex="-1"></a>Eventually, we define the bridge affinity between centroids $k$ and $l$ as the square root of the variance gain:</span>
+<span id="cb3-207"><a href="#cb3-207" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb3-208"><a href="#cb3-208" aria-hidden="true" tabindex="-1"></a>a_{kl} =</span>
+<span id="cb3-209"><a href="#cb3-209" aria-hidden="true" tabindex="-1"></a>\begin{cases}</span>
+<span id="cb3-210"><a href="#cb3-210" aria-hidden="true" tabindex="-1"></a>0, &amp; \text{if } k = l, <span class="sc">\\</span></span>
+<span id="cb3-211"><a href="#cb3-211" aria-hidden="true" tabindex="-1"></a>\sqrt{\frac{\sum_{\boldsymbol{x_i} \in \mathcal{V}_k \cup \mathcal{V}_l} \alpha_i^2}{n_k + n_l}}, &amp; \text{otherwise}.</span>
+<span id="cb3-212"><a href="#cb3-212" aria-hidden="true" tabindex="-1"></a>\end{cases}</span>
+<span id="cb3-213"><a href="#cb3-213" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb3-214"><a href="#cb3-214" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-215"><a href="#cb3-215" aria-hidden="true" tabindex="-1"></a>The inclusion of the square root redefines the variance affinity measure. Rather than using the squared Euclidean norm, the affinity is interpreted as a quadratic mean, representing the ratio of the standard deviation to the length of the segment connecting two centroids. </span>
+<span id="cb3-216"><a href="#cb3-216" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-217"><a href="#cb3-217" aria-hidden="true" tabindex="-1"></a>This concept can be generalized by introducing the $p$-bridge affinity for any $p &gt; 0$ using the Minkowski mean:</span>
+<span id="cb3-218"><a href="#cb3-218" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb3-219"><a href="#cb3-219" aria-hidden="true" tabindex="-1"></a>a_{p, kl} =</span>
+<span id="cb3-220"><a href="#cb3-220" aria-hidden="true" tabindex="-1"></a>\begin{cases}</span>
+<span id="cb3-221"><a href="#cb3-221" aria-hidden="true" tabindex="-1"></a>0, &amp; \text{if } k = l, <span class="sc">\\</span></span>
+<span id="cb3-222"><a href="#cb3-222" aria-hidden="true" tabindex="-1"></a>\left(\frac{\sum_{\boldsymbol{x_i} \in \mathcal{V}_k \cup \mathcal{V}_l} \alpha_i^p}{n_k + n_l}\right)^{1/p}, &amp; \text{otherwise}.</span>
+<span id="cb3-223"><a href="#cb3-223" aria-hidden="true" tabindex="-1"></a>\end{cases}</span>
+<span id="cb3-224"><a href="#cb3-224" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb3-225"><a href="#cb3-225" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-226"><a href="#cb3-226" aria-hidden="true" tabindex="-1"></a>Both definitions are equivalent when $p = 2$. For $p = 1$, the affinity aligns directly with the SVM model previously discussed. Note that this yields a bounded metric in $<span class="co">[</span><span class="ot">0, 1/2</span><span class="co">]</span>$.</span>
+<span id="cb3-227"><a href="#cb3-227" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-228"><a href="#cb3-228" aria-hidden="true" tabindex="-1"></a>To allow points with large margin to dominate and make the algorithm more robust to noise and outliers we consider the following exponential transformation:</span>
+<span id="cb3-229"><a href="#cb3-229" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb3-230"><a href="#cb3-230" aria-hidden="true" tabindex="-1"></a>\tilde{a}_{kl} = g(a_{kl})=\exp(\gamma a_{kl}).</span>
+<span id="cb3-231"><a href="#cb3-231" aria-hidden="true" tabindex="-1"></a>$${#eq-scaling}</span>
 <span id="cb3-232"><a href="#cb3-232" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-233"><a href="#cb3-233" aria-hidden="true" tabindex="-1"></a><span class="in">```pseudocode</span></span>
-<span id="cb3-234"><a href="#cb3-234" aria-hidden="true" tabindex="-1"></a><span class="in">#| label: alg-spectral-bridges</span></span>
-<span id="cb3-235"><a href="#cb3-235" aria-hidden="true" tabindex="-1"></a><span class="in">#| html-indent-size: "1.2em"</span></span>
-<span id="cb3-236"><a href="#cb3-236" aria-hidden="true" tabindex="-1"></a><span class="in">#| html-comment-delimiter: "//"</span></span>
-<span id="cb3-237"><a href="#cb3-237" aria-hidden="true" tabindex="-1"></a><span class="in">#| html-line-number: true</span></span>
-<span id="cb3-238"><a href="#cb3-238" aria-hidden="true" tabindex="-1"></a><span class="in">#| html-line-number-punc: ":"</span></span>
-<span id="cb3-239"><a href="#cb3-239" aria-hidden="true" tabindex="-1"></a><span class="in">#| html-no-end: false</span></span>
-<span id="cb3-240"><a href="#cb3-240" aria-hidden="true" tabindex="-1"></a><span class="in">#| pdf-placement: "htb!"</span></span>
-<span id="cb3-241"><a href="#cb3-241" aria-hidden="true" tabindex="-1"></a><span class="in">#| pdf-line-number: true</span></span>
-<span id="cb3-242"><a href="#cb3-242" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-243"><a href="#cb3-243" aria-hidden="true" tabindex="-1"></a><span class="in">\begin{algorithm}</span></span>
-<span id="cb3-244"><a href="#cb3-244" aria-hidden="true" tabindex="-1"></a><span class="in">\caption{Spectral Bridges}</span></span>
-<span id="cb3-245"><a href="#cb3-245" aria-hidden="true" tabindex="-1"></a><span class="in">\begin{algorithmic}</span></span>
-<span id="cb3-246"><a href="#cb3-246" aria-hidden="true" tabindex="-1"></a><span class="in">\Procedure{SpectralBridges}{$X, k, m$}</span></span>
-<span id="cb3-247"><a href="#cb3-247" aria-hidden="true" tabindex="-1"></a><span class="in">\Comment{$X$: input dataset, $k$: number of clusters, $m$: number of Voronoï regions}</span></span>
-<span id="cb3-248"><a href="#cb3-248" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-249"><a href="#cb3-249" aria-hidden="true" tabindex="-1"></a><span class="in">    \State \textbf{Step 1: Vector Quantization}</span></span>
-<span id="cb3-250"><a href="#cb3-250" aria-hidden="true" tabindex="-1"></a><span class="in">    \State $\text{centroids}, \text{voronoiRegions} \gets$ \Call{KMeans}{$X, m$}</span></span>
-<span id="cb3-251"><a href="#cb3-251" aria-hidden="true" tabindex="-1"></a><span class="in">    \Comment{Initial centroids and Voronoi regions using k-means++}</span></span>
-<span id="cb3-252"><a href="#cb3-252" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-253"><a href="#cb3-253" aria-hidden="true" tabindex="-1"></a><span class="in">    \State \textbf{Step 2: Affinity Computation}</span></span>
-<span id="cb3-254"><a href="#cb3-254" aria-hidden="true" tabindex="-1"></a><span class="in">    \State $A = \{g(a_{kl})\}_{kl} \gets$ \Call{Affinity}{$X, \text{centroids}, \text{voronoiRegions}$}</span></span>
-<span id="cb3-255"><a href="#cb3-255" aria-hidden="true" tabindex="-1"></a><span class="in">    \Comment{Compute affinity matrix $A$}</span></span>
-<span id="cb3-256"><a href="#cb3-256" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-257"><a href="#cb3-257" aria-hidden="true" tabindex="-1"></a><span class="in">    \State \textbf{Step 3: Spectral Clustering}</span></span>
-<span id="cb3-258"><a href="#cb3-258" aria-hidden="true" tabindex="-1"></a><span class="in">    \Comment{Assign each region to a cluster}</span></span>
-<span id="cb3-259"><a href="#cb3-259" aria-hidden="true" tabindex="-1"></a><span class="in">    \State $\text{labels} \gets$ \Call{SpectralClustering}{$A, k$}</span></span>
-<span id="cb3-260"><a href="#cb3-260" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-261"><a href="#cb3-261" aria-hidden="true" tabindex="-1"></a><span class="in">    \State \textbf{Step 4: Propagate}</span></span>
-<span id="cb3-262"><a href="#cb3-262" aria-hidden="true" tabindex="-1"></a><span class="in">    \Comment{Assign each data point to the cluster of its region}</span></span>
-<span id="cb3-263"><a href="#cb3-263" aria-hidden="true" tabindex="-1"></a><span class="in">    \State $\text{clusters} \gets$ \Call{Propagate}{$X, \text{labels}, \text{voronoiRegions}$}</span></span>
-<span id="cb3-264"><a href="#cb3-264" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-265"><a href="#cb3-265" aria-hidden="true" tabindex="-1"></a><span class="in">    \State \Return $\text{clusters}$</span></span>
-<span id="cb3-266"><a href="#cb3-266" aria-hidden="true" tabindex="-1"></a><span class="in">    \Comment{Return cluster labels for data points in $X$}</span></span>
-<span id="cb3-267"><a href="#cb3-267" aria-hidden="true" tabindex="-1"></a><span class="in">\EndProcedure</span></span>
-<span id="cb3-268"><a href="#cb3-268" aria-hidden="true" tabindex="-1"></a><span class="in">\end{algorithmic}</span></span>
-<span id="cb3-269"><a href="#cb3-269" aria-hidden="true" tabindex="-1"></a><span class="in">\end{algorithm}</span></span>
-<span id="cb3-270"><a href="#cb3-270" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb3-233"><a href="#cb3-233" aria-hidden="true" tabindex="-1"></a>where $\gamma$ is a scaling factor. This factor is set to ensure a large enough separation between the final coefficients. This factor is determined by the equation:</span>
+<span id="cb3-234"><a href="#cb3-234" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb3-235"><a href="#cb3-235" aria-hidden="true" tabindex="-1"></a>\gamma = \frac{log(𝑀)}{q_{90} - q_{10}}</span>
+<span id="cb3-236"><a href="#cb3-236" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb3-237"><a href="#cb3-237" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-238"><a href="#cb3-238" aria-hidden="true" tabindex="-1"></a>where $q_{10}$ and $q_{90}$ are respectively the 10th and 90th percentiles of the original affinity matrix and $M &gt; 1$. Thus, since the transformation is order-preserving, the 90th percentile of the newly constructed matrix is $M$ times greater than the 10th percentile. By default, $M$ is arbitrarily set to a large value of $10^4$.</span>
+<span id="cb3-239"><a href="#cb3-239" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-240"><a href="#cb3-240" aria-hidden="true" tabindex="-1"></a>This regularization is crucial: with a bounded affinity metric, exponentiation enhances the separation between low and high-density regions, controlled by a scaling parameter, as in traditional spectral clustering. Redefining the metric with a square root (or power $1/p$ for the generalized affinity) helps mitigate a converse issue. Omitting this step would entail $a_{kl} \leq 2^{-p}$. Machine error could cause numerical instability when solving the Laplacian eigenproblem, especially if values become too small or too large, since the range of affinity values can become wide when the initial ratio between the largest and smallest non-zero unscaled bridge affinities is high. This transformation reduces the maximum values in the affinity matrix while preserving the metric's interpretability and distance-like properties; importantly, this adjustment is not intended for outlier detection.</span>
+<span id="cb3-241"><a href="#cb3-241" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-242"><a href="#cb3-242" aria-hidden="true" tabindex="-1"></a><span class="fu">## Algorithm</span></span>
+<span id="cb3-243"><a href="#cb3-243" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-244"><a href="#cb3-244" aria-hidden="true" tabindex="-1"></a>The Spectral Bridges algorithm first identifies local clusters to define Voronoï regions, computes edges with affinity weights between these regions, and ultimately cuts edges between regions with low inter-region density to determine the final clusters (see @alg-spectral-bridges and @fig-steps).</span>
+<span id="cb3-245"><a href="#cb3-245" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-246"><a href="#cb3-246" aria-hidden="true" tabindex="-1"></a>In spectral clustering, the time complexity is usually dominated by the eigen-decomposition step, which is $O(n^3)$. However, in the case of Spectral Bridges, the k-means algorithm has a time complexity of $O(n \times m \times d)$. For datasets with large $n$, this can be more significant than the $O(m^3)$ time complexity of the Spectral Bridges eigen-decomposition. As for the affinity matrix construction, there are $m^2$ coefficients to be calculated. Each $a_{kl}$ coefficient requires the computation of $n_k + n_l$ dot products as well as the norm $\| \boldsymbol \mu_k-\boldsymbol \mu_l \|$, the latter often being negligeable. Assuming that the Voronoï regions are roughly balanced in cardinality, we have $n_k \approx \frac{n}{m}$. Since $m$ should always be less than $n$, therefore $\frac{n}{m} &gt; 1$ and the time complexity of the affinity matrix is $O(\frac{n}{m} \times m^2 \times d) = O(n \times m \times d)$ given the acceptable range of values for $m$. Nonetheless, this is rarely the bottleneck. </span>
+<span id="cb3-247"><a href="#cb3-247" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-248"><a href="#cb3-248" aria-hidden="true" tabindex="-1"></a><span class="in">```pseudocode</span></span>
+<span id="cb3-249"><a href="#cb3-249" aria-hidden="true" tabindex="-1"></a><span class="in">#| label: alg-spectral-bridges</span></span>
+<span id="cb3-250"><a href="#cb3-250" aria-hidden="true" tabindex="-1"></a><span class="in">#| html-indent-size: "1.2em"</span></span>
+<span id="cb3-251"><a href="#cb3-251" aria-hidden="true" tabindex="-1"></a><span class="in">#| html-comment-delimiter: "//"</span></span>
+<span id="cb3-252"><a href="#cb3-252" aria-hidden="true" tabindex="-1"></a><span class="in">#| html-line-number: true</span></span>
+<span id="cb3-253"><a href="#cb3-253" aria-hidden="true" tabindex="-1"></a><span class="in">#| html-line-number-punc: ":"</span></span>
+<span id="cb3-254"><a href="#cb3-254" aria-hidden="true" tabindex="-1"></a><span class="in">#| html-no-end: false</span></span>
+<span id="cb3-255"><a href="#cb3-255" aria-hidden="true" tabindex="-1"></a><span class="in">#| pdf-placement: "htb!"</span></span>
+<span id="cb3-256"><a href="#cb3-256" aria-hidden="true" tabindex="-1"></a><span class="in">#| pdf-line-number: true</span></span>
+<span id="cb3-257"><a href="#cb3-257" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-258"><a href="#cb3-258" aria-hidden="true" tabindex="-1"></a><span class="in">\begin{algorithm}</span></span>
+<span id="cb3-259"><a href="#cb3-259" aria-hidden="true" tabindex="-1"></a><span class="in">\caption{Spectral Bridges}</span></span>
+<span id="cb3-260"><a href="#cb3-260" aria-hidden="true" tabindex="-1"></a><span class="in">\begin{algorithmic}</span></span>
+<span id="cb3-261"><a href="#cb3-261" aria-hidden="true" tabindex="-1"></a><span class="in">\Procedure{SpectralBridges}{$X, k, m$}</span></span>
+<span id="cb3-262"><a href="#cb3-262" aria-hidden="true" tabindex="-1"></a><span class="in">\Comment{$X$: input dataset, $k$: number of clusters, $m$: number of Voronoï regions}</span></span>
+<span id="cb3-263"><a href="#cb3-263" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-264"><a href="#cb3-264" aria-hidden="true" tabindex="-1"></a><span class="in">    \State \textbf{Step 1: Vector Quantization}</span></span>
+<span id="cb3-265"><a href="#cb3-265" aria-hidden="true" tabindex="-1"></a><span class="in">    \State $\text{centroids}, \text{voronoiRegions} \gets$ \Call{KMeans}{$X, m$}</span></span>
+<span id="cb3-266"><a href="#cb3-266" aria-hidden="true" tabindex="-1"></a><span class="in">    \Comment{Initial centroids and Voronoi regions using k-means++}</span></span>
+<span id="cb3-267"><a href="#cb3-267" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-268"><a href="#cb3-268" aria-hidden="true" tabindex="-1"></a><span class="in">    \State \textbf{Step 2: Affinity Computation}</span></span>
+<span id="cb3-269"><a href="#cb3-269" aria-hidden="true" tabindex="-1"></a><span class="in">    \State $A = \{g(a_{kl})\}_{kl} \gets$ \Call{Affinity}{$X, \text{centroids}, \text{voronoiRegions}$}</span></span>
+<span id="cb3-270"><a href="#cb3-270" aria-hidden="true" tabindex="-1"></a><span class="in">    \Comment{Compute affinity matrix $A$}</span></span>
 <span id="cb3-271"><a href="#cb3-271" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-272"><a href="#cb3-272" aria-hidden="true" tabindex="-1"></a>::: {#fig-steps layout-ncol=3}</span>
-<span id="cb3-273"><a href="#cb3-273" aria-hidden="true" tabindex="-1"></a><span class="al">![Vector quantization](figures/spectral-briges-1.pdf)</span></span>
-<span id="cb3-274"><a href="#cb3-274" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-275"><a href="#cb3-275" aria-hidden="true" tabindex="-1"></a><span class="al">![Affinity computation](figures/spectral-briges-2.pdf)</span></span>
-<span id="cb3-276"><a href="#cb3-276" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-277"><a href="#cb3-277" aria-hidden="true" tabindex="-1"></a><span class="al">![Spectral clustering](figures/spectral-briges-3-4.pdf)</span></span>
-<span id="cb3-278"><a href="#cb3-278" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-279"><a href="#cb3-279" aria-hidden="true" tabindex="-1"></a>Illustration of the Spectral Bridges algorithm with the Iris dataset (first principal plane). The bold red dots represent the centroids of the clusters, while the colored cells indicate the final partition of the data points. Vector quantization (Step 1 of @alg-spectral-bridges), Affinity computation (Step 2 of @alg-spectral-bridges), Spectral clustering and spreading (Step 3-4 of @alg-spectral-bridges).</span>
-<span id="cb3-280"><a href="#cb3-280" aria-hidden="true" tabindex="-1"></a>:::</span>
-<span id="cb3-281"><a href="#cb3-281" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-282"><a href="#cb3-282" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-283"><a href="#cb3-283" aria-hidden="true" tabindex="-1"></a><span class="fu">## Hyperparameter settings</span></span>
-<span id="cb3-284"><a href="#cb3-284" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-285"><a href="#cb3-285" aria-hidden="true" tabindex="-1"></a>The proposed algorithm requires three input parameters: the number of clusters $K$, the number of Voronoï regions $m$, and a scaling parameter for the spectral clustering phase.</span>
+<span id="cb3-272"><a href="#cb3-272" aria-hidden="true" tabindex="-1"></a><span class="in">    \State \textbf{Step 3: Spectral Clustering}</span></span>
+<span id="cb3-273"><a href="#cb3-273" aria-hidden="true" tabindex="-1"></a><span class="in">    \Comment{Assign each region to a cluster}</span></span>
+<span id="cb3-274"><a href="#cb3-274" aria-hidden="true" tabindex="-1"></a><span class="in">    \State $\text{labels} \gets$ \Call{SpectralClustering}{$A, k$}</span></span>
+<span id="cb3-275"><a href="#cb3-275" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-276"><a href="#cb3-276" aria-hidden="true" tabindex="-1"></a><span class="in">    \State \textbf{Step 4: Propagate}</span></span>
+<span id="cb3-277"><a href="#cb3-277" aria-hidden="true" tabindex="-1"></a><span class="in">    \Comment{Assign each data point to the cluster of its region}</span></span>
+<span id="cb3-278"><a href="#cb3-278" aria-hidden="true" tabindex="-1"></a><span class="in">    \State $\text{clusters} \gets$ \Call{Propagate}{$X, \text{labels}, \text{voronoiRegions}$}</span></span>
+<span id="cb3-279"><a href="#cb3-279" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-280"><a href="#cb3-280" aria-hidden="true" tabindex="-1"></a><span class="in">    \State \Return $\text{clusters}$</span></span>
+<span id="cb3-281"><a href="#cb3-281" aria-hidden="true" tabindex="-1"></a><span class="in">    \Comment{Return cluster labels for data points in $X$}</span></span>
+<span id="cb3-282"><a href="#cb3-282" aria-hidden="true" tabindex="-1"></a><span class="in">\EndProcedure</span></span>
+<span id="cb3-283"><a href="#cb3-283" aria-hidden="true" tabindex="-1"></a><span class="in">\end{algorithmic}</span></span>
+<span id="cb3-284"><a href="#cb3-284" aria-hidden="true" tabindex="-1"></a><span class="in">\end{algorithm}</span></span>
+<span id="cb3-285"><a href="#cb3-285" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb3-286"><a href="#cb3-286" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-287"><a href="#cb3-287" aria-hidden="true" tabindex="-1"></a>Model selection in non-parametric settings is challenging due to the absence of predefined model parameters. It relies heavily on data-driven approaches. Metrics like the Gap Statistic <span class="co">[</span><span class="ot">@tibshirani2001estimating</span><span class="co">]</span> and the Laplacian eigengap <span class="co">[</span><span class="ot">@von2007tutorial</span><span class="co">]</span> are potential tools for hyperparameter selection.</span>
-<span id="cb3-288"><a href="#cb3-288" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-289"><a href="#cb3-289" aria-hidden="true" tabindex="-1"></a>We propose a method for choosing the scaling parameter (see Equation @eq-scaling) that yields stable results. Selecting both $m$, the number of Voronoï regions, and $K$, the number of clusters, is difficult. We address this by adopting a heuristic: first, choose $K$, then determine $m$ using a modified Laplacian eigengap.</span>
-<span id="cb3-290"><a href="#cb3-290" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-291"><a href="#cb3-291" aria-hidden="true" tabindex="-1"></a>If $K$ represents the true number of clusters, the affinity matrix resembles a graph adjacency matrix with $K$ connected components. This configuration is characterized by an eigengap at the $K$th eigenvalue. In Self-Tuning Spectral Clustering <span class="co">[</span><span class="ot">@zelnik2004self</span><span class="co">]</span>, the eigengap $\lambda_{K+1} - \lambda_K$ is used to evaluate clustering quality for $K$ clusters. Following a similar strategy, and assuming $K$ is known, the Laplacian eigengap at the $K$th eigenvalue can select $m$, with the scaling parameter fixed.</span>
-<span id="cb3-292"><a href="#cb3-292" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-293"><a href="#cb3-293" aria-hidden="true" tabindex="-1"></a>Determining the optimal value of $m$ using the eigengap is not straightforward. As the affinity matrix dimension increases, the number of eigenvalues grows, reducing gaps between them. This makes direct comparisons unreliable. To address this, we use the ratio $R = (\lambda_{K+1} - \lambda_K) / \lambda_{K+1}$. This metric is bounded between 0 and 1 and measures the relative difference between consecutive eigenvalues. It facilitates meaningful comparisons across different values of $m$. A value of $R$ close to 1 suggests high clustering quality, whereas lower values indicate weaker performance.</span>
-<span id="cb3-294"><a href="#cb3-294" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-295"><a href="#cb3-295" aria-hidden="true" tabindex="-1"></a>Using this metric, we determine a near-optimal value for $m$ by maximizing the average $R$ across possible values of $m$. Additionally, the metric enhances robustness by running the algorithm with different random seeds and selecting the clustering result with the highest normalized eigengap.</span>
+<span id="cb3-287"><a href="#cb3-287" aria-hidden="true" tabindex="-1"></a>::: {#fig-steps layout-ncol=3}</span>
+<span id="cb3-288"><a href="#cb3-288" aria-hidden="true" tabindex="-1"></a><span class="al">![Vector quantization](figures/spectral-briges-1.pdf)</span></span>
+<span id="cb3-289"><a href="#cb3-289" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-290"><a href="#cb3-290" aria-hidden="true" tabindex="-1"></a><span class="al">![Affinity computation](figures/spectral-briges-2.pdf)</span></span>
+<span id="cb3-291"><a href="#cb3-291" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-292"><a href="#cb3-292" aria-hidden="true" tabindex="-1"></a><span class="al">![Spectral clustering](figures/spectral-briges-3-4.pdf)</span></span>
+<span id="cb3-293"><a href="#cb3-293" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-294"><a href="#cb3-294" aria-hidden="true" tabindex="-1"></a>Illustration of the Spectral Bridges algorithm with the Iris dataset (first principal plane). The bold red dots represent the centroids of the clusters, while the colored cells indicate the final partition of the data points. Vector quantization (Step 1 of @alg-spectral-bridges), Affinity computation (Step 2 of @alg-spectral-bridges), Spectral clustering and spreading (Step 3-4 of @alg-spectral-bridges).</span>
+<span id="cb3-295"><a href="#cb3-295" aria-hidden="true" tabindex="-1"></a>:::</span>
 <span id="cb3-296"><a href="#cb3-296" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-297"><a href="#cb3-297" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-298"><a href="#cb3-298" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-299"><a href="#cb3-299" aria-hidden="true" tabindex="-1"></a><span class="fu"># Numerical experiments</span></span>
-<span id="cb3-300"><a href="#cb3-300" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-301"><a href="#cb3-301" aria-hidden="true" tabindex="-1"></a>In this section, the results obtained from testing the Spectral Bridges algorithm on various datasets, both small and large scale, including real-world and well-known synthetic datasets, are presented. These experiments assess the accuracy, time and space complexity, ease of use, robustness, and adaptability of our algorithm. We compare Spectral Bridges (SB) against several state-of-the-art methods, including k-means++ (KM) <span class="co">[</span><span class="ot">@macqueen1967some; @arthur2007kmeanspp</span><span class="co">]</span>, Expectation-Maximization (EM) <span class="co">[</span><span class="ot">@dempster1977maximum</span><span class="co">]</span>, Ward Clustering (WC) <span class="co">[</span><span class="ot">@ward1963hierarchical</span><span class="co">]</span>, DBSCAN (DB) <span class="co">[</span><span class="ot">@ester1996density</span><span class="co">]</span> and GIT <span class="co">[</span><span class="ot">@gao2021git</span><span class="co">]</span>. This comparison establishes baselines across centroid-based clustering algorithms, hierarchical methods, and density-based methods. </span>
-<span id="cb3-302"><a href="#cb3-302" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-303"><a href="#cb3-303" aria-hidden="true" tabindex="-1"></a>The algorithms are evaluated on both raw and Principal Component Analysis processed (PCA-processed) data with varying dimensionality. For synthetic datasets, Gaussian and/or uniform noise is introduced to assess the robustness of the algorithm.</span>
-<span id="cb3-304"><a href="#cb3-304" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-305"><a href="#cb3-305" aria-hidden="true" tabindex="-1"></a><span class="fu">## Datasets</span></span>
-<span id="cb3-306"><a href="#cb3-306" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-307"><a href="#cb3-307" aria-hidden="true" tabindex="-1"></a><span class="fu">### Real-world data</span></span>
-<span id="cb3-308"><a href="#cb3-308" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-309"><a href="#cb3-309" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**MNIST**: A large dataset containing 60,000 handwritten digit images in ten balanced classes, commonly used for image processing benchmarks. Each image consists of $28 \times 28 = 784$ pixels.</span>
-<span id="cb3-310"><a href="#cb3-310" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**UCI ML Breast Cancer Wisconsin**: A dataset featuring computed attributes from digitized images of fine needle aspirates (FNA) of breast masses, used to predict whether a tumor is malignant or benign.</span>
+<span id="cb3-298"><a href="#cb3-298" aria-hidden="true" tabindex="-1"></a><span class="fu">## Hyperparameter settings</span></span>
+<span id="cb3-299"><a href="#cb3-299" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-300"><a href="#cb3-300" aria-hidden="true" tabindex="-1"></a>The proposed algorithm requires three input parameters: the number of clusters $K$, the number of Voronoï regions $m$, and a scaling parameter for the spectral clustering phase.</span>
+<span id="cb3-301"><a href="#cb3-301" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-302"><a href="#cb3-302" aria-hidden="true" tabindex="-1"></a>Model selection in non-parametric settings is challenging due to the absence of predefined model parameters. It relies heavily on data-driven approaches. Metrics like the Gap Statistic <span class="co">[</span><span class="ot">@tibshirani2001estimating</span><span class="co">]</span> and the Laplacian eigengap <span class="co">[</span><span class="ot">@von2007tutorial</span><span class="co">]</span> are potential tools for hyperparameter selection.</span>
+<span id="cb3-303"><a href="#cb3-303" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-304"><a href="#cb3-304" aria-hidden="true" tabindex="-1"></a>We propose a method for choosing the scaling parameter (see Equation @eq-scaling) that yields stable results. Selecting both $m$, the number of Voronoï regions, and $K$, the number of clusters, is difficult. We address this by adopting a heuristic: first, choose $K$, then determine $m$ using a modified Laplacian eigengap.</span>
+<span id="cb3-305"><a href="#cb3-305" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-306"><a href="#cb3-306" aria-hidden="true" tabindex="-1"></a>If $K$ represents the true number of clusters, the affinity matrix resembles a graph adjacency matrix with $K$ connected components. This configuration is characterized by an eigengap at the $K$th eigenvalue. In Self-Tuning Spectral Clustering <span class="co">[</span><span class="ot">@zelnik2004self</span><span class="co">]</span>, the eigengap $\lambda_{K+1} - \lambda_K$ is used to evaluate clustering quality for $K$ clusters. Following a similar strategy, and assuming $K$ is known, the Laplacian eigengap at the $K$th eigenvalue can select $m$, with the scaling parameter fixed.</span>
+<span id="cb3-307"><a href="#cb3-307" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-308"><a href="#cb3-308" aria-hidden="true" tabindex="-1"></a>Determining the optimal value of $m$ using the eigengap is not straightforward. As the affinity matrix dimension increases, the number of eigenvalues grows, reducing gaps between them. This makes direct comparisons unreliable. To address this, we use the ratio $\rho = (\lambda_{K+1} - \lambda_K) / \lambda_{K+1}$. This metric is bounded between 0 and 1 and measures the relative difference between consecutive eigenvalues. It facilitates meaningful comparisons across different values of $m$. A value of $R$ close to 1 suggests high clustering quality, whereas lower values indicate weaker performance.</span>
+<span id="cb3-309"><a href="#cb3-309" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-310"><a href="#cb3-310" aria-hidden="true" tabindex="-1"></a>Using this metric, we determine a near-optimal value for $m$ by maximizing the average $R$ across possible values of $m$. Additionally, the metric enhances robustness by running the algorithm with different random seeds and selecting the clustering result with the highest normalized eigengap.</span>
 <span id="cb3-311"><a href="#cb3-311" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-312"><a href="#cb3-312" aria-hidden="true" tabindex="-1"></a><span class="fu">### Synthetic data</span></span>
+<span id="cb3-312"><a href="#cb3-312" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-313"><a href="#cb3-313" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-314"><a href="#cb3-314" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Impossible**: A synthetic dataset designed to challenge clustering algorithms with complex patterns.</span>
-<span id="cb3-315"><a href="#cb3-315" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Moons**: A two-dimensional dataset with two interleaving half-circles.</span>
-<span id="cb3-316"><a href="#cb3-316" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Circles**: A synthetic dataset of points arranged in two non-linearly separable circles.</span>
-<span id="cb3-317"><a href="#cb3-317" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Smile**: A synthetic dataset with points arranged in the shape of a smiling face, used to test the separation of non-linearly separable data.</span>
-<span id="cb3-318"><a href="#cb3-318" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-319"><a href="#cb3-319" aria-hidden="true" tabindex="-1"></a><span class="fu">### Datasets Summary &amp; Class Balance</span></span>
-<span id="cb3-320"><a href="#cb3-320" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-321"><a href="#cb3-321" aria-hidden="true" tabindex="-1"></a>| **Dataset**    | **#Dims** | **#Samples** | **#Classes** | **Class Proportions**                     |</span>
-<span id="cb3-322"><a href="#cb3-322" aria-hidden="true" tabindex="-1"></a>| -------------- | --------- | ------------ | ------------ | ----------------------------------------- |</span>
-<span id="cb3-323"><a href="#cb3-323" aria-hidden="true" tabindex="-1"></a>| MNIST          | 784       | 60000        | 10           | 9.9%, 11.2%, 9.9%, 10.3%, 9.7%, 9%, 9.9%, 10.4%, 9.7%, 9.9% |</span>
-<span id="cb3-324"><a href="#cb3-324" aria-hidden="true" tabindex="-1"></a>| Breast Cancer  | 30        | 569          | 2            | 37.3%, 62.7%                              |</span>
-<span id="cb3-325"><a href="#cb3-325" aria-hidden="true" tabindex="-1"></a>| Impossible     | 2         | 3594         | 7            | 24.8%, 18.8%, 11.3%, 7.5%, 12.5%, 12.5%, 12.5% |</span>
-<span id="cb3-326"><a href="#cb3-326" aria-hidden="true" tabindex="-1"></a>| Moons          | 2         | 1000         | 2            | 50%, 50%                                  |</span>
-<span id="cb3-327"><a href="#cb3-327" aria-hidden="true" tabindex="-1"></a>| Circles        | 2         | 1000         | 2            | 50%, 50%                                  |</span>
-<span id="cb3-328"><a href="#cb3-328" aria-hidden="true" tabindex="-1"></a>| Smile          | 2         | 1000         | 4            | 25%, 25%, 25%, 25%                        |</span>
-<span id="cb3-329"><a href="#cb3-329" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-330"><a href="#cb3-330" aria-hidden="true" tabindex="-1"></a>Table: Datasets Summary &amp; Class Balance</span>
-<span id="cb3-331"><a href="#cb3-331" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-332"><a href="#cb3-332" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-333"><a href="#cb3-333" aria-hidden="true" tabindex="-1"></a>Class proportions are presented in ascending order starting from label $0$.</span>
-<span id="cb3-334"><a href="#cb3-334" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-335"><a href="#cb3-335" aria-hidden="true" tabindex="-1"></a><span class="fu">## Metrics</span></span>
-<span id="cb3-336"><a href="#cb3-336" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-337"><a href="#cb3-337" aria-hidden="true" tabindex="-1"></a>To evaluate the performance of the clustering algorithm, the Adjusted Rand Index (ARI) <span class="co">[</span><span class="ot">@halkidi2002cluster</span><span class="co">]</span> and Normalized Mutual Information (NMI) <span class="co">[</span><span class="ot">@cover1991information</span><span class="co">]</span> are used. ARI measures the similarity between two clustering results, ranging from -0.5 to 1, with 1 indicating perfect agreement. NMI ranges from 0 to 1, with higher values indicating better clustering quality. In some tests, the variability of scores across multiple runs is also reported due to the random initialization in k-means, though k-means++ generally provides stable and reproducible results.</span>
-<span id="cb3-338"><a href="#cb3-338" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-339"><a href="#cb3-339" aria-hidden="true" tabindex="-1"></a><span class="fu">## Platform</span></span>
-<span id="cb3-340"><a href="#cb3-340" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-341"><a href="#cb3-341" aria-hidden="true" tabindex="-1"></a>All experiments were conducted on an Archlinux machine with Linux 6.9.3 Kernel, 8GB of RAM, and an AMD Ryzen 3 7320U processor.</span>
-<span id="cb3-342"><a href="#cb3-342" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-343"><a href="#cb3-343" aria-hidden="true" tabindex="-1"></a><span class="fu">## Sensitivity to hyperparameters</span></span>
+<span id="cb3-314"><a href="#cb3-314" aria-hidden="true" tabindex="-1"></a><span class="fu"># Numerical experiments</span></span>
+<span id="cb3-315"><a href="#cb3-315" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-316"><a href="#cb3-316" aria-hidden="true" tabindex="-1"></a>In this section, the results obtained from testing the Spectral Bridges algorithm on various datasets, both small and large scale, including real-world and well-known synthetic datasets, are presented. These experiments assess the accuracy, time and space complexity, ease of use, robustness, and adaptability of our algorithm. We compare Spectral Bridges (SB) against several state-of-the-art methods, including k-means++ (KM) <span class="co">[</span><span class="ot">@macqueen1967some; @arthur2007kmeanspp</span><span class="co">]</span>, Expectation-Maximization (EM) <span class="co">[</span><span class="ot">@dempster1977maximum</span><span class="co">]</span>, Ward Clustering (WC) <span class="co">[</span><span class="ot">@ward1963hierarchical</span><span class="co">]</span>, DBSCAN (DB) <span class="co">[</span><span class="ot">@ester1996density</span><span class="co">]</span> and GIT <span class="co">[</span><span class="ot">@gao2021git</span><span class="co">]</span>. This comparison establishes baselines across centroid-based clustering algorithms, hierarchical methods, and density-based methods. </span>
+<span id="cb3-317"><a href="#cb3-317" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-318"><a href="#cb3-318" aria-hidden="true" tabindex="-1"></a>The algorithms are evaluated on both raw and Principal Component Analysis processed (PCA-processed) data with varying dimensionality. For synthetic datasets, Gaussian and/or uniform noise is introduced to assess the robustness of the algorithm.</span>
+<span id="cb3-319"><a href="#cb3-319" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-320"><a href="#cb3-320" aria-hidden="true" tabindex="-1"></a><span class="fu">## Datasets</span></span>
+<span id="cb3-321"><a href="#cb3-321" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-322"><a href="#cb3-322" aria-hidden="true" tabindex="-1"></a><span class="fu">### Real-world data</span></span>
+<span id="cb3-323"><a href="#cb3-323" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-324"><a href="#cb3-324" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**MNIST**: A large dataset containing 60,000 handwritten digit images in ten balanced classes, commonly used for image processing benchmarks. Each image consists of $28 \times 28 = 784$ pixels.</span>
+<span id="cb3-325"><a href="#cb3-325" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**UCI ML Breast Cancer Wisconsin**: A dataset featuring computed attributes from digitized images of fine needle aspirates (FNA) of breast masses, used to predict whether a tumor is malignant or benign.</span>
+<span id="cb3-326"><a href="#cb3-326" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-327"><a href="#cb3-327" aria-hidden="true" tabindex="-1"></a><span class="fu">### Synthetic data</span></span>
+<span id="cb3-328"><a href="#cb3-328" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-329"><a href="#cb3-329" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Impossible**: A synthetic dataset designed to challenge clustering algorithms with complex patterns.</span>
+<span id="cb3-330"><a href="#cb3-330" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Moons**: A two-dimensional dataset with two interleaving half-circles.</span>
+<span id="cb3-331"><a href="#cb3-331" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Circles**: A synthetic dataset of points arranged in two non-linearly separable circles.</span>
+<span id="cb3-332"><a href="#cb3-332" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Smile**: A synthetic dataset with points arranged in the shape of a smiling face, used to test the separation of non-linearly separable data.</span>
+<span id="cb3-333"><a href="#cb3-333" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-334"><a href="#cb3-334" aria-hidden="true" tabindex="-1"></a><span class="fu">### Datasets Summary &amp; Class Balance</span></span>
+<span id="cb3-335"><a href="#cb3-335" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-336"><a href="#cb3-336" aria-hidden="true" tabindex="-1"></a>| **Dataset**    | **#Dims** | **#Samples** | **#Classes** | **Class Proportions**                     |</span>
+<span id="cb3-337"><a href="#cb3-337" aria-hidden="true" tabindex="-1"></a>| -------------- | --------- | ------------ | ------------ | ----------------------------------------- |</span>
+<span id="cb3-338"><a href="#cb3-338" aria-hidden="true" tabindex="-1"></a>| MNIST          | 784       | 60000        | 10           | 9.9%, 11.2%, 9.9%, 10.3%, 9.7%, 9%, 9.9%, 10.4%, 9.7%, 9.9% |</span>
+<span id="cb3-339"><a href="#cb3-339" aria-hidden="true" tabindex="-1"></a>| Breast Cancer  | 30        | 569          | 2            | 37.3%, 62.7%                              |</span>
+<span id="cb3-340"><a href="#cb3-340" aria-hidden="true" tabindex="-1"></a>| Impossible     | 2         | 3594         | 7            | 24.8%, 18.8%, 11.3%, 7.5%, 12.5%, 12.5%, 12.5% |</span>
+<span id="cb3-341"><a href="#cb3-341" aria-hidden="true" tabindex="-1"></a>| Moons          | 2         | 1000         | 2            | 50%, 50%                                  |</span>
+<span id="cb3-342"><a href="#cb3-342" aria-hidden="true" tabindex="-1"></a>| Circles        | 2         | 1000         | 2            | 50%, 50%                                  |</span>
+<span id="cb3-343"><a href="#cb3-343" aria-hidden="true" tabindex="-1"></a>| Smile          | 2         | 1000         | 4            | 25%, 25%, 25%, 25%                        |</span>
 <span id="cb3-344"><a href="#cb3-344" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-345"><a href="#cb3-345" aria-hidden="true" tabindex="-1"></a>The hyperparameters of the Spectral Bridges algorithm were based on the size of each dataset, $n$, and the number of clusters, $K$.</span>
+<span id="cb3-345"><a href="#cb3-345" aria-hidden="true" tabindex="-1"></a>Table: Datasets Summary &amp; Class Balance</span>
 <span id="cb3-346"><a href="#cb3-346" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-347"><a href="#cb3-347" aria-hidden="true" tabindex="-1"></a>To better grasp the sensitivity regarding to $m$, the number of Voronoï cells, Spectral Bridges was run on the PCA $h = 32$ embedded MNIST dataset with varying values of $m \in <span class="sc">\{</span>10, 120, 230, 340, 450, 560, 670, 780, 890, 1000 <span class="sc">\}</span>$. The case $m = 10$ is equivalent to the k-means++ algorithm. ARI and NMI scores are recorded over 20 consecutive iterations and subsequently plotted. As shown by @fig-m-vs-score, the accuracy seems to be consistently increasing with values of $m$, with the largest observed gap occurring between values of $m = 10$ and $m = 120$, and flattening thereafter, indicating a tremendous improvement over the classical k-means++ framework even for empirically suboptimal hyperparameter values. </span>
-<span id="cb3-348"><a href="#cb3-348" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-347"><a href="#cb3-347" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-348"><a href="#cb3-348" aria-hidden="true" tabindex="-1"></a>Class proportions are presented in ascending order starting from label $0$.</span>
 <span id="cb3-349"><a href="#cb3-349" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-350"><a href="#cb3-350" aria-hidden="true" tabindex="-1"></a><span class="al">![ARI and NMI scores of Spectral Bridges with varying values of $m$.](figures/nodes_vs_score.pdf)</span>{#fig-m-vs-score}</span>
+<span id="cb3-350"><a href="#cb3-350" aria-hidden="true" tabindex="-1"></a><span class="fu">## Metrics</span></span>
 <span id="cb3-351"><a href="#cb3-351" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-352"><a href="#cb3-352" aria-hidden="true" tabindex="-1"></a>For other algorithms, such as DBSCAN, labels were used to determine the best hyperparameter values to compare our method against the "best case scenario", thus putting  the Spectral Bridges algorithm at a voluntary disadvantage.</span>
+<span id="cb3-352"><a href="#cb3-352" aria-hidden="true" tabindex="-1"></a>To evaluate the performance of the clustering algorithm, the Adjusted Rand Index (ARI) <span class="co">[</span><span class="ot">@halkidi2002cluster</span><span class="co">]</span> and Normalized Mutual Information (NMI) <span class="co">[</span><span class="ot">@cover1991information</span><span class="co">]</span> are used. ARI measures the similarity between two clustering results, ranging from -0.5 to 1, with 1 indicating perfect agreement. NMI ranges from 0 to 1, with higher values indicating better clustering quality. In some tests, the variability of scores across multiple runs is also reported due to the random initialization in k-means, though k-means++ generally provides stable and reproducible results.</span>
 <span id="cb3-353"><a href="#cb3-353" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-354"><a href="#cb3-354" aria-hidden="true" tabindex="-1"></a><span class="fu">## Time complexity</span></span>
+<span id="cb3-354"><a href="#cb3-354" aria-hidden="true" tabindex="-1"></a><span class="fu">## Platform</span></span>
 <span id="cb3-355"><a href="#cb3-355" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-356"><a href="#cb3-356" aria-hidden="true" tabindex="-1"></a>To assess the algorithm's time complexity, the average execution times over 50 runs were computed for varying numbers of Voronoï regions $m$ as well as dataset sizes. With a constant number of clusters $K = 5$ and an embedding dimension of $d = 10$, the results (see @fig-time-complexity) highlight Spectral Bridges algorihtm's efficacy. As discussed previously, we observe a linear relationship between $m$ and the execution time because the matrix construction is highly optimized and the time taken is almost negligeable compared to that of the initial k-means++ centroids initalization.</span>
+<span id="cb3-356"><a href="#cb3-356" aria-hidden="true" tabindex="-1"></a>All experiments were conducted on an Archlinux machine with Linux 6.9.3 Kernel, 8GB of RAM, and an AMD Ryzen 3 7320U processor.</span>
 <span id="cb3-357"><a href="#cb3-357" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-358"><a href="#cb3-358" aria-hidden="true" tabindex="-1"></a>::: {#fig-time-complexity layout-ncol=2}</span>
+<span id="cb3-358"><a href="#cb3-358" aria-hidden="true" tabindex="-1"></a><span class="fu">## Sensitivity to hyperparameters</span></span>
 <span id="cb3-359"><a href="#cb3-359" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-360"><a href="#cb3-360" aria-hidden="true" tabindex="-1"></a><span class="al">![Varying $n$, fixed $m = 10$](figures/size_vs_time.pdf)</span></span>
+<span id="cb3-360"><a href="#cb3-360" aria-hidden="true" tabindex="-1"></a>The hyperparameters of the Spectral Bridges algorithm were based on the size of each dataset, $n$, and the number of clusters, $K$.</span>
 <span id="cb3-361"><a href="#cb3-361" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-362"><a href="#cb3-362" aria-hidden="true" tabindex="-1"></a><span class="al">![Varying $m$, fixed $n = 5000$](figures/nodes_vs_time.pdf)</span></span>
+<span id="cb3-362"><a href="#cb3-362" aria-hidden="true" tabindex="-1"></a>To better grasp the sensitivity regarding to $m$, the number of Voronoï cells, Spectral Bridges was run on the PCA $h = 32$ embedded MNIST dataset with varying values of $m \in <span class="sc">\{</span>10, 120, 230, 340, 450, 560, 670, 780, 890, 1000 <span class="sc">\}</span>$. The case $m = 10$ is equivalent to the k-means++ algorithm. ARI and NMI scores are recorded over 20 consecutive iterations and subsequently plotted. As shown by @fig-m-vs-score, the accuracy seems to be consistently increasing with values of $m$, with the largest observed gap occurring between values of $m = 10$ and $m = 120$, and flattening thereafter, indicating a tremendous improvement over the classical k-means++ framework even for empirically suboptimal hyperparameter values. </span>
 <span id="cb3-363"><a href="#cb3-363" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-364"><a href="#cb3-364" aria-hidden="true" tabindex="-1"></a>Average time taken per model fit.</span>
-<span id="cb3-365"><a href="#cb3-365" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb3-364"><a href="#cb3-364" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-365"><a href="#cb3-365" aria-hidden="true" tabindex="-1"></a><span class="al">![ARI and NMI scores of Spectral Bridges with varying values of $m$.](figures/nodes_vs_score.pdf)</span>{#fig-m-vs-score}</span>
 <span id="cb3-366"><a href="#cb3-366" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-367"><a href="#cb3-367" aria-hidden="true" tabindex="-1"></a><span class="fu">## Accuracy</span></span>
+<span id="cb3-367"><a href="#cb3-367" aria-hidden="true" tabindex="-1"></a>For other algorithms, such as DBSCAN, labels were used to determine the best hyperparameter values to compare our method against the "best case scenario", thus putting  the Spectral Bridges algorithm at a voluntary disadvantage.</span>
 <span id="cb3-368"><a href="#cb3-368" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-369"><a href="#cb3-369" aria-hidden="true" tabindex="-1"></a>The algorithm's accuracy was first evaluated on the MNIST dataset. Metrics were collected to compare our method with k-means++, EM, and Ward clustering. Metrics were estimated by computing the empirical average over 10 consecutive runs for each method. Due to limited computational resources, we randomly selected a sample of 20,000 data points (one-third of the total) for each run, on which all algorithms were trained and tested. To ensure reproducibility, a fixed random seed was set at the beginning of all scripts. Note, however, that this does not imply centroids were initialized identically for centroid based methods, as these may vary according to the implementation of each tested algorithm.</span>
+<span id="cb3-369"><a href="#cb3-369" aria-hidden="true" tabindex="-1"></a><span class="fu">## Time complexity</span></span>
 <span id="cb3-370"><a href="#cb3-370" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-371"><a href="#cb3-371" aria-hidden="true" tabindex="-1"></a>Let $h$ denote the embedding dimension of the dataset. Spectral Bridges was tested both on the raw MNIST dataset without preprocessing ($h = 784$) and after reducing its dimension using PCA to $h \in <span class="sc">\{</span>8, 16, 32, 64<span class="sc">\}</span>$ (see @fig-mnist-pca-scores).</span>
+<span id="cb3-371"><a href="#cb3-371" aria-hidden="true" tabindex="-1"></a>To assess the algorithm's time complexity, the average execution times over 50 runs were computed for varying numbers of Voronoï regions $m$ as well as dataset sizes. With a constant number of clusters $K = 5$ and an embedding dimension of $d = 10$, the results (see @fig-time-complexity) highlight Spectral Bridges algorihtm's efficacy. As discussed previously, we observe a linear relationship between $m$ and the execution time because the matrix construction is highly optimized and the time taken is almost negligeable compared to that of the initial k-means++ centroids initalization.</span>
 <span id="cb3-372"><a href="#cb3-372" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-373"><a href="#cb3-373" aria-hidden="true" tabindex="-1"></a><span class="al">![ARI and NMI scores of k-means++ (pink), EM (green), Ward Clustering (red), GIT (blue), and Spectral Bridges (purple) on PCA embedding and full MNIST.](figures/mnist_pca_summary.pdf)</span>{#fig-mnist-pca-scores}</span>
+<span id="cb3-373"><a href="#cb3-373" aria-hidden="true" tabindex="-1"></a>::: {#fig-time-complexity layout-ncol=2}</span>
 <span id="cb3-374"><a href="#cb3-374" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-375"><a href="#cb3-375" aria-hidden="true" tabindex="-1"></a>Furthermore, the proposed algorithm was also tested on the same MNIST dataset after reducing its dimension to $h \in <span class="sc">\{</span>2, 4, 8, 16<span class="sc">\}</span>$ using UMAP <span class="co">[</span><span class="ot">@McInnes2018</span><span class="co">]</span>, a state-of-the-art non-linear dimension reduction algorithm (see @fig-mnist-umap-scores). To further improve the clustering performance of Spectral Bridges, the <span class="in">`fit_select`</span> method was employed. This method effectively trains the algorithm with multiple initializations and selects the one with the largest normalized eigengap (refer to the **Hyperparameter settings** section).</span>
+<span id="cb3-375"><a href="#cb3-375" aria-hidden="true" tabindex="-1"></a><span class="al">![Varying $n$, fixed $m = 10$](figures/size_vs_time.pdf)</span></span>
 <span id="cb3-376"><a href="#cb3-376" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-377"><a href="#cb3-377" aria-hidden="true" tabindex="-1"></a><span class="al">![ARI and NMI scores of k-means++ (pink), EM (green), Ward Clustering (red), GIT (blue), Spectral Bridges (purple) on UMAP embedding](figures/mnist_umap_summary.pdf)</span>{#fig-mnist-umap-scores}</span>
+<span id="cb3-377"><a href="#cb3-377" aria-hidden="true" tabindex="-1"></a><span class="al">![Varying $m$, fixed $n = 5000$](figures/nodes_vs_time.pdf)</span></span>
 <span id="cb3-378"><a href="#cb3-378" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-379"><a href="#cb3-379" aria-hidden="true" tabindex="-1"></a>Note the Spectral Bridges is substantially better than other traditional methods and shines even with quite simple dimension reduction algorithms.</span>
-<span id="cb3-380"><a href="#cb3-380" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-381"><a href="#cb3-381" aria-hidden="true" tabindex="-1"></a>For visualization purposes, the predicted clusters by Spectral Bridges and k-means++ were projected using UMAP to compare them against the ground truth labels and to better understand the cluster shapes (see @fig-MNIST). Note this projection was not used in the experiments as an embedding, and thus does not play any role in the clustering process itself. As a matter of fact, the embedding used was obtained with Principal Componant Analysis (PCA), $h = 32$ and 250 Voronoï regions. Note that the label colors match the legend only in the case of the ground truth data. Indeed, the ordering of the labels have no significance on clustering quality.</span>
-<span id="cb3-382"><a href="#cb3-382" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-383"><a href="#cb3-383" aria-hidden="true" tabindex="-1"></a>::: {#fig-MNIST layout-ncol=3}</span>
-<span id="cb3-384"><a href="#cb3-384" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-385"><a href="#cb3-385" aria-hidden="true" tabindex="-1"></a><span class="al">![k-means++](figures/KMumap.pdf)</span></span>
-<span id="cb3-386"><a href="#cb3-386" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-387"><a href="#cb3-387" aria-hidden="true" tabindex="-1"></a><span class="al">![Spectral Bridges](figures/SBumap.pdf)</span></span>
-<span id="cb3-388"><a href="#cb3-388" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-389"><a href="#cb3-389" aria-hidden="true" tabindex="-1"></a><span class="al">![Ground Truth](figures/GTumap.pdf)</span></span>
-<span id="cb3-390"><a href="#cb3-390" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-391"><a href="#cb3-391" aria-hidden="true" tabindex="-1"></a>UMAP projection of predicted clusters against the ground truth labels.</span>
-<span id="cb3-392"><a href="#cb3-392" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb3-379"><a href="#cb3-379" aria-hidden="true" tabindex="-1"></a>Average time taken per model fit.</span>
+<span id="cb3-380"><a href="#cb3-380" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb3-381"><a href="#cb3-381" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-382"><a href="#cb3-382" aria-hidden="true" tabindex="-1"></a><span class="fu">## Accuracy</span></span>
+<span id="cb3-383"><a href="#cb3-383" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-384"><a href="#cb3-384" aria-hidden="true" tabindex="-1"></a>The algorithm's accuracy was first evaluated on the MNIST dataset. Metrics were collected to compare our method with k-means++, EM, and Ward clustering. Metrics were estimated by computing the empirical average over 10 consecutive runs for each method. Due to limited computational resources, we randomly selected a sample of 20,000 data points (one-third of the total) for each run, on which all algorithms were trained and tested. To ensure reproducibility, a fixed random seed was set at the beginning of all scripts. Note, however, that this does not imply centroids were initialized identically for centroid based methods, as these may vary according to the implementation of each tested algorithm.</span>
+<span id="cb3-385"><a href="#cb3-385" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-386"><a href="#cb3-386" aria-hidden="true" tabindex="-1"></a>Let $h$ denote the embedding dimension of the dataset. Spectral Bridges was tested both on the raw MNIST dataset without preprocessing ($h = 784$) and after reducing its dimension using PCA to $h \in <span class="sc">\{</span>8, 16, 32, 64<span class="sc">\}</span>$ (see @fig-mnist-pca-scores).</span>
+<span id="cb3-387"><a href="#cb3-387" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-388"><a href="#cb3-388" aria-hidden="true" tabindex="-1"></a><span class="al">![ARI and NMI scores of k-means++ (pink), EM (green), Ward Clustering (red), GIT (blue), and Spectral Bridges (purple) on PCA embedding and full MNIST.](figures/mnist_pca_summary.pdf)</span>{#fig-mnist-pca-scores}</span>
+<span id="cb3-389"><a href="#cb3-389" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-390"><a href="#cb3-390" aria-hidden="true" tabindex="-1"></a>Furthermore, the proposed algorithm was also tested on the same MNIST dataset after reducing its dimension to $h \in <span class="sc">\{</span>2, 4, 8, 16<span class="sc">\}</span>$ using UMAP <span class="co">[</span><span class="ot">@McInnes2018</span><span class="co">]</span>, a state-of-the-art non-linear dimension reduction algorithm (see @fig-mnist-umap-scores). To further improve the clustering performance of Spectral Bridges, the <span class="in">`fit_select`</span> method was employed. This method effectively trains the algorithm with multiple initializations and selects the one with the largest normalized eigengap (refer to the **Hyperparameter settings** section).</span>
+<span id="cb3-391"><a href="#cb3-391" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-392"><a href="#cb3-392" aria-hidden="true" tabindex="-1"></a><span class="al">![ARI and NMI scores of k-means++ (pink), EM (green), Ward Clustering (red), GIT (blue), Spectral Bridges (purple) on UMAP embedding](figures/mnist_umap_summary.pdf)</span>{#fig-mnist-umap-scores}</span>
 <span id="cb3-393"><a href="#cb3-393" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-394"><a href="#cb3-394" aria-hidden="true" tabindex="-1"></a>The Spectral Bridges algorithm was also put to the test against the same competitors using scikit-learn's UCI Breast Cancer data. Once again, this new method performs well although the advantage is not as obvious in this case (see @fig-cancer-scores). However, in none of our tests has it ranked worse than k-means++. The results are displayed as a boxplot generated from 200 iterations of each algorithm using a different seed, in order to better grasp the variability lying in the seed dependent nature of the k-means++, Expectation Maximization and Spectral Bridges algorithms.</span>
+<span id="cb3-394"><a href="#cb3-394" aria-hidden="true" tabindex="-1"></a>Note the Spectral Bridges is substantially better than other traditional methods and shines even with quite simple dimension reduction algorithms.</span>
 <span id="cb3-395"><a href="#cb3-395" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-396"><a href="#cb3-396" aria-hidden="true" tabindex="-1"></a><span class="al">![ARI and NMI scores of k-means++ (blue), EM (green), Ward Clustering (red), and Spectral Bridges (purple) on the UCI Breast Cancer dataset.](figures/cancer_summary.pdf)</span>{#fig-cancer-scores}</span>
+<span id="cb3-396"><a href="#cb3-396" aria-hidden="true" tabindex="-1"></a>For visualization purposes, the predicted clusters by Spectral Bridges and k-means++ were projected using UMAP to compare them against the ground truth labels and to better understand the cluster shapes (see @fig-MNIST). Note this projection was not used in the experiments as an embedding, and thus does not play any role in the clustering process itself. As a matter of fact, the embedding used was obtained with Principal Componant Analysis (PCA), $h = 32$ and 250 Voronoï regions. Note that the label colors match the legend only in the case of the ground truth data. Indeed, the ordering of the labels have no significance on clustering quality.</span>
 <span id="cb3-397"><a href="#cb3-397" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-398"><a href="#cb3-398" aria-hidden="true" tabindex="-1"></a>Since the Spectral Bridges algorithm is expected to excel at discerning complex and intricate cluster structures, an array of four toy datasets was collected, as illustrated in @fig-toy-datasets.</span>
+<span id="cb3-398"><a href="#cb3-398" aria-hidden="true" tabindex="-1"></a>::: {#fig-MNIST layout-ncol=3}</span>
 <span id="cb3-399"><a href="#cb3-399" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-400"><a href="#cb3-400" aria-hidden="true" tabindex="-1"></a>::: {#fig-toy-datasets layout-ncol=4}</span>
+<span id="cb3-400"><a href="#cb3-400" aria-hidden="true" tabindex="-1"></a><span class="al">![k-means++](figures/KMumap.pdf)</span></span>
 <span id="cb3-401"><a href="#cb3-401" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-402"><a href="#cb3-402" aria-hidden="true" tabindex="-1"></a><span class="al">![Impossible](figures/impossible.pdf)</span></span>
+<span id="cb3-402"><a href="#cb3-402" aria-hidden="true" tabindex="-1"></a><span class="al">![Spectral Bridges](figures/SBumap.pdf)</span></span>
 <span id="cb3-403"><a href="#cb3-403" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-404"><a href="#cb3-404" aria-hidden="true" tabindex="-1"></a><span class="al">![Moons](figures/moons.pdf)</span></span>
+<span id="cb3-404"><a href="#cb3-404" aria-hidden="true" tabindex="-1"></a><span class="al">![Ground Truth](figures/GTumap.pdf)</span></span>
 <span id="cb3-405"><a href="#cb3-405" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-406"><a href="#cb3-406" aria-hidden="true" tabindex="-1"></a><span class="al">![Circles](figures/circles.pdf)</span></span>
-<span id="cb3-407"><a href="#cb3-407" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-408"><a href="#cb3-408" aria-hidden="true" tabindex="-1"></a><span class="al">![Smile](figures/smile.pdf)</span></span>
-<span id="cb3-409"><a href="#cb3-409" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-410"><a href="#cb3-410" aria-hidden="true" tabindex="-1"></a>Four toy datasets.</span>
-<span id="cb3-411"><a href="#cb3-411" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb3-406"><a href="#cb3-406" aria-hidden="true" tabindex="-1"></a>UMAP projection of predicted clusters against the ground truth labels.</span>
+<span id="cb3-407"><a href="#cb3-407" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb3-408"><a href="#cb3-408" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-409"><a href="#cb3-409" aria-hidden="true" tabindex="-1"></a>The Spectral Bridges algorithm was also put to the test against the same competitors using scikit-learn's UCI Breast Cancer data. Once again, this new method performs well although the advantage is not as obvious in this case (see @fig-cancer-scores). However, in none of our tests has it ranked worse than k-means++. The results are displayed as a boxplot generated from 200 iterations of each algorithm using a different seed, in order to better grasp the variability lying in the seed dependent nature of the k-means++, Expectation Maximization and Spectral Bridges algorithms.</span>
+<span id="cb3-410"><a href="#cb3-410" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-411"><a href="#cb3-411" aria-hidden="true" tabindex="-1"></a><span class="al">![ARI and NMI scores of k-means++ (blue), EM (green), Ward Clustering (red), and Spectral Bridges (purple) on the UCI Breast Cancer dataset.](figures/cancer_summary.pdf)</span>{#fig-cancer-scores}</span>
 <span id="cb3-412"><a href="#cb3-412" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-413"><a href="#cb3-413" aria-hidden="true" tabindex="-1"></a>Multiple algorithms, including the proposed one, were benchmarked in the exact same manner as for the UCI Breast Cancer data. The results show that the proposed method outperforms all tested algorithms (DBSCAN, k-means++, Expectation Maximization, and Ward Clustering) while requiring few hyperparameters. As previously discussed, DBSCAN's parameters were optimized using the ground truth labels to represent a best-case scenario; however, in practical applications, suboptimal performance is more likely. Despite this optimization, the Spectral-Bridge algorithm still demonstrates superior ability to capture and represent the underlying cluster structures.</span>
+<span id="cb3-413"><a href="#cb3-413" aria-hidden="true" tabindex="-1"></a>Since the Spectral Bridges algorithm is expected to excel at discerning complex and intricate cluster structures, an array of four toy datasets was collected, as illustrated in @fig-toy-datasets.</span>
 <span id="cb3-414"><a href="#cb3-414" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-415"><a href="#cb3-415" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-416"><a href="#cb3-416" aria-hidden="true" tabindex="-1"></a><span class="al">![ARI and NMI scores of Spectral Bridges and competitors on standard synthetic toy datasets.](figures/synthetic_summary.pdf)</span>{#fig-synthetic-scores}</span>
-<span id="cb3-417"><a href="#cb3-417" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-418"><a href="#cb3-418" aria-hidden="true" tabindex="-1"></a>\newpage</span>
-<span id="cb3-419"><a href="#cb3-419" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-420"><a href="#cb3-420" aria-hidden="true" tabindex="-1"></a><span class="fu">## Noise robustness</span></span>
-<span id="cb3-421"><a href="#cb3-421" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-422"><a href="#cb3-422" aria-hidden="true" tabindex="-1"></a>To evaluate the noise robustness of the algorithm, two experimental setups were devised: one involved introducing Gaussian-distributed perturbations to the data, and the other involved concatenating uniformly distributed points within a predefined rectangular region (determined by the span of the dataset) to the existing dataset. As illustrated in @fig-noise-robustness, the tests demonstrate that in both scenarios, the algorithm exhibits a high degree of insensitivity to noise.</span>
-<span id="cb3-423"><a href="#cb3-423" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-424"><a href="#cb3-424" aria-hidden="true" tabindex="-1"></a>::: {#fig-noise-robustness layout-ncol=3}</span>
-<span id="cb3-425"><a href="#cb3-425" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-426"><a href="#cb3-426" aria-hidden="true" tabindex="-1"></a><span class="al">![Clean](figures/clean_impossible.pdf)</span></span>
+<span id="cb3-415"><a href="#cb3-415" aria-hidden="true" tabindex="-1"></a>::: {#fig-toy-datasets layout-ncol=4}</span>
+<span id="cb3-416"><a href="#cb3-416" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-417"><a href="#cb3-417" aria-hidden="true" tabindex="-1"></a><span class="al">![Impossible](figures/impossible.pdf)</span></span>
+<span id="cb3-418"><a href="#cb3-418" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-419"><a href="#cb3-419" aria-hidden="true" tabindex="-1"></a><span class="al">![Moons](figures/moons.pdf)</span></span>
+<span id="cb3-420"><a href="#cb3-420" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-421"><a href="#cb3-421" aria-hidden="true" tabindex="-1"></a><span class="al">![Circles](figures/circles.pdf)</span></span>
+<span id="cb3-422"><a href="#cb3-422" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-423"><a href="#cb3-423" aria-hidden="true" tabindex="-1"></a><span class="al">![Smile](figures/smile.pdf)</span></span>
+<span id="cb3-424"><a href="#cb3-424" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-425"><a href="#cb3-425" aria-hidden="true" tabindex="-1"></a>Four toy datasets.</span>
+<span id="cb3-426"><a href="#cb3-426" aria-hidden="true" tabindex="-1"></a>:::</span>
 <span id="cb3-427"><a href="#cb3-427" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-428"><a href="#cb3-428" aria-hidden="true" tabindex="-1"></a><span class="al">![Uniform noise](figures/uniform_noise_impossible.pdf)</span></span>
+<span id="cb3-428"><a href="#cb3-428" aria-hidden="true" tabindex="-1"></a>Multiple algorithms, including the proposed one, were benchmarked in the exact same manner as for the UCI Breast Cancer data. The results show that the proposed method outperforms all tested algorithms (DBSCAN, k-means++, Expectation Maximization, and Ward Clustering) while requiring few hyperparameters. As previously discussed, DBSCAN's parameters were optimized using the ground truth labels to represent a best-case scenario; however, in practical applications, suboptimal performance is more likely. Despite this optimization, the Spectral-Bridge algorithm still demonstrates superior ability to capture and represent the underlying cluster structures.</span>
 <span id="cb3-429"><a href="#cb3-429" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-430"><a href="#cb3-430" aria-hidden="true" tabindex="-1"></a><span class="al">![Gaussian noise](figures/gaussian_noise_impossible.pdf)</span></span>
-<span id="cb3-431"><a href="#cb3-431" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-432"><a href="#cb3-432" aria-hidden="true" tabindex="-1"></a>Three representations of the algorithm's predicted cluster centers are displayed as colored dots, with each point of the Impossible dataset shown as a small black dot. In the left graph, the dataset is unmodified. In the center graph, 250 uniformly distributed samples were added. In the right graph, Gaussian noise perturbations with $\sigma = 0.1$ were applied.</span>
-<span id="cb3-433"><a href="#cb3-433" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-434"><a href="#cb3-434" aria-hidden="true" tabindex="-1"></a>:::</span>
-<span id="cb3-435"><a href="#cb3-435" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-436"><a href="#cb3-436" aria-hidden="true" tabindex="-1"></a><span class="fu"># Conclusive remarks</span></span>
-<span id="cb3-437"><a href="#cb3-437" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-438"><a href="#cb3-438" aria-hidden="true" tabindex="-1"></a>Spectral Bridges is an original clustering algorithm which presents a novel approach by integrating the strengths of traditional k-means and spectral clustering frameworks. This algorithm utilizes a simple affinity measure for spectral clustering, which is derived from the minimal margin between pairs of Voronoï regions. </span>
-<span id="cb3-439"><a href="#cb3-439" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-440"><a href="#cb3-440" aria-hidden="true" tabindex="-1"></a>The algorithm demonstrates scalability, handling large datasets efficiently through a balanced computational complexity between the k-means clustering and eigen-decomposition steps. As a non-parametric method, Spectral Bridges does not rely on strong assumptions about data distribution, enhancing its versatility across various data types. It performs exceptionally well with both synthetic and real-world data and consistently outperforms conventional clustering algorithms such as k-means, DBSCAN, and mixture models. </span>
-<span id="cb3-441"><a href="#cb3-441" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-442"><a href="#cb3-442" aria-hidden="true" tabindex="-1"></a>The design of Spectral Bridges ensures robustness to noise, a significant advantage in real-world applications. Additionally, the algorithm requires minimal hyperparameters, primarily the number of Voronoï regions, making it straightforward to tune and deploy. </span>
-<span id="cb3-443"><a href="#cb3-443" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-444"><a href="#cb3-444" aria-hidden="true" tabindex="-1"></a>Furthermore, Spectral Bridges can be kernelized, allowing it to handle data in similarity space directly, which enhances its flexibility and applicability. Overall, Spectral Bridges is a powerful, robust, and scalable clustering algorithm that offers significant improvements over traditional methods, making it an excellent tool for advanced clustering tasks across numerous domains.</span>
-<span id="cb3-445"><a href="#cb3-445" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-446"><a href="#cb3-446" aria-hidden="true" tabindex="-1"></a><span class="fu"># Appendix {.appendix}</span></span>
-<span id="cb3-447"><a href="#cb3-447" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-448"><a href="#cb3-448" aria-hidden="true" tabindex="-1"></a><span class="fu">## Derivation of the bridge affinity {#gain}</span></span>
-<span id="cb3-449"><a href="#cb3-449" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-450"><a href="#cb3-450" aria-hidden="true" tabindex="-1"></a>We denote a bridge as a segment connecting two centroids $\boldsymbol \mu_k$ and $\boldsymbol \mu_l$. The inertia of a bridge between $\mathcal{V}_k$ and $\mathcal{V}_l$ is defined as </span>
-<span id="cb3-451"><a href="#cb3-451" aria-hidden="true" tabindex="-1"></a>$$</span>
-<span id="cb3-452"><a href="#cb3-452" aria-hidden="true" tabindex="-1"></a>B_{kl} = \sum_{\boldsymbol x_i\in \mathcal{V}_k \cup \mathcal{V}_l} \|\boldsymbol x_i - \boldsymbol p_{kl}(\boldsymbol x_i)\|^2,</span>
-<span id="cb3-453"><a href="#cb3-453" aria-hidden="true" tabindex="-1"></a>$$ where </span>
-<span id="cb3-454"><a href="#cb3-454" aria-hidden="true" tabindex="-1"></a>$$</span>
-<span id="cb3-455"><a href="#cb3-455" aria-hidden="true" tabindex="-1"></a>\boldsymbol p_{kl}(\boldsymbol x_i) = \boldsymbol \mu_{k} + t_i(\boldsymbol \mu_{l} - \boldsymbol \mu_{k}),</span>
-<span id="cb3-456"><a href="#cb3-456" aria-hidden="true" tabindex="-1"></a>$$ with $$</span>
-<span id="cb3-457"><a href="#cb3-457" aria-hidden="true" tabindex="-1"></a>t_i = \min\left(1, \max\left(0, \frac{\langle \boldsymbol x_i - \boldsymbol \mu_k | \boldsymbol \mu_l - \boldsymbol \mu_k\rangle}{\|  \boldsymbol \mu_l - \boldsymbol \mu_k \|^2}\right)\right). </span>
-<span id="cb3-458"><a href="#cb3-458" aria-hidden="true" tabindex="-1"></a>$$ </span>
-<span id="cb3-459"><a href="#cb3-459" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-460"><a href="#cb3-460" aria-hidden="true" tabindex="-1"></a>$B_{kl}$, the bridge inertia between centroids $k$ and $l$, can be expressed as the sum of three terms, which represents the projection onto each centroïds and onto the segment:</span>
-<span id="cb3-461"><a href="#cb3-461" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-462"><a href="#cb3-462" aria-hidden="true" tabindex="-1"></a>$$</span>
-<span id="cb3-463"><a href="#cb3-463" aria-hidden="true" tabindex="-1"></a>\begin{aligned}</span>
-<span id="cb3-464"><a href="#cb3-464" aria-hidden="true" tabindex="-1"></a>B_{kl} &amp;=&amp; \sum_{i \mid t_i=0} \|\boldsymbol x_i - \boldsymbol \mu_k\|^2  + \sum_{i \mid t_i=1} \|\boldsymbol x_i - \boldsymbol \mu_l\|^2 + \sum_{i \mid t_i\in ]0,1[} \|\boldsymbol x_i - \boldsymbol p_{kl}(\boldsymbol x_i)\|^2.</span>
-<span id="cb3-465"><a href="#cb3-465" aria-hidden="true" tabindex="-1"></a>\end{aligned}</span>
+<span id="cb3-430"><a href="#cb3-430" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-431"><a href="#cb3-431" aria-hidden="true" tabindex="-1"></a><span class="al">![ARI and NMI scores of Spectral Bridges and competitors on standard synthetic toy datasets.](figures/synthetic_summary.pdf)</span>{#fig-synthetic-scores}</span>
+<span id="cb3-432"><a href="#cb3-432" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-433"><a href="#cb3-433" aria-hidden="true" tabindex="-1"></a>\newpage</span>
+<span id="cb3-434"><a href="#cb3-434" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-435"><a href="#cb3-435" aria-hidden="true" tabindex="-1"></a><span class="fu">## Noise robustness</span></span>
+<span id="cb3-436"><a href="#cb3-436" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-437"><a href="#cb3-437" aria-hidden="true" tabindex="-1"></a>To evaluate the noise robustness of the algorithm, two experimental setups were devised: one involved introducing Gaussian-distributed perturbations to the data, and the other involved concatenating uniformly distributed points within a predefined rectangular region (determined by the span of the dataset) to the existing dataset. As illustrated in @fig-noise-robustness, the tests demonstrate that in both scenarios, the algorithm exhibits a high degree of insensitivity to noise.</span>
+<span id="cb3-438"><a href="#cb3-438" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-439"><a href="#cb3-439" aria-hidden="true" tabindex="-1"></a>::: {#fig-noise-robustness layout-ncol=3}</span>
+<span id="cb3-440"><a href="#cb3-440" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-441"><a href="#cb3-441" aria-hidden="true" tabindex="-1"></a><span class="al">![Clean](figures/clean_impossible.pdf)</span></span>
+<span id="cb3-442"><a href="#cb3-442" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-443"><a href="#cb3-443" aria-hidden="true" tabindex="-1"></a><span class="al">![Uniform noise](figures/uniform_noise_impossible.pdf)</span></span>
+<span id="cb3-444"><a href="#cb3-444" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-445"><a href="#cb3-445" aria-hidden="true" tabindex="-1"></a><span class="al">![Gaussian noise](figures/gaussian_noise_impossible.pdf)</span></span>
+<span id="cb3-446"><a href="#cb3-446" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-447"><a href="#cb3-447" aria-hidden="true" tabindex="-1"></a>Three representations of the algorithm's predicted cluster centers are displayed as colored dots, with each point of the Impossible dataset shown as a small black dot. In the left graph, the dataset is unmodified. In the center graph, 250 uniformly distributed samples were added. In the right graph, Gaussian noise perturbations with $\sigma = 0.1$ were applied.</span>
+<span id="cb3-448"><a href="#cb3-448" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-449"><a href="#cb3-449" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb3-450"><a href="#cb3-450" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-451"><a href="#cb3-451" aria-hidden="true" tabindex="-1"></a><span class="fu"># Conclusive remarks</span></span>
+<span id="cb3-452"><a href="#cb3-452" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-453"><a href="#cb3-453" aria-hidden="true" tabindex="-1"></a>Spectral Bridges is an original clustering algorithm which presents a novel approach by integrating the strengths of traditional k-means and spectral clustering frameworks. This algorithm utilizes a simple affinity measure for spectral clustering, which is derived from the minimal margin between pairs of Voronoï regions. </span>
+<span id="cb3-454"><a href="#cb3-454" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-455"><a href="#cb3-455" aria-hidden="true" tabindex="-1"></a>The algorithm demonstrates scalability, handling large datasets efficiently through a balanced computational complexity between the k-means clustering and eigen-decomposition steps. As a non-parametric method, Spectral Bridges does not rely on strong assumptions about data distribution, enhancing its versatility across various data types. It performs exceptionally well with both synthetic and real-world data and consistently outperforms conventional clustering algorithms such as k-means, DBSCAN, and mixture models. </span>
+<span id="cb3-456"><a href="#cb3-456" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-457"><a href="#cb3-457" aria-hidden="true" tabindex="-1"></a>The design of Spectral Bridges ensures robustness to noise, a significant advantage in real-world applications. Additionally, the algorithm requires minimal hyperparameters, primarily the number of Voronoï regions, making it straightforward to tune and deploy. </span>
+<span id="cb3-458"><a href="#cb3-458" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-459"><a href="#cb3-459" aria-hidden="true" tabindex="-1"></a>Furthermore, Spectral Bridges can be kernelized, allowing it to handle data in similarity space directly, which enhances its flexibility and applicability. Overall, Spectral Bridges is a powerful, robust, and scalable clustering algorithm that offers significant improvements over traditional methods, making it an excellent tool for advanced clustering tasks across numerous domains.</span>
+<span id="cb3-460"><a href="#cb3-460" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-461"><a href="#cb3-461" aria-hidden="true" tabindex="-1"></a><span class="fu"># Appendix {.appendix}</span></span>
+<span id="cb3-462"><a href="#cb3-462" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-463"><a href="#cb3-463" aria-hidden="true" tabindex="-1"></a><span class="fu">## Derivation of the bridge affinity {#gain}</span></span>
+<span id="cb3-464"><a href="#cb3-464" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-465"><a href="#cb3-465" aria-hidden="true" tabindex="-1"></a>We denote a bridge as a segment connecting two centroids $\boldsymbol \mu_k$ and $\boldsymbol \mu_l$. The inertia of a bridge between $\mathcal{V}_k$ and $\mathcal{V}_l$ is defined as </span>
 <span id="cb3-466"><a href="#cb3-466" aria-hidden="true" tabindex="-1"></a>$$</span>
-<span id="cb3-467"><a href="#cb3-467" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-468"><a href="#cb3-468" aria-hidden="true" tabindex="-1"></a>The last term may be decomposed in two parts corresponding to the points of the two Voronoï regions which are projected on the segment:</span>
-<span id="cb3-469"><a href="#cb3-469" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-470"><a href="#cb3-470" aria-hidden="true" tabindex="-1"></a>$$</span>
-<span id="cb3-471"><a href="#cb3-471" aria-hidden="true" tabindex="-1"></a>\begin{aligned}</span>
-<span id="cb3-472"><a href="#cb3-472" aria-hidden="true" tabindex="-1"></a>\sum_{i \mid t_i\in ]0,1<span class="co">[</span><span class="ot">} \|\boldsymbol x_i - \boldsymbol p_{kl}(\boldsymbol x_i)\|^2 &amp;=&amp; \sum_{i \mid t_i\in </span><span class="co">]</span>0,\frac{1}{2}[} \|\boldsymbol x_i - \boldsymbol p_{kl}(\boldsymbol x_i)\|^2 + \sum_{i \mid t_i\in [\frac{1}{2},1[} \|\boldsymbol x_i - \boldsymbol p_{kl}(\boldsymbol x_i)\|^2<span class="sc">\\</span></span>
-<span id="cb3-473"><a href="#cb3-473" aria-hidden="true" tabindex="-1"></a>\end{aligned}</span>
-<span id="cb3-474"><a href="#cb3-474" aria-hidden="true" tabindex="-1"></a>$$</span>
-<span id="cb3-475"><a href="#cb3-475" aria-hidden="true" tabindex="-1"></a>and each part further decomposed using Pythagore </span>
-<span id="cb3-476"><a href="#cb3-476" aria-hidden="true" tabindex="-1"></a>$$</span>
-<span id="cb3-477"><a href="#cb3-477" aria-hidden="true" tabindex="-1"></a>\begin{aligned}</span>
-<span id="cb3-478"><a href="#cb3-478" aria-hidden="true" tabindex="-1"></a>\sum_{i \mid t_i\in ]0,\frac{1}{2}<span class="co">[</span><span class="ot">} \|\boldsymbol x_i - \boldsymbol p_{kl}(\boldsymbol x_i)\|^2 &amp;=&amp; \sum_{i \mid t_i\in </span><span class="co">]</span>0,\frac{1}{2}<span class="co">[</span><span class="ot">} \|\boldsymbol x_i - \boldsymbol \mu_k\|^2 - \sum_{i \mid t_i\in </span><span class="co">]</span>0,\frac{1}{2}[} \|\boldsymbol \mu_k - \boldsymbol p_{kl}(\boldsymbol x_i)\|^2<span class="sc">\\</span></span>
-<span id="cb3-479"><a href="#cb3-479" aria-hidden="true" tabindex="-1"></a>&amp;=&amp; \sum_{i \mid t_i\in ]0,\frac{1}{2}<span class="co">[</span><span class="ot">} \|\boldsymbol x_i - \boldsymbol \mu_k\|^2 - \sum_{i \mid t_i\in </span><span class="co">]</span>0,\frac{1}{2}[} \|t_i (\boldsymbol \mu_k - \boldsymbol \mu_{l})\|^2,</span>
+<span id="cb3-467"><a href="#cb3-467" aria-hidden="true" tabindex="-1"></a>B_{kl} = \sum_{\boldsymbol x_i\in \mathcal{V}_k \cup \mathcal{V}_l} \|\boldsymbol x_i - \boldsymbol p_{kl}(\boldsymbol x_i)\|^2,</span>
+<span id="cb3-468"><a href="#cb3-468" aria-hidden="true" tabindex="-1"></a>$$ where </span>
+<span id="cb3-469"><a href="#cb3-469" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb3-470"><a href="#cb3-470" aria-hidden="true" tabindex="-1"></a>\boldsymbol p_{kl}(\boldsymbol x_i) = \boldsymbol \mu_{k} + t_i(\boldsymbol \mu_{l} - \boldsymbol \mu_{k}),</span>
+<span id="cb3-471"><a href="#cb3-471" aria-hidden="true" tabindex="-1"></a>$$ with $$</span>
+<span id="cb3-472"><a href="#cb3-472" aria-hidden="true" tabindex="-1"></a>t_i = \min\left(1, \max\left(0, \frac{\langle \boldsymbol x_i - \boldsymbol \mu_k | \boldsymbol \mu_l - \boldsymbol \mu_k\rangle}{\|  \boldsymbol \mu_l - \boldsymbol \mu_k \|^2}\right)\right). </span>
+<span id="cb3-473"><a href="#cb3-473" aria-hidden="true" tabindex="-1"></a>$$ </span>
+<span id="cb3-474"><a href="#cb3-474" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-475"><a href="#cb3-475" aria-hidden="true" tabindex="-1"></a>$B_{kl}$, the bridge inertia between centroids $k$ and $l$, can be expressed as the sum of three terms, which represents the projection onto each centroïds and onto the segment:</span>
+<span id="cb3-476"><a href="#cb3-476" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-477"><a href="#cb3-477" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb3-478"><a href="#cb3-478" aria-hidden="true" tabindex="-1"></a>\begin{aligned}</span>
+<span id="cb3-479"><a href="#cb3-479" aria-hidden="true" tabindex="-1"></a>B_{kl} &amp;=&amp; \sum_{i \mid t_i=0} \|\boldsymbol x_i - \boldsymbol \mu_k\|^2  + \sum_{i \mid t_i=1} \|\boldsymbol x_i - \boldsymbol \mu_l\|^2 + \sum_{i \mid t_i\in ]0,1[} \|\boldsymbol x_i - \boldsymbol p_{kl}(\boldsymbol x_i)\|^2.</span>
 <span id="cb3-480"><a href="#cb3-480" aria-hidden="true" tabindex="-1"></a>\end{aligned}</span>
 <span id="cb3-481"><a href="#cb3-481" aria-hidden="true" tabindex="-1"></a>$$</span>
 <span id="cb3-482"><a href="#cb3-482" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-483"><a href="#cb3-483" aria-hidden="true" tabindex="-1"></a>$$</span>
-<span id="cb3-484"><a href="#cb3-484" aria-hidden="true" tabindex="-1"></a>\begin{aligned}</span>
-<span id="cb3-485"><a href="#cb3-485" aria-hidden="true" tabindex="-1"></a>\sum_{i \mid t_i\in ]\frac{1}{2},1<span class="co">[</span><span class="ot">} \|\boldsymbol x_i - \boldsymbol p_{kl}(\boldsymbol x_i)\|^2 &amp;=&amp; \sum_{i \mid t_i\in </span><span class="co">]</span>0,\frac{1}{2}<span class="co">[</span><span class="ot">} \|\boldsymbol x_i - \boldsymbol \mu_l\|^2 - \sum_{i \mid t_i\in </span><span class="co">]</span>0,\frac{1}{2}[} \|\boldsymbol \mu_l - \boldsymbol p_{kl}(\boldsymbol x_i)\|^2<span class="sc">\\</span></span>
-<span id="cb3-486"><a href="#cb3-486" aria-hidden="true" tabindex="-1"></a>&amp;=&amp; \sum_{i \mid t_i\in ]\frac{1}{2},1<span class="co">[</span><span class="ot">} \|\boldsymbol x_i - \boldsymbol \mu_k\|^2 - \sum_{i \mid t_i\in </span><span class="co">]</span>0,\frac{1}{2}[} \|(1-t_i) (\boldsymbol \mu_k - \boldsymbol \mu_{l})\|^2</span>
-<span id="cb3-487"><a href="#cb3-487" aria-hidden="true" tabindex="-1"></a>\end{aligned}</span>
-<span id="cb3-488"><a href="#cb3-488" aria-hidden="true" tabindex="-1"></a>$$</span>
-<span id="cb3-489"><a href="#cb3-489" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-490"><a href="#cb3-490" aria-hidden="true" tabindex="-1"></a>Thus </span>
+<span id="cb3-483"><a href="#cb3-483" aria-hidden="true" tabindex="-1"></a>The last term may be decomposed in two parts corresponding to the points of the two Voronoï regions which are projected on the segment:</span>
+<span id="cb3-484"><a href="#cb3-484" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-485"><a href="#cb3-485" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb3-486"><a href="#cb3-486" aria-hidden="true" tabindex="-1"></a>\begin{aligned}</span>
+<span id="cb3-487"><a href="#cb3-487" aria-hidden="true" tabindex="-1"></a>\sum_{i \mid t_i\in ]0,1<span class="co">[</span><span class="ot">} \|\boldsymbol x_i - \boldsymbol p_{kl}(\boldsymbol x_i)\|^2 &amp;=&amp; \sum_{i \mid t_i\in </span><span class="co">]</span>0,\frac{1}{2}[} \|\boldsymbol x_i - \boldsymbol p_{kl}(\boldsymbol x_i)\|^2 + \sum_{i \mid t_i\in [\frac{1}{2},1[} \|\boldsymbol x_i - \boldsymbol p_{kl}(\boldsymbol x_i)\|^2<span class="sc">\\</span></span>
+<span id="cb3-488"><a href="#cb3-488" aria-hidden="true" tabindex="-1"></a>\end{aligned}</span>
+<span id="cb3-489"><a href="#cb3-489" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb3-490"><a href="#cb3-490" aria-hidden="true" tabindex="-1"></a>and each part further decomposed using Pythagore </span>
 <span id="cb3-491"><a href="#cb3-491" aria-hidden="true" tabindex="-1"></a>$$</span>
 <span id="cb3-492"><a href="#cb3-492" aria-hidden="true" tabindex="-1"></a>\begin{aligned}</span>
-<span id="cb3-493"><a href="#cb3-493" aria-hidden="true" tabindex="-1"></a>B_{kl}- I_{kl} &amp;=  \sum_{i \mid t_i\in ]0,\frac{1}{2}<span class="co">[</span><span class="ot">} t_i^2 \|\boldsymbol \mu_k - \boldsymbol \mu_l\|^2 + \sum_{i \mid t_i\in </span><span class="co">]</span>\frac{1}{2},1[} (1-t_i)^2 \|\boldsymbol \mu_k - \boldsymbol \mu_l\|^2,<span class="sc">\\</span></span>
-<span id="cb3-494"><a href="#cb3-494" aria-hidden="true" tabindex="-1"></a>\frac{B_{kl}- I_{kl}}{\|\boldsymbol \mu_k - \boldsymbol \mu_l\|^2} &amp;= \sum_{i \mid t_i\in ]0,\frac{1}{2}<span class="co">[</span><span class="ot">} t_i^2  + \sum_{i \mid t_i\in </span><span class="co">]</span>\frac{1}{2},1[} (1-t_i)^2, <span class="sc">\\</span></span>
-<span id="cb3-495"><a href="#cb3-495" aria-hidden="true" tabindex="-1"></a>\frac{B_{kl}- I_{kl}}{(n_k+n_l)\|\boldsymbol \mu_k - \boldsymbol \mu_l\|^2} &amp;= \frac{\sum_{\boldsymbol{x_i} \in \mathcal V_k} \langle \boldsymbol{x_i} - \boldsymbol{\mu}_k \vert \boldsymbol{\mu}_l - \boldsymbol{\mu}_k \rangle_+^2 + \sum_{\boldsymbol{x_i} \in \mathcal V_l} \langle \boldsymbol{x_i} - \boldsymbol{\mu}_l \vert \boldsymbol{\mu}_k - \boldsymbol{\mu}_l\rangle_+^2}{(n_k+n_l)\|\boldsymbol \mu_k - \boldsymbol \mu_l\|^4}.</span>
-<span id="cb3-496"><a href="#cb3-496" aria-hidden="true" tabindex="-1"></a>\end{aligned}</span>
-<span id="cb3-497"><a href="#cb3-497" aria-hidden="true" tabindex="-1"></a>$$</span>
-<span id="cb3-498"><a href="#cb3-498" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-499"><a href="#cb3-499" aria-hidden="true" tabindex="-1"></a><span class="fu">## Code</span></span>
-<span id="cb3-500"><a href="#cb3-500" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-501"><a href="#cb3-501" aria-hidden="true" tabindex="-1"></a><span class="fu">### Implementation </span></span>
-<span id="cb3-502"><a href="#cb3-502" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-503"><a href="#cb3-503" aria-hidden="true" tabindex="-1"></a>Numerical experiments have been conducted in Python. The python scripts to reproduce the simulations and figures are available at <span class="ot">&lt;https://github.com/flheight/Spectral-Bridges&gt;</span>.  The Spectral Bridge algorithm is implemented both in </span>
+<span id="cb3-493"><a href="#cb3-493" aria-hidden="true" tabindex="-1"></a>\sum_{i \mid t_i\in ]0,\frac{1}{2}<span class="co">[</span><span class="ot">} \|\boldsymbol x_i - \boldsymbol p_{kl}(\boldsymbol x_i)\|^2 &amp;=&amp; \sum_{i \mid t_i\in </span><span class="co">]</span>0,\frac{1}{2}<span class="co">[</span><span class="ot">} \|\boldsymbol x_i - \boldsymbol \mu_k\|^2 - \sum_{i \mid t_i\in </span><span class="co">]</span>0,\frac{1}{2}[} \|\boldsymbol \mu_k - \boldsymbol p_{kl}(\boldsymbol x_i)\|^2<span class="sc">\\</span></span>
+<span id="cb3-494"><a href="#cb3-494" aria-hidden="true" tabindex="-1"></a>&amp;=&amp; \sum_{i \mid t_i\in ]0,\frac{1}{2}<span class="co">[</span><span class="ot">} \|\boldsymbol x_i - \boldsymbol \mu_k\|^2 - \sum_{i \mid t_i\in </span><span class="co">]</span>0,\frac{1}{2}[} \|t_i (\boldsymbol \mu_k - \boldsymbol \mu_{l})\|^2,</span>
+<span id="cb3-495"><a href="#cb3-495" aria-hidden="true" tabindex="-1"></a>\end{aligned}</span>
+<span id="cb3-496"><a href="#cb3-496" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb3-497"><a href="#cb3-497" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-498"><a href="#cb3-498" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb3-499"><a href="#cb3-499" aria-hidden="true" tabindex="-1"></a>\begin{aligned}</span>
+<span id="cb3-500"><a href="#cb3-500" aria-hidden="true" tabindex="-1"></a>\sum_{i \mid t_i\in ]\frac{1}{2},1<span class="co">[</span><span class="ot">} \|\boldsymbol x_i - \boldsymbol p_{kl}(\boldsymbol x_i)\|^2 &amp;=&amp; \sum_{i \mid t_i\in </span><span class="co">]</span>0,\frac{1}{2}<span class="co">[</span><span class="ot">} \|\boldsymbol x_i - \boldsymbol \mu_l\|^2 - \sum_{i \mid t_i\in </span><span class="co">]</span>0,\frac{1}{2}[} \|\boldsymbol \mu_l - \boldsymbol p_{kl}(\boldsymbol x_i)\|^2<span class="sc">\\</span></span>
+<span id="cb3-501"><a href="#cb3-501" aria-hidden="true" tabindex="-1"></a>&amp;=&amp; \sum_{i \mid t_i\in ]\frac{1}{2},1<span class="co">[</span><span class="ot">} \|\boldsymbol x_i - \boldsymbol \mu_k\|^2 - \sum_{i \mid t_i\in </span><span class="co">]</span>0,\frac{1}{2}[} \|(1-t_i) (\boldsymbol \mu_k - \boldsymbol \mu_{l})\|^2</span>
+<span id="cb3-502"><a href="#cb3-502" aria-hidden="true" tabindex="-1"></a>\end{aligned}</span>
+<span id="cb3-503"><a href="#cb3-503" aria-hidden="true" tabindex="-1"></a>$$</span>
 <span id="cb3-504"><a href="#cb3-504" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-505"><a href="#cb3-505" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Python: <span class="ot">&lt;https://pypi.org/project/spectral-bridges&gt;</span>, and</span>
-<span id="cb3-506"><a href="#cb3-506" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>R: <span class="ot">&lt;https://github.com/cambroise/spectral-bridges-Rpackage&gt;</span>.</span>
-<span id="cb3-507"><a href="#cb3-507" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-508"><a href="#cb3-508" aria-hidden="true" tabindex="-1"></a><span class="fu">### Affinity matrix computation</span></span>
-<span id="cb3-509"><a href="#cb3-509" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-510"><a href="#cb3-510" aria-hidden="true" tabindex="-1"></a>Taking a closer look at the second step of @alg-spectral-bridges, that is the affinity matrix calculation with a $O(n \times m \times d)$ time complexity, most operations can be parallelized leaving a single loop, bundling together $m^2$ dot products into only $m$ matrix multiplications, thus allowing for an efficient construction in both high and low level programming languages. Though the complexity of the algorithm remains unchanged, libraries such as Basic Linear Algebra Subprograms can render the calculations orders of magnitude faster. Moreover, the symmetrical nature of the bridge affinity can be used to effectively halve the computation time.</span>
-<span id="cb3-511"><a href="#cb3-511" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-512"><a href="#cb3-512" aria-hidden="true" tabindex="-1"></a>The calculation of the affinity matrix is highlighted by the Python code @lst-code-affinity. Though it could be even more optimized, the following code snippet is approximately 200 times faster than a naive implementation on a small dataset comprised of $n = 3594$, $d = 2$ points, and a value of $m = 250$.</span>
+<span id="cb3-505"><a href="#cb3-505" aria-hidden="true" tabindex="-1"></a>Thus </span>
+<span id="cb3-506"><a href="#cb3-506" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb3-507"><a href="#cb3-507" aria-hidden="true" tabindex="-1"></a>\begin{aligned}</span>
+<span id="cb3-508"><a href="#cb3-508" aria-hidden="true" tabindex="-1"></a>B_{kl}- I_{kl} &amp;=  \sum_{i \mid t_i\in ]0,\frac{1}{2}<span class="co">[</span><span class="ot">} t_i^2 \|\boldsymbol \mu_k - \boldsymbol \mu_l\|^2 + \sum_{i \mid t_i\in </span><span class="co">]</span>\frac{1}{2},1[} (1-t_i)^2 \|\boldsymbol \mu_k - \boldsymbol \mu_l\|^2,<span class="sc">\\</span></span>
+<span id="cb3-509"><a href="#cb3-509" aria-hidden="true" tabindex="-1"></a>\frac{B_{kl}- I_{kl}}{\|\boldsymbol \mu_k - \boldsymbol \mu_l\|^2} &amp;= \sum_{i \mid t_i\in ]0,\frac{1}{2}<span class="co">[</span><span class="ot">} t_i^2  + \sum_{i \mid t_i\in </span><span class="co">]</span>\frac{1}{2},1[} (1-t_i)^2, <span class="sc">\\</span></span>
+<span id="cb3-510"><a href="#cb3-510" aria-hidden="true" tabindex="-1"></a>\frac{B_{kl}- I_{kl}}{(n_k+n_l)\|\boldsymbol \mu_k - \boldsymbol \mu_l\|^2} &amp;= \frac{\sum_{\boldsymbol{x_i} \in \mathcal V_k} \langle \boldsymbol{x_i} - \boldsymbol{\mu}_k \vert \boldsymbol{\mu}_l - \boldsymbol{\mu}_k \rangle_+^2 + \sum_{\boldsymbol{x_i} \in \mathcal V_l} \langle \boldsymbol{x_i} - \boldsymbol{\mu}_l \vert \boldsymbol{\mu}_k - \boldsymbol{\mu}_l\rangle_+^2}{(n_k+n_l)\|\boldsymbol \mu_k - \boldsymbol \mu_l\|^4}.</span>
+<span id="cb3-511"><a href="#cb3-511" aria-hidden="true" tabindex="-1"></a>\end{aligned}</span>
+<span id="cb3-512"><a href="#cb3-512" aria-hidden="true" tabindex="-1"></a>$$</span>
 <span id="cb3-513"><a href="#cb3-513" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-514"><a href="#cb3-514" aria-hidden="true" tabindex="-1"></a>Notice that the Python code is significantly faster than the R code.</span>
+<span id="cb3-514"><a href="#cb3-514" aria-hidden="true" tabindex="-1"></a><span class="fu">## Code</span></span>
 <span id="cb3-515"><a href="#cb3-515" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-516"><a href="#cb3-516" aria-hidden="true" tabindex="-1"></a><span class="in">```{python affinity, python.reticulate = FALSE}</span></span>
-<span id="cb3-517"><a href="#cb3-517" aria-hidden="true" tabindex="-1"></a><span class="in">#| lst-label: lst-code-affinity</span></span>
-<span id="cb3-518"><a href="#cb3-518" aria-hidden="true" tabindex="-1"></a><span class="in">#| lst-cap: "Python code for affinity matrix computation"</span></span>
-<span id="cb3-519"><a href="#cb3-519" aria-hidden="true" tabindex="-1"></a><span class="in">#| echo: true</span></span>
-<span id="cb3-520"><a href="#cb3-520" aria-hidden="true" tabindex="-1"></a><span class="in">#| eval: false</span></span>
-<span id="cb3-521"><a href="#cb3-521" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-522"><a href="#cb3-522" aria-hidden="true" tabindex="-1"></a><span class="in">#Initialize the matrix as empty</span></span>
-<span id="cb3-523"><a href="#cb3-523" aria-hidden="true" tabindex="-1"></a><span class="in">affinity = np.empty((self.n_nodes, self.n_nodes))</span></span>
+<span id="cb3-516"><a href="#cb3-516" aria-hidden="true" tabindex="-1"></a><span class="fu">### Implementation </span></span>
+<span id="cb3-517"><a href="#cb3-517" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-518"><a href="#cb3-518" aria-hidden="true" tabindex="-1"></a>Numerical experiments have been conducted in Python. The python scripts to reproduce the simulations and figures are available at <span class="ot">&lt;https://github.com/flheight/Spectral-Bridges&gt;</span>.  The Spectral Bridge algorithm is implemented both in </span>
+<span id="cb3-519"><a href="#cb3-519" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-520"><a href="#cb3-520" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Python: <span class="ot">&lt;https://pypi.org/project/spectral-bridges&gt;</span>, and</span>
+<span id="cb3-521"><a href="#cb3-521" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>R: <span class="ot">&lt;https://github.com/cambroise/spectral-bridges-Rpackage&gt;</span>.</span>
+<span id="cb3-522"><a href="#cb3-522" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-523"><a href="#cb3-523" aria-hidden="true" tabindex="-1"></a><span class="fu">### Affinity matrix computation</span></span>
 <span id="cb3-524"><a href="#cb3-524" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-525"><a href="#cb3-525" aria-hidden="true" tabindex="-1"></a><span class="in">#Center each region</span></span>
-<span id="cb3-526"><a href="#cb3-526" aria-hidden="true" tabindex="-1"></a><span class="in">X_centered = [</span></span>
-<span id="cb3-527"><a href="#cb3-527" aria-hidden="true" tabindex="-1"></a><span class="in">    np.array(</span></span>
-<span id="cb3-528"><a href="#cb3-528" aria-hidden="true" tabindex="-1"></a><span class="in">        X[kmeans.labels_ == i] - kmeans.cluster_centers_[i],</span></span>
-<span id="cb3-529"><a href="#cb3-529" aria-hidden="true" tabindex="-1"></a><span class="in">        dtype=np.float32,</span></span>
-<span id="cb3-530"><a href="#cb3-530" aria-hidden="true" tabindex="-1"></a><span class="in">        order="F",</span></span>
-<span id="cb3-531"><a href="#cb3-531" aria-hidden="true" tabindex="-1"></a><span class="in">    )</span></span>
-<span id="cb3-532"><a href="#cb3-532" aria-hidden="true" tabindex="-1"></a><span class="in">    for i in range(self.n_nodes)</span></span>
-<span id="cb3-533"><a href="#cb3-533" aria-hidden="true" tabindex="-1"></a><span class="in">]</span></span>
-<span id="cb3-534"><a href="#cb3-534" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-535"><a href="#cb3-535" aria-hidden="true" tabindex="-1"></a><span class="in">#Cardinal calculation</span></span>
-<span id="cb3-536"><a href="#cb3-536" aria-hidden="true" tabindex="-1"></a><span class="in">counts = np.array([X_centered[i].shape[0] for i in range(self.n_nodes)])</span></span>
-<span id="cb3-537"><a href="#cb3-537" aria-hidden="true" tabindex="-1"></a><span class="in">counts = counts[None, :] + counts[:, None]</span></span>
-<span id="cb3-538"><a href="#cb3-538" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-539"><a href="#cb3-539" aria-hidden="true" tabindex="-1"></a><span class="in">#Calculate the affinity</span></span>
-<span id="cb3-540"><a href="#cb3-540" aria-hidden="true" tabindex="-1"></a><span class="in">for i in range(self.n_nodes):</span></span>
-<span id="cb3-541"><a href="#cb3-541" aria-hidden="true" tabindex="-1"></a><span class="in">    segments = np.asfortranarray(</span></span>
-<span id="cb3-542"><a href="#cb3-542" aria-hidden="true" tabindex="-1"></a><span class="in">        kmeans.cluster_centers_ - kmeans.cluster_centers_[i]</span></span>
-<span id="cb3-543"><a href="#cb3-543" aria-hidden="true" tabindex="-1"></a><span class="in">    )</span></span>
-<span id="cb3-544"><a href="#cb3-544" aria-hidden="true" tabindex="-1"></a><span class="in">    dists = np.einsum("ij,ij-&gt;i", segments, segments)</span></span>
-<span id="cb3-545"><a href="#cb3-545" aria-hidden="true" tabindex="-1"></a><span class="in">    dists[i] = 1</span></span>
-<span id="cb3-546"><a href="#cb3-546" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-547"><a href="#cb3-547" aria-hidden="true" tabindex="-1"></a><span class="in">    projs = sgemm(1.0, X_centered[i], segments, trans_b=True)</span></span>
-<span id="cb3-548"><a href="#cb3-548" aria-hidden="true" tabindex="-1"></a><span class="in">    np.clip(projs / dists, 0, None, out=projs)</span></span>
-<span id="cb3-549"><a href="#cb3-549" aria-hidden="true" tabindex="-1"></a><span class="in">    projs = np.power(projs, self.p)</span></span>
-<span id="cb3-550"><a href="#cb3-550" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-551"><a href="#cb3-551" aria-hidden="true" tabindex="-1"></a><span class="in">    affinity[i] = projs.sum(axis=0)</span></span>
-<span id="cb3-552"><a href="#cb3-552" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-553"><a href="#cb3-553" aria-hidden="true" tabindex="-1"></a><span class="in">affinity = np.power((affinity + affinity.T) / counts, 1 / self.p)</span></span>
-<span id="cb3-554"><a href="#cb3-554" aria-hidden="true" tabindex="-1"></a><span class="in">affinity -= 0.5 * affinity.max()</span></span>
-<span id="cb3-555"><a href="#cb3-555" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-556"><a href="#cb3-556" aria-hidden="true" tabindex="-1"></a><span class="in">#Scale and exponentiate</span></span>
-<span id="cb3-557"><a href="#cb3-557" aria-hidden="true" tabindex="-1"></a><span class="in">q10, q90 = np.quantile(affinity, [0.1, 0.9])</span></span>
-<span id="cb3-558"><a href="#cb3-558" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-559"><a href="#cb3-559" aria-hidden="true" tabindex="-1"></a><span class="in">gamma = np.log(self.M) / (q90 - q10)</span></span>
-<span id="cb3-560"><a href="#cb3-560" aria-hidden="true" tabindex="-1"></a><span class="in">affinity = np.exp(gamma * affinity)</span></span>
-<span id="cb3-561"><a href="#cb3-561" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb3-562"><a href="#cb3-562" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb3-563"><a href="#cb3-563" aria-hidden="true" tabindex="-1"></a>\newpage  </span>
-<span id="cb3-564"><a href="#cb3-564" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb3-565"><a href="#cb3-565" aria-hidden="true" tabindex="-1"></a><span class="fu"># References {.unnumbered}</span></span>
-<span id="cb3-566"><a href="#cb3-566" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-567"><a href="#cb3-567" aria-hidden="true" tabindex="-1"></a>::: {#refs}</span>
-<span id="cb3-568"><a href="#cb3-568" aria-hidden="true" tabindex="-1"></a>:::</span>
-<span id="cb3-569"><a href="#cb3-569" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-570"><a href="#cb3-570" aria-hidden="true" tabindex="-1"></a><span class="fu"># Session information {.appendix .unnumbered}</span></span>
-<span id="cb3-571"><a href="#cb3-571" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-572"><a href="#cb3-572" aria-hidden="true" tabindex="-1"></a><span class="in">```{r session-info}</span></span>
-<span id="cb3-573"><a href="#cb3-573" aria-hidden="true" tabindex="-1"></a><span class="in">sessionInfo()</span></span>
-<span id="cb3-574"><a href="#cb3-574" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></pre></div>
+<span id="cb3-525"><a href="#cb3-525" aria-hidden="true" tabindex="-1"></a>Taking a closer look at the second step of @alg-spectral-bridges, that is the affinity matrix calculation with a $O(n \times m \times d)$ time complexity, most operations can be parallelized leaving a single loop, bundling together $m^2$ dot products into only $m$ matrix multiplications, thus allowing for an efficient construction in both high and low level programming languages. Though the complexity of the algorithm remains unchanged, libraries such as Basic Linear Algebra Subprograms can render the calculations orders of magnitude faster. Moreover, the symmetrical nature of the bridge affinity can be used to effectively halve the computation time.</span>
+<span id="cb3-526"><a href="#cb3-526" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-527"><a href="#cb3-527" aria-hidden="true" tabindex="-1"></a>The calculation of the affinity matrix is highlighted by the Python code @lst-code-affinity. Though it could be even more optimized, the following code snippet is approximately 200 times faster than a naive implementation on a small dataset comprised of $n = 3594$, $d = 2$ points, and a value of $m = 250$.</span>
+<span id="cb3-528"><a href="#cb3-528" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-529"><a href="#cb3-529" aria-hidden="true" tabindex="-1"></a>Notice that the Python code is significantly faster than the R code.</span>
+<span id="cb3-530"><a href="#cb3-530" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-531"><a href="#cb3-531" aria-hidden="true" tabindex="-1"></a><span class="in">```{python affinity, python.reticulate = FALSE}</span></span>
+<span id="cb3-532"><a href="#cb3-532" aria-hidden="true" tabindex="-1"></a><span class="in">#| lst-label: lst-code-affinity</span></span>
+<span id="cb3-533"><a href="#cb3-533" aria-hidden="true" tabindex="-1"></a><span class="in">#| lst-cap: "Python code for affinity matrix computation"</span></span>
+<span id="cb3-534"><a href="#cb3-534" aria-hidden="true" tabindex="-1"></a><span class="in">#| echo: true</span></span>
+<span id="cb3-535"><a href="#cb3-535" aria-hidden="true" tabindex="-1"></a><span class="in">#| eval: false</span></span>
+<span id="cb3-536"><a href="#cb3-536" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-537"><a href="#cb3-537" aria-hidden="true" tabindex="-1"></a><span class="in">#Initialize the matrix as empty</span></span>
+<span id="cb3-538"><a href="#cb3-538" aria-hidden="true" tabindex="-1"></a><span class="in">affinity = np.empty((self.n_nodes, self.n_nodes))</span></span>
+<span id="cb3-539"><a href="#cb3-539" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-540"><a href="#cb3-540" aria-hidden="true" tabindex="-1"></a><span class="in">#Center each region</span></span>
+<span id="cb3-541"><a href="#cb3-541" aria-hidden="true" tabindex="-1"></a><span class="in">X_centered = [</span></span>
+<span id="cb3-542"><a href="#cb3-542" aria-hidden="true" tabindex="-1"></a><span class="in">    np.array(</span></span>
+<span id="cb3-543"><a href="#cb3-543" aria-hidden="true" tabindex="-1"></a><span class="in">        X[kmeans.labels_ == i] - kmeans.cluster_centers_[i],</span></span>
+<span id="cb3-544"><a href="#cb3-544" aria-hidden="true" tabindex="-1"></a><span class="in">        dtype=np.float32,</span></span>
+<span id="cb3-545"><a href="#cb3-545" aria-hidden="true" tabindex="-1"></a><span class="in">        order="F",</span></span>
+<span id="cb3-546"><a href="#cb3-546" aria-hidden="true" tabindex="-1"></a><span class="in">    )</span></span>
+<span id="cb3-547"><a href="#cb3-547" aria-hidden="true" tabindex="-1"></a><span class="in">    for i in range(self.n_nodes)</span></span>
+<span id="cb3-548"><a href="#cb3-548" aria-hidden="true" tabindex="-1"></a><span class="in">]</span></span>
+<span id="cb3-549"><a href="#cb3-549" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-550"><a href="#cb3-550" aria-hidden="true" tabindex="-1"></a><span class="in">#Cardinal calculation</span></span>
+<span id="cb3-551"><a href="#cb3-551" aria-hidden="true" tabindex="-1"></a><span class="in">counts = np.array([X_centered[i].shape[0] for i in range(self.n_nodes)])</span></span>
+<span id="cb3-552"><a href="#cb3-552" aria-hidden="true" tabindex="-1"></a><span class="in">counts = counts[None, :] + counts[:, None]</span></span>
+<span id="cb3-553"><a href="#cb3-553" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-554"><a href="#cb3-554" aria-hidden="true" tabindex="-1"></a><span class="in">#Calculate the affinity</span></span>
+<span id="cb3-555"><a href="#cb3-555" aria-hidden="true" tabindex="-1"></a><span class="in">for i in range(self.n_nodes):</span></span>
+<span id="cb3-556"><a href="#cb3-556" aria-hidden="true" tabindex="-1"></a><span class="in">    segments = np.asfortranarray(</span></span>
+<span id="cb3-557"><a href="#cb3-557" aria-hidden="true" tabindex="-1"></a><span class="in">        kmeans.cluster_centers_ - kmeans.cluster_centers_[i]</span></span>
+<span id="cb3-558"><a href="#cb3-558" aria-hidden="true" tabindex="-1"></a><span class="in">    )</span></span>
+<span id="cb3-559"><a href="#cb3-559" aria-hidden="true" tabindex="-1"></a><span class="in">    dists = np.einsum("ij,ij-&gt;i", segments, segments)</span></span>
+<span id="cb3-560"><a href="#cb3-560" aria-hidden="true" tabindex="-1"></a><span class="in">    dists[i] = 1</span></span>
+<span id="cb3-561"><a href="#cb3-561" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-562"><a href="#cb3-562" aria-hidden="true" tabindex="-1"></a><span class="in">    projs = sgemm(1.0, X_centered[i], segments, trans_b=True)</span></span>
+<span id="cb3-563"><a href="#cb3-563" aria-hidden="true" tabindex="-1"></a><span class="in">    np.clip(projs / dists, 0, None, out=projs)</span></span>
+<span id="cb3-564"><a href="#cb3-564" aria-hidden="true" tabindex="-1"></a><span class="in">    projs = np.power(projs, self.p)</span></span>
+<span id="cb3-565"><a href="#cb3-565" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-566"><a href="#cb3-566" aria-hidden="true" tabindex="-1"></a><span class="in">    affinity[i] = projs.sum(axis=0)</span></span>
+<span id="cb3-567"><a href="#cb3-567" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-568"><a href="#cb3-568" aria-hidden="true" tabindex="-1"></a><span class="in">affinity = np.power((affinity + affinity.T) / counts, 1 / self.p)</span></span>
+<span id="cb3-569"><a href="#cb3-569" aria-hidden="true" tabindex="-1"></a><span class="in">affinity -= 0.5 * affinity.max()</span></span>
+<span id="cb3-570"><a href="#cb3-570" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-571"><a href="#cb3-571" aria-hidden="true" tabindex="-1"></a><span class="in">#Scale and exponentiate</span></span>
+<span id="cb3-572"><a href="#cb3-572" aria-hidden="true" tabindex="-1"></a><span class="in">q10, q90 = np.quantile(affinity, [0.1, 0.9])</span></span>
+<span id="cb3-573"><a href="#cb3-573" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-574"><a href="#cb3-574" aria-hidden="true" tabindex="-1"></a><span class="in">gamma = np.log(self.M) / (q90 - q10)</span></span>
+<span id="cb3-575"><a href="#cb3-575" aria-hidden="true" tabindex="-1"></a><span class="in">affinity = np.exp(gamma * affinity)</span></span>
+<span id="cb3-576"><a href="#cb3-576" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb3-577"><a href="#cb3-577" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-578"><a href="#cb3-578" aria-hidden="true" tabindex="-1"></a>\newpage  </span>
+<span id="cb3-579"><a href="#cb3-579" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-580"><a href="#cb3-580" aria-hidden="true" tabindex="-1"></a><span class="fu"># References {.unnumbered}</span></span>
+<span id="cb3-581"><a href="#cb3-581" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-582"><a href="#cb3-582" aria-hidden="true" tabindex="-1"></a>::: {#refs}</span>
+<span id="cb3-583"><a href="#cb3-583" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb3-584"><a href="#cb3-584" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-585"><a href="#cb3-585" aria-hidden="true" tabindex="-1"></a><span class="fu"># Session information {.appendix .unnumbered}</span></span>
+<span id="cb3-586"><a href="#cb3-586" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-587"><a href="#cb3-587" aria-hidden="true" tabindex="-1"></a><span class="in">```{r session-info}</span></span>
+<span id="cb3-588"><a href="#cb3-588" aria-hidden="true" tabindex="-1"></a><span class="in">sessionInfo()</span></span>
+<span id="cb3-589"><a href="#cb3-589" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></pre></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
+    <script type="text/javascript">
+    (function(d) {
+      d.querySelectorAll(".pseudocode-container").forEach(function(el) {
+        let pseudocodeOptions = {
+          indentSize: el.dataset.indentSize || "1.2em",
+          commentDelimiter: el.dataset.commentDelimiter || "//",
+          lineNumber: el.dataset.lineNumber === "true" ? true : false,
+          lineNumberPunc: el.dataset.lineNumberPunc || ":",
+          noEnd: el.dataset.noEnd === "true" ? true : false,
+          titlePrefix: el.dataset.captionPrefix || "Algorithm"
+        };
+        pseudocode.renderElement(el.querySelector(".pseudocode"), pseudocodeOptions);
+      });
+    })(document);
+    (function(d) {
+      d.querySelectorAll(".pseudocode-container").forEach(function(el) {
+        let captionSpan = el.querySelector(".ps-root > .ps-algorithm > .ps-line > .ps-keyword")
+        if (captionSpan !== null) {
+          let captionPrefix = el.dataset.captionPrefix + " ";
+          let captionNumber = "";
+          if (el.dataset.pseudocodeNumber) {
+            captionNumber = el.dataset.pseudocodeNumber + " ";
+            if (el.dataset.chapterLevel) {
+              captionNumber = el.dataset.chapterLevel + "." + captionNumber;
+            }
+          }
+          captionSpan.innerHTML = captionPrefix + captionNumber;
+        }
+      });
+    })(document);
+    </script>
+  
     <script type="text/javascript">
     (function(d) {
       d.querySelectorAll(".pseudocode-container").forEach(function(el) {

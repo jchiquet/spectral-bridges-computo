@@ -151,18 +151,33 @@ $$
 
 The basic intuition behind this affinity is that $t_i$ represents the
 relative position of the projection of $\boldsymbol x_i$ on the segment
-$[\boldsymbol \mu_k,\boldsymbol \mu_l]$. $\alpha_i$ represents the relative position on the segment, 
-with the centroid of the class to which $\boldsymbol x_i$ belongs as the reference point.
+$[\boldsymbol \mu_k,\boldsymbol \mu_l]$. $\alpha_i$ represents the relative position on the segment, with the centroid of the class to which $\boldsymbol x_i$ belongs as the reference point.
 
-The boundary that separates the two clusters defined by centroids
-$\boldsymbol \mu_k$ and $\boldsymbol \mu_l$ is a hyperplane. This
+
+This quantity can also be understood in relation to a local form of PCA. Unlike the standard PCA inertia criterion, this approach is directional and limited to the union of two Voronoï cells. 
+
+Let $\bar{X}_k$ denote the matrix representing the region $\mathcal{V}_k$, centered at its barycenter $\boldsymbol{\mu}_k$. The projection operator onto the $\boldsymbol{\mu}_k$-centered segment $[\boldsymbol{0}, \boldsymbol{\mu}_l - \boldsymbol{\mu}_k]$ is given by:
+$$
+\pi_{kl}(\cdot) = \boldsymbol{p}_{kl}(\cdot) - \boldsymbol{\mu}_k
+$$
+
+It then follows that:
+$$
+\frac{\sum_{\boldsymbol{x_i} \in \mathcal{V}_k \cup \mathcal{V}_l} \alpha_i^2}{n_k + n_l} = \frac{\| \pi_{kl}(\bar{X}_k) \|_F^2 + \| \pi_{lk}(\bar{X}_l) \|_F^2}{n_k + n_l}
+$$
+where $\| \cdot \|_F$ is the Frobenius norm.
+
+This formulation is particularly useful for numerical implementation.
+
+Moreover, the boundary that separates the two clusters defined by centroids
+$\boldsymbol \mu_k$ and $\boldsymbol \mu_l$ is a hyperplane $\mathcal{P}_{kl}$. This
 hyperplane is orthogonal to the line segment connecting the centroids
 and intersects this segment at its midpoint.
 
 If we consider all points $\boldsymbol x_i \in \mathcal V_k \cup \mathcal V_l$ which are not projected on centroids but somewhere on the segment, the distance from
 a point to the hyperplane is 
 $$
-\|\boldsymbol p_{kl}(\boldsymbol x_i) - \boldsymbol \mu_{kl}\| = (1/2-\alpha_i) \| \boldsymbol \mu_k-\boldsymbol \mu_l \|.
+d(\boldsymbol x_i, \mathcal{P}_{kl}) = (1/2-\alpha_i) \| \boldsymbol \mu_k-\boldsymbol \mu_l \|.
 $$
 
 This distance is similar to the concept of margin in Support Vector Machine [@Cortes1995]. When the $\alpha_i$ values are small (close to zero since $\alpha_i\in [0,1/2]$), the margins to the hyperplane are large, indicating a low density between the classes. Conversely, if

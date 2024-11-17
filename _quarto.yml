@@ -2,6 +2,8 @@ project:
   title: "spectral-bridges"
   render:
     - "spectral-bridges.qmd"
+filters:
+  - pseudocode
 
 
 
