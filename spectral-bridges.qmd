@@ -158,12 +158,12 @@ This quantity can also be understood in relation to a local form of PCA. Unlike 
 
 Let $X_{| k}$ denote the data matrix restricted to the region $\mathcal{V}_k$. The projection operator onto the $\boldsymbol{\mu}_k$-centered segment $[\boldsymbol{0}, \boldsymbol{\mu}_l - \boldsymbol{\mu}_k]$ is given by:
 $$
-\pi_{kl}(\cdot) = \boldsymbol{p}_{kl}(\cdot) - \boldsymbol{\mu}_k
+\boldsymbol{\pi}_{kl}(\cdot) = \boldsymbol{p}_{kl}(\cdot) - \boldsymbol{\mu}_k
 $$
 
 It then follows that:
 $$
-\frac{\sum_{\boldsymbol{x_i} \in \mathcal{V}_k \cup \mathcal{V}_l} \alpha_i^2}{n_k + n_l} = \frac{\| \pi_{kl}(X_{| k}) \|_F^2 + \| \pi_{lk}(X_{| l}) \|_F^2}{(n_k + n_l) \| \boldsymbol{\mu}_k - \boldsymbol{\mu}_l \|^2}
+\frac{\sum_{\boldsymbol{x_i} \in \mathcal{V}_k \cup \mathcal{V}_l} \alpha_i^2}{n_k + n_l} = \frac{\| \boldsymbol{\pi}_{kl}(X_{| k}) \|_F^2 + \| \boldsymbol{\pi}_{lk}(X_{| l}) \|_F^2}{(n_k + n_l) \| \boldsymbol{\mu}_k - \boldsymbol{\mu}_l \|^2}
 $$
 where $\| \cdot \|_F$ is the Frobenius norm.
 

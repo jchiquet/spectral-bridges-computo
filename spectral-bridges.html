@@ -427,10 +427,10 @@ t_i, &amp; \text{ if } t_i\in[0,1/2],\\
 <p>The basic intuition behind this affinity is that <span class="math inline">t_i</span> represents the relative position of the projection of <span class="math inline">\boldsymbol x_i</span> on the segment <span class="math inline">[\boldsymbol \mu_k,\boldsymbol \mu_l]</span>. <span class="math inline">\alpha_i</span> represents the relative position on the segment, with the centroid of the class to which <span class="math inline">\boldsymbol x_i</span> belongs as the reference point.</p>
 <p>This quantity can also be understood in relation to a local form of PCA. Unlike the standard PCA inertia criterion, this approach is directional and limited to the union of two Voronoï cells.</p>
 <p>Let <span class="math inline">X_{| k}</span> denote the data matrix restricted to the region <span class="math inline">\mathcal{V}_k</span>. The projection operator onto the <span class="math inline">\boldsymbol{\mu}_k</span>-centered segment <span class="math inline">[\boldsymbol{0}, \boldsymbol{\mu}_l - \boldsymbol{\mu}_k]</span> is given by: <span class="math display">
-\pi_{kl}(\cdot) = \boldsymbol{p}_{kl}(\cdot) - \boldsymbol{\mu}_k
+\boldsymbol{\pi}_{kl}(\cdot) = \boldsymbol{p}_{kl}(\cdot) - \boldsymbol{\mu}_k
 </span></p>
 <p>It then follows that: <span class="math display">
-\frac{\sum_{\boldsymbol{x_i} \in \mathcal{V}_k \cup \mathcal{V}_l} \alpha_i^2}{n_k + n_l} = \frac{\| \pi_{kl}(X_{| k}) \|_F^2 + \| \pi_{lk}(X_{| l}) \|_F^2}{(n_k + n_l) \| \boldsymbol{\mu}_k - \boldsymbol{\mu}_l \|^2}
+\frac{\sum_{\boldsymbol{x_i} \in \mathcal{V}_k \cup \mathcal{V}_l} \alpha_i^2}{n_k + n_l} = \frac{\| \boldsymbol{\pi}_{kl}(X_{| k}) \|_F^2 + \| \boldsymbol{\pi}_{lk}(X_{| l}) \|_F^2}{(n_k + n_l) \| \boldsymbol{\mu}_k - \boldsymbol{\mu}_l \|^2}
 </span> where <span class="math inline">\| \cdot \|_F</span> is the Frobenius norm.</p>
 <p>This formulation is particularly useful for numerical implementation.</p>
 <p>Moreover, the boundary that separates the two clusters defined by centroids <span class="math inline">\boldsymbol \mu_k</span> and <span class="math inline">\boldsymbol \mu_l</span> is a hyperplane <span class="math inline">\mathcal{P}_{kl}</span>. This hyperplane is orthogonal to the line segment connecting the centroids and intersects this segment at its midpoint.</p>
@@ -513,7 +513,7 @@ a_{p, kl} =
 <h2 data-number="3.2" class="anchored" data-anchor-id="algorithm"><span class="header-section-number">3.2</span> Algorithm</h2>
 <p>The Spectral Bridges algorithm first identifies local clusters to define Voronoï regions, computes edges with affinity weights between these regions, and ultimately cuts edges between regions with low inter-region density to determine the final clusters (see <a href="#alg-spectral-bridges" class="quarto-xref">Algorithm 1</a> and <a href="#fig-steps" class="quarto-xref">Figure&nbsp;3</a>).</p>
 <p>In spectral clustering, the time complexity is usually dominated by the eigen-decomposition step, which is <span class="math inline">O(n^3)</span>. However, in the case of Spectral Bridges, the k-means algorithm has a time complexity of <span class="math inline">O(n \times m \times d)</span>. For datasets with large <span class="math inline">n</span>, this can be more significant than the <span class="math inline">O(m^3)</span> time complexity of the Spectral Bridges eigen-decomposition. As for the affinity matrix construction, there are <span class="math inline">m^2</span> coefficients to be calculated. Each <span class="math inline">a_{kl}</span> coefficient requires the computation of <span class="math inline">n_k + n_l</span> dot products as well as the norm <span class="math inline">\| \boldsymbol \mu_k-\boldsymbol \mu_l \|</span>, the latter often being negligeable. Assuming that the Voronoï regions are roughly balanced in cardinality, we have <span class="math inline">n_k \approx \frac{n}{m}</span>. Since <span class="math inline">m</span> should always be less than <span class="math inline">n</span>, therefore <span class="math inline">\frac{n}{m} &gt; 1</span> and the time complexity of the affinity matrix is <span class="math inline">O(\frac{n}{m} \times m^2 \times d) = O(n \times m \times d)</span> given the acceptable range of values for <span class="math inline">m</span>. Nonetheless, this is rarely the bottleneck.</p>
-<div id="alg-spectral-bridges" class="pseudocode-container quarto-float" data-caption-prefix="Algorithm" data-pseudocode-number="1" data-line-number="true" data-indent-size="1.2em" data-line-number-punc=":" data-no-end="false" data-comment-delimiter="//">
+<div id="alg-spectral-bridges" class="pseudocode-container quarto-float" data-line-number="true" data-line-number-punc=":" data-no-end="false" data-indent-size="1.2em" data-comment-delimiter="//" data-pseudocode-number="1" data-caption-prefix="Algorithm">
 <div class="pseudocode">
 \begin{algorithm} \caption{Spectral Bridges} \begin{algorithmic} \Procedure{SpectralBridges}{$X, k, m$} \Comment{$X$: input dataset, $k$: number of clusters, $m$: number of Voronoï regions} \State \textbf{Step 1: Vector Quantization} \State $\text{centroids}, \text{voronoiRegions} \gets$ \Call{KMeans}{$X, m$} \Comment{Initial centroids and Voronoi regions using k-means++} \State \textbf{Step 2: Affinity Computation} \State $A = \{g(a_{kl})\}_{kl} \gets$ \Call{Affinity}{$X, \text{centroids}, \text{voronoiRegions}$} \Comment{Compute affinity matrix $A$} \State \textbf{Step 3: Spectral Clustering} \Comment{Assign each region to a cluster} \State $\text{labels} \gets$ \Call{SpectralClustering}{$A, k$} \State \textbf{Step 4: Propagate} \Comment{Assign each data point to the cluster of its region} \State $\text{clusters} \gets$ \Call{Propagate}{$X, \text{labels}, \text{voronoiRegions}$} \State \Return $\text{clusters}$ \Comment{Return cluster labels for data points in $X$} \EndProcedure \end{algorithmic} \end{algorithm}
 </div>
@@ -1087,9 +1087,9 @@ Listing&nbsp;1: Python code for affinity matrix computation
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sessionInfo</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
-<pre><code>R version 4.3.3 (2024-02-29 ucrt)
-Platform: x86_64-w64-mingw32/x64 (64-bit)
-Running under: Windows 11 x64 (build 22621)
+<pre><code>R version 4.4.1 (2024-06-14 ucrt)
+Platform: x86_64-w64-mingw32/x64
+Running under: Windows 11 x64 (build 22631)
 
 Matrix products: default
 
@@ -1106,10 +1106,10 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 loaded via a namespace (and not attached):
- [1] htmlwidgets_1.6.4 compiler_4.3.3    fastmap_1.2.0     cli_3.6.2        
- [5] tools_4.3.3       htmltools_0.5.8.1 rstudioapi_0.16.0 yaml_2.3.8       
- [9] rmarkdown_2.27    knitr_1.47        jsonlite_1.8.8    xfun_0.44        
-[13] digest_0.6.35     rlang_1.1.3       evaluate_0.23    </code></pre>
+ [1] htmlwidgets_1.6.4 compiler_4.4.1    fastmap_1.2.0     cli_3.6.3        
+ [5] tools_4.4.1       htmltools_0.5.8.1 rstudioapi_0.16.0 yaml_2.3.8       
+ [9] rmarkdown_2.27    knitr_1.47        jsonlite_1.8.8    xfun_0.45        
+[13] digest_0.6.36     rlang_1.1.4       evaluate_0.24.0  </code></pre>
 </div>
 </div>
 <!-- -->
@@ -1762,12 +1762,12 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb3-158"><a href="#cb3-158" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-159"><a href="#cb3-159" aria-hidden="true" tabindex="-1"></a>Let $X_{| k}$ denote the data matrix restricted to the region $\mathcal{V}_k$. The projection operator onto the $\boldsymbol{\mu}_k$-centered segment $<span class="co">[</span><span class="ot">\boldsymbol{0}, \boldsymbol{\mu}_l - \boldsymbol{\mu}_k</span><span class="co">]</span>$ is given by:</span>
 <span id="cb3-160"><a href="#cb3-160" aria-hidden="true" tabindex="-1"></a>$$</span>
-<span id="cb3-161"><a href="#cb3-161" aria-hidden="true" tabindex="-1"></a>\pi_{kl}(\cdot) = \boldsymbol{p}_{kl}(\cdot) - \boldsymbol{\mu}_k</span>
+<span id="cb3-161"><a href="#cb3-161" aria-hidden="true" tabindex="-1"></a>\boldsymbol{\pi}_{kl}(\cdot) = \boldsymbol{p}_{kl}(\cdot) - \boldsymbol{\mu}_k</span>
 <span id="cb3-162"><a href="#cb3-162" aria-hidden="true" tabindex="-1"></a>$$</span>
 <span id="cb3-163"><a href="#cb3-163" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-164"><a href="#cb3-164" aria-hidden="true" tabindex="-1"></a>It then follows that:</span>
 <span id="cb3-165"><a href="#cb3-165" aria-hidden="true" tabindex="-1"></a>$$</span>
-<span id="cb3-166"><a href="#cb3-166" aria-hidden="true" tabindex="-1"></a>\frac{\sum_{\boldsymbol{x_i} \in \mathcal{V}_k \cup \mathcal{V}_l} \alpha_i^2}{n_k + n_l} = \frac{\| \pi_{kl}(X_{| k}) \|_F^2 + \| \pi_{lk}(X_{| l}) \|_F^2}{(n_k + n_l) \| \boldsymbol{\mu}_k - \boldsymbol{\mu}_l \|^2}</span>
+<span id="cb3-166"><a href="#cb3-166" aria-hidden="true" tabindex="-1"></a>\frac{\sum_{\boldsymbol{x_i} \in \mathcal{V}_k \cup \mathcal{V}_l} \alpha_i^2}{n_k + n_l} = \frac{\| \boldsymbol{\pi}_{kl}(X_{| k}) \|_F^2 + \| \boldsymbol{\pi}_{lk}(X_{| l}) \|_F^2}{(n_k + n_l) \| \boldsymbol{\mu}_k - \boldsymbol{\mu}_l \|^2}</span>
 <span id="cb3-167"><a href="#cb3-167" aria-hidden="true" tabindex="-1"></a>$$</span>
 <span id="cb3-168"><a href="#cb3-168" aria-hidden="true" tabindex="-1"></a>where $\| \cdot \|_F$ is the Frobenius norm.</span>
 <span id="cb3-169"><a href="#cb3-169" aria-hidden="true" tabindex="-1"></a></span>
