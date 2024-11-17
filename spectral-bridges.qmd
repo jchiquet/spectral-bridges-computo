@@ -163,7 +163,7 @@ $$
 
 It then follows that:
 $$
-\frac{\sum_{\boldsymbol{x_i} \in \mathcal{V}_k \cup \mathcal{V}_l} \alpha_i^2}{n_k + n_l} = \frac{\| \pi_{kl}(\bar{X}_k) \|_F^2 + \| \pi_{lk}(\bar{X}_l) \|_F^2}{n_k + n_l}
+\frac{\sum_{\boldsymbol{x_i} \in \mathcal{V}_k \cup \mathcal{V}_l} \alpha_i^2}{n_k + n_l} = \frac{\| \pi_{kl}(\bar{X}_k) \|_F^2 + \| \pi_{lk}(\bar{X}_l) \|_F^2}{(n_k + n_l) \| \boldsymbol{\mu}_k - \boldsymbol{\mu}_l \|^2}
 $$
 where $\| \cdot \|_F$ is the Frobenius norm.
 
